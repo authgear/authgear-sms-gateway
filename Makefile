@@ -25,6 +25,10 @@ fmt:
 lint:
 	go vet ./cmd/... ./pkg/...
 
+.PHONY: check-dockerignore
+check-dockerignore:
+	./scripts/sh/check-dockerignore.sh
+
 .PHONY: govulncheck
 govulncheck:
 	govulncheck -show traces,version,verbose ./...
