@@ -17,6 +17,7 @@ config:
       type: accessyou
       accessyou:
         accountno: "my-accountno"
+        user: "my-user"
         pwd: "my-pwd"
     - name: sendcloud
       type: sendcloud

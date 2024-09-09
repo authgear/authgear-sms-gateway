@@ -52,6 +52,7 @@ type ProviderConfigNexmo struct {
 
 type ProviderConfigAccessYou struct {
 	AccountNo string `json:"accountno,omitempty"`
+	User      string `json:"user,omitempty"`
 	Pwd       string `json:"pwd,omitempty"`
 }
 
@@ -133,9 +134,10 @@ var _ = SMSProviderConfigSchema.Add("ProviderConfigAccessYou", `
 	"additionalProperties": false,
 	"properties": {
 		"accountno": { "type": "string" },
+		"user": { "type": "string" },
 		"pwd": {"type": "string"}
 	},
-	"required": ["accountno", "pwd"]
+	"required": ["accountno", "user", "pwd"]
 }
 `)
 
