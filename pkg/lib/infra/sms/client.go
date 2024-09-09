@@ -3,6 +3,7 @@ package sms
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
 )
@@ -12,7 +13,7 @@ type RawClient interface {
 	GetName() string
 }
 
-func NewClientFromConfigProvider(p *config.Provider) (RawClient, error) {
+func NewClientFromConfigProvider(p *config.Provider, logger *slog.Logger) (RawClient, error) {
 	switch p.Type {
 	case config.ProviderTypeTwilio:
 		return NewTwilioClient(

@@ -3,6 +3,7 @@ package sms
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms"
@@ -11,14 +12,15 @@ import (
 type SMSProviders struct {
 	Clients []sms.RawClient
 	Map     map[string]sms.RawClient
+	Logger  *slog.Logger
 }
 
-func NewSMSProviders(c *config.SMSProviderConfig) (*SMSProviders, error) {
+func NewSMSProviders(c *config.SMSProviderConfig, logger *slog.Logger) (*SMSProviders, error) {
 	var clients []sms.RawClient
 	var clientMap = make(map[string]sms.RawClient)
 
 	for _, provider := range c.Providers {
-		client, err := sms.NewClientFromConfigProvider(provider)
+		client, err := sms.NewClientFromConfigProvider(provider, logger)
 		if err != nil {
 			return nil, err
 		}

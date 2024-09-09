@@ -14,7 +14,7 @@ type SMSService struct {
 }
 
 func NewSMSService(logger *slog.Logger, smsProviderConfig *config.SMSProviderConfig) (*SMSService, error) {
-	smsProviders, err := NewSMSProviders(smsProviderConfig)
+	smsProviders, err := NewSMSProviders(smsProviderConfig, logger)
 	if err != nil {
 		return nil, err
 	}
