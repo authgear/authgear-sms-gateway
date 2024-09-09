@@ -7,6 +7,7 @@ config:
       twilio:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
+        message_service_sid: "my-message-service-sid"
     - name: nexmo
       type: nexmo
       nexmo:
@@ -49,6 +50,7 @@ config:
       twilio:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
+        message_service_sid: "my-message-service-sid"
   provider_selector:
     switch:
       - type: match_phone_number_alpha2
@@ -69,6 +71,7 @@ config:
       twilio:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
+        message_service_sid: "my-message-service-sid"
   provider_selector:
     switch:
       - type: match_phone_number_alpha2

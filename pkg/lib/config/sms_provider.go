@@ -40,8 +40,9 @@ type Provider struct {
 }
 
 type ProviderConfigTwilio struct {
-	AccountSID string `json:"account_sid,omitempty"`
-	AuthToken  string `json:"auth_token,omitempty"`
+	AccountSID          string `json:"account_sid,omitempty"`
+	AuthToken           string `json:"auth_token,omitempty"`
+	MessagingServiceSID string `json:"message_service_sid,omitempty"`
 }
 
 type ProviderConfigNexmo struct {
@@ -107,9 +108,10 @@ var _ = SMSProviderConfigSchema.Add("ProviderConfigTwilio", `
 	"additionalProperties": false,
 	"properties": {
 		"account_sid": { "type": "string" },
-		"auth_token": {"type": "string"}
+		"auth_token": {"type": "string"},
+		"message_service_sid": {"type": "string"}
 	},
-	"required": ["account_sid", "auth_token"]
+	"required": ["account_sid", "auth_token", "message_service_sid"]
 }
 `)
 
