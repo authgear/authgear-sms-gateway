@@ -1,0 +1,37 @@
+providers:
+  - name: twilio
+    type: twilio
+    twilio:
+      account_sid: "my-account-sid"
+      auth_token: "my-auth-token"
+      message_service_sid: "my-message-service-sid"
+  - name: nexmo
+    type: nexmo
+    nexmo:
+      api_key: "my-api-key"
+      api_secret: "my-secret"
+  - name: accessyou
+    type: accessyou
+    accessyou:
+      accountno: "my-accountno"
+      pwd: "my-pwd"
+  - name: sendcloud
+    type: sendcloud
+    sendcloud:
+      sms_user: "my-sms-user"
+      sms_key: "my-sms-key"
+  - name: infobip
+    type: infobip
+    infobip:
+      api_key: "my-api-key"
+provider_selector:
+  switch:
+    - type: match_phone_number_alpha2
+      use_provider: accessyou
+      phone_number_alpha2: HK
+    - type: match_phone_number_alpha2
+      use_provider: sendcloud
+      phone_number_alpha2: CN
+    - type: default
+      use_provider: infobip
+

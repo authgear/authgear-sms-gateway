@@ -7,10 +7,17 @@ The request will be redirected to corresponding provider by a set of rules.
 
 Install tools specified in `.tool-versions`
 
-## Setup
+### Install dependencies
 
 ```sh
 $ make vendor
+```
+
+### Set up environment
+
+```sh
+$ cp .env.example .env
+$ cp var/sms_service_provider_config.example.yaml var/sms_service_provider_config.yaml
 ```
 
 ## Run
