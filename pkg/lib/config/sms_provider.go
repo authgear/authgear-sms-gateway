@@ -179,7 +179,7 @@ var _ = SMSProviderConfigSchema.Add("ProviderSelectorSwitchType", `
 type ProviderSelectorSwitchRule struct {
 	Type              ProviderSelectorSwitchType `json:"type,omitempty"`
 	UseProvider       string                     `json:"use_provider,omitempty"`
-	PhonyNumberAlpha2 string                     `json:"phone_number_alpha2,omitempty"`
+	PhoneNumberAlpha2 string                     `json:"phone_number_alpha2,omitempty"`
 }
 
 var _ = SMSProviderConfigSchema.Add("ProviderSelectorSwitchRule", `
