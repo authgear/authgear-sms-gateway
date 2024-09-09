@@ -2,13 +2,19 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/joho/godotenv"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/handler"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/logger"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms"
 )
 
 func main() {
@@ -21,13 +27,33 @@ func main() {
 		panic(err)
 	}
 
-	http.Handle("/healthz", &handler.HealthzHandler{})
+	logger := logger.NewLogger()
+
+	smsServiceProviderConfigPath, err := filepath.Abs(cfg.SMSServiceProviderConfigPath)
+	smsProviderConfigYAML, err := os.ReadFile(smsServiceProviderConfigPath)
+	if err != nil {
+		panic(err)
+	}
+	smsProviderConfig, err := config.ParseSMSProviderConfigFromYAML([]byte(smsProviderConfigYAML))
+	if err != nil {
+		panic(err)
+	}
+	smsService, err := sms.NewSMSService(logger, smsProviderConfig)
+	if err != nil {
+		panic(err)
+	}
+
+	http.Handle("/healthz", handler.NewHealthzHandler())
+	http.Handle("/send", handler.NewSendHandler(
+		logger, smsService,
+	))
 
 	server := &http.Server{
 		Addr:              cfg.ListenAddr,
 		ReadHeaderTimeout: 3 * time.Second,
 	}
 
+	logger.Info(fmt.Sprintf("Server running at %v", cfg.ListenAddr))
 	err = server.ListenAndServe()
 	if err != nil {
 		panic(err)
