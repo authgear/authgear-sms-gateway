@@ -52,6 +52,7 @@ type ProviderConfigNexmo struct {
 
 type ProviderConfigAccessYou struct {
 	Sender    string `json:"sender,omitempty"`
+	BaseUrl   string `json:"base_url,omitempty"`
 	AccountNo string `json:"accountno,omitempty"`
 	User      string `json:"user,omitempty"`
 	Pwd       string `json:"pwd,omitempty"`
@@ -59,6 +60,7 @@ type ProviderConfigAccessYou struct {
 
 type ProviderConfigSendCloud struct {
 	Sender  string `json:"sender,omitempty"`
+	BaseUrl string `json:"base_url,omitempty"`
 	SMSUser string `json:"sms_user,omitempty"`
 	SMSKey  string `json:"sms_key,omitempty"`
 }
@@ -129,6 +131,7 @@ var _ = SMSProviderConfigSchema.Add("ProviderConfigAccessYou", `
 	"additionalProperties": false,
 	"properties": {
 		"sender": { "type": "string" },
+		"base_url": { "type": "string" },
 		"accountno": { "type": "string" },
 		"user": { "type": "string" },
 		"pwd": {"type": "string"}
@@ -143,6 +146,7 @@ var _ = SMSProviderConfigSchema.Add("ProviderConfigSendCloud", `
 	"additionalProperties": false,
 	"properties": {
 		"sender": { "type": "string" },
+		"base_url": { "type": "string" },
 		"sms_user": { "type": "string" },
 		"sms_key": {"type": "string"}
 	},
