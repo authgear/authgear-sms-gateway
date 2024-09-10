@@ -31,9 +31,22 @@ func NewClientFromConfigProvider(p *config.Provider, logger *slog.Logger) (RawCl
 			p.Nexmo.Sender,
 		), nil
 	case config.ProviderTypeAccessYou:
-		fallthrough
+		return NewAccessYouClient(
+			p.Name,
+			p.AccessYou.BaseUrl,
+			p.AccessYou.AccountNo,
+			p.AccessYou.User,
+			p.AccessYou.Pwd,
+			p.AccessYou.Sender,
+			logger,
+		), nil
 	case config.ProviderTypeSendCloud:
-		fallthrough
+		return NewSendCloudClient(
+			p.Name,
+			p.SendCloud.BaseUrl,
+			p.SendCloud.SMSUser,
+			p.SendCloud.SMSKey,
+		), nil
 	default:
 		return nil, errors.New(fmt.Sprintf("Unknown type %s", p.Type))
 	}
