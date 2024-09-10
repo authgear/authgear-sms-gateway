@@ -8,22 +8,26 @@ config:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
         message_service_sid: "my-message-service-sid"
+        sender: "+85212345678"
     - name: nexmo
       type: nexmo
       nexmo:
         api_key: "my-api-key"
         api_secret: "my-secret"
+        sender: "+85212345678"
     - name: accessyou
       type: accessyou
       accessyou:
         accountno: "my-accountno"
         user: "my-user"
         pwd: "my-pwd"
+        sender: "my-sender"
     - name: sendcloud
       type: sendcloud
       sendcloud:
         sms_user: "my-sms-user"
         sms_key: "my-sms-key"
+        sender: "my-sender"
     - name: infobip
       type: infobip
       infobip:
@@ -52,6 +56,7 @@ config:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
         message_service_sid: "my-message-service-sid"
+        sender: "my-sender"
   provider_selector:
     switch:
       - type: match_phone_number_alpha2
@@ -73,6 +78,7 @@ config:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
         message_service_sid: "my-message-service-sid"
+        sender: "my-sender"
   provider_selector:
     switch:
       - type: match_phone_number_alpha2

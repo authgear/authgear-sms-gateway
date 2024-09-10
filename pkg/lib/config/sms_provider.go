@@ -40,23 +40,27 @@ type Provider struct {
 }
 
 type ProviderConfigTwilio struct {
+	Sender              string `json:"sender,omitempty"`
 	AccountSID          string `json:"account_sid,omitempty"`
 	AuthToken           string `json:"auth_token,omitempty"`
 	MessagingServiceSID string `json:"message_service_sid,omitempty"`
 }
 
 type ProviderConfigNexmo struct {
+	Sender    string `json:"sender,omitempty"`
 	APIKey    string `json:"api_key,omitempty"`
 	APISecret string `json:"api_secret,omitempty"`
 }
 
 type ProviderConfigAccessYou struct {
+	Sender    string `json:"sender,omitempty"`
 	AccountNo string `json:"accountno,omitempty"`
 	User      string `json:"user,omitempty"`
 	Pwd       string `json:"pwd,omitempty"`
 }
 
 type ProviderConfigSendCloud struct {
+	Sender  string `json:"sender,omitempty"`
 	SMSUser string `json:"sms_user,omitempty"`
 	SMSKey  string `json:"sms_key,omitempty"`
 }
@@ -108,11 +112,12 @@ var _ = SMSProviderConfigSchema.Add("ProviderConfigTwilio", `
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
+		"sender": { "type": "string" },
 		"account_sid": { "type": "string" },
 		"auth_token": {"type": "string"},
 		"message_service_sid": {"type": "string"}
 	},
-	"required": ["account_sid", "auth_token", "message_service_sid"]
+	"required": ["sender", "account_sid", "auth_token", "message_service_sid"]
 }
 `)
 
@@ -121,10 +126,11 @@ var _ = SMSProviderConfigSchema.Add("ProviderConfigNexmo", `
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
+		"sender": { "type": "string" },
 		"api_key": { "type": "string" },
 		"api_secret": {"type": "string"}
 	},
-	"required": ["api_key", "api_secret"]
+	"required": ["sender", "api_key", "api_secret"]
 }
 `)
 
@@ -133,11 +139,12 @@ var _ = SMSProviderConfigSchema.Add("ProviderConfigAccessYou", `
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
+		"sender": { "type": "string" },
 		"accountno": { "type": "string" },
 		"user": { "type": "string" },
 		"pwd": {"type": "string"}
 	},
-	"required": ["accountno", "user", "pwd"]
+	"required": ["sender", "accountno", "user", "pwd"]
 }
 `)
 
@@ -146,10 +153,11 @@ var _ = SMSProviderConfigSchema.Add("ProviderConfigSendCloud", `
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
+		"sender": { "type": "string" },
 		"sms_user": { "type": "string" },
 		"sms_key": {"type": "string"}
 	},
-	"required": ["sms_user", "sms_key"]
+	"required": ["sender", "sms_user", "sms_key"]
 }
 `)
 
