@@ -34,8 +34,6 @@ func NewClientFromConfigProvider(p *config.Provider, logger *slog.Logger) (RawCl
 		fallthrough
 	case config.ProviderTypeSendCloud:
 		fallthrough
-	case config.ProviderTypeInfobip:
-		fallthrough
 	default:
 		return nil, errors.New(fmt.Sprintf("Unknown type %s", p.Type))
 	}

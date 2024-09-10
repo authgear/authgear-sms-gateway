@@ -19,13 +19,12 @@ const (
 	ProviderTypeNexmo     ProviderType = "nexmo"
 	ProviderTypeAccessYou ProviderType = "accessyou"
 	ProviderTypeSendCloud ProviderType = "sendcloud"
-	ProviderTypeInfobip   ProviderType = "infobip"
 )
 
 var _ = SMSProviderConfigSchema.Add("ProviderType", `
 {
 	"type": "string",
-	"enum": ["twilio", "nexmo", "accessyou", "sendcloud", "infobip"]
+	"enum": ["twilio", "nexmo", "accessyou", "sendcloud"]
 }
 `)
 
@@ -36,7 +35,6 @@ type Provider struct {
 	Nexmo     *ProviderConfigNexmo     `json:"nexmo,omitempty" nullable:"true"`
 	AccessYou *ProviderConfigAccessYou `json:"accessyou,omitempty" nullable:"true"`
 	SendCloud *ProviderConfigSendCloud `json:"sendcloud,omitempty" nullable:"true"`
-	Infobip   *ProviderConfigInfobip   `json:"infobip,omitempty" nullable:"true"`
 }
 
 type ProviderConfigTwilio struct {
@@ -65,10 +63,6 @@ type ProviderConfigSendCloud struct {
 	SMSKey  string `json:"sms_key,omitempty"`
 }
 
-type ProviderConfigInfobip struct {
-	APIKey string `json:"api_key,omitempty"`
-}
-
 var _ = SMSProviderConfigSchema.Add("Provider", `
 {
 	"type": "object",
@@ -79,8 +73,7 @@ var _ = SMSProviderConfigSchema.Add("Provider", `
 		"twilio": { "$ref": "#/$defs/ProviderConfigTwilio" },
 		"nexmo": { "$ref": "#/$defs/ProviderConfigNexmo" },
 		"accessyou": { "$ref": "#/$defs/ProviderConfigAccessYou" },
-		"sendcloud": { "$ref": "#/$defs/ProviderConfigSendCloud" },
-		"infobip": { "$ref": "#/$defs/ProviderConfigInfobip" }
+		"sendcloud": { "$ref": "#/$defs/ProviderConfigSendCloud" }
 	},
 	"allOf": [
 		{
@@ -98,10 +91,6 @@ var _ = SMSProviderConfigSchema.Add("Provider", `
 		{
 			"if": { "properties": { "type": { "const": "sendcloud" } }},
 			"then": { "required": ["sendcloud"] }
-		},
-		{
-			"if": { "properties": { "type": { "const": "infobip" } }},
-			"then": { "required": ["infobip"] }
 		}
 	]
 }
@@ -158,17 +147,6 @@ var _ = SMSProviderConfigSchema.Add("ProviderConfigSendCloud", `
 		"sms_key": {"type": "string"}
 	},
 	"required": ["sender", "sms_user", "sms_key"]
-}
-`)
-
-var _ = SMSProviderConfigSchema.Add("ProviderConfigInfobip", `
-{
-	"type": "object",
-	"additionalProperties": false,
-	"properties": {
-		"api_key": { "type": "string" }
-	},
-	"required": ["api_key"]
 }
 `)
 

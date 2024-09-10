@@ -28,10 +28,6 @@ config:
         sms_user: "my-sms-user"
         sms_key: "my-sms-key"
         sender: "my-sender"
-    - name: infobip
-      type: infobip
-      infobip:
-        api_key: "my-api-key"
   provider_selector:
     switch:
       - type: match_phone_number_alpha2
@@ -41,13 +37,13 @@ config:
         use_provider: sendcloud
         phone_number_alpha2: CN
       - type: default
-        use_provider: infobip
+        use_provider: twilio
 ---
 name: failed-provider-type
 error: |-
   invalid configuration:
   /providers/0/type: enum
-    map[actual:twillio expected:[twilio nexmo accessyou sendcloud infobip]]
+    map[actual:twillio expected:[twilio nexmo accessyou sendcloud]]
 config:
   providers:
     - name: twilio
