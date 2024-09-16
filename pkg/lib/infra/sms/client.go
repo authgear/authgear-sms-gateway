@@ -9,7 +9,7 @@ import (
 )
 
 type RawClient interface {
-	Send(to string, body string) error
+	Send(to string, body string, templateName string, languageTag string, templateVariables *TemplateVariables) error
 	GetName() string
 }
 

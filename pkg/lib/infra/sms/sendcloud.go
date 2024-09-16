@@ -109,7 +109,13 @@ func (n *SendCloudClient) GetName() string {
 	return n.Name
 }
 
-func (n *SendCloudClient) Send(to string, body string) error {
+func (n *SendCloudClient) Send(
+	to string,
+	body string,
+	templateName string,
+	languageTag string,
+	templateVariables *TemplateVariables,
+) error {
 
 	req, _ := http.NewRequest("POST", fmt.Sprintf("%v/smsapi/send", n.BaseUrl), nil)
 	req.Header.Set("Cookie", "dynamic=sms")

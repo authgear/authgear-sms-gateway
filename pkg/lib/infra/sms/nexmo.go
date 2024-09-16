@@ -28,7 +28,13 @@ func (n *NexmoClient) GetName() string {
 	return n.Name
 }
 
-func (n *NexmoClient) Send(to string, body string) error {
+func (n *NexmoClient) Send(
+	to string,
+	body string,
+	templateName string,
+	languageTag string,
+	templateVariables *TemplateVariables,
+) error {
 	if n.NexmoClient == nil {
 		return ErrMissingNexmoConfiguration
 	}

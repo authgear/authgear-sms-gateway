@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
+	. "github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/type_util"
 )
 
@@ -28,12 +29,19 @@ func NewSMSService(logger *slog.Logger, smsProviderConfig *config.SMSProviderCon
 	}, nil
 }
 
-func (s *SMSService) Send(appID string, to type_util.SensitivePhoneNumber, body string) error {
+func (s *SMSService) Send(
+	appID string,
+	to type_util.SensitivePhoneNumber,
+	body string,
+	templateName string,
+	languageTag string,
+	templateVariables *TemplateVariables,
+) error {
 	client, err := s.SMSProviderSelector.GetClientByMatch(&MatchContext{AppID: appID, PhoneNumber: string(to)})
 	if err != nil {
 		return err
 	}
 	s.Logger.Info(fmt.Sprintf("Client %v is selected for %v", client.GetName(), to))
-	err = client.Send(string(to), body)
+	err = client.Send(string(to), body, templateName, languageTag, templateVariables)
 	return nil
 }
