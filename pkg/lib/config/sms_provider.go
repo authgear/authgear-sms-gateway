@@ -19,13 +19,12 @@ const (
 	ProviderTypeNexmo     ProviderType = "nexmo"
 	ProviderTypeAccessYou ProviderType = "accessyou"
 	ProviderTypeSendCloud ProviderType = "sendcloud"
-	ProviderTypeInfobip   ProviderType = "infobip"
 )
 
 var _ = SMSProviderConfigSchema.Add("ProviderType", `
 {
 	"type": "string",
-	"enum": ["twilio", "nexmo", "accessyou", "sendcloud", "infobip"]
+	"enum": ["twilio", "nexmo", "accessyou", "sendcloud"]
 }
 `)
 
@@ -36,31 +35,34 @@ type Provider struct {
 	Nexmo     *ProviderConfigNexmo     `json:"nexmo,omitempty" nullable:"true"`
 	AccessYou *ProviderConfigAccessYou `json:"accessyou,omitempty" nullable:"true"`
 	SendCloud *ProviderConfigSendCloud `json:"sendcloud,omitempty" nullable:"true"`
-	Infobip   *ProviderConfigInfobip   `json:"infobip,omitempty" nullable:"true"`
 }
 
 type ProviderConfigTwilio struct {
-	AccountSID string `json:"account_sid,omitempty"`
-	AuthToken  string `json:"auth_token,omitempty"`
+	Sender              string `json:"sender,omitempty"`
+	AccountSID          string `json:"account_sid,omitempty"`
+	AuthToken           string `json:"auth_token,omitempty"`
+	MessagingServiceSID string `json:"message_service_sid,omitempty"`
 }
 
 type ProviderConfigNexmo struct {
+	Sender    string `json:"sender,omitempty"`
 	APIKey    string `json:"api_key,omitempty"`
 	APISecret string `json:"api_secret,omitempty"`
 }
 
 type ProviderConfigAccessYou struct {
+	Sender    string `json:"sender,omitempty"`
+	BaseUrl   string `json:"base_url,omitempty"`
 	AccountNo string `json:"accountno,omitempty"`
+	User      string `json:"user,omitempty"`
 	Pwd       string `json:"pwd,omitempty"`
 }
 
 type ProviderConfigSendCloud struct {
+	Sender  string `json:"sender,omitempty"`
+	BaseUrl string `json:"base_url,omitempty"`
 	SMSUser string `json:"sms_user,omitempty"`
 	SMSKey  string `json:"sms_key,omitempty"`
-}
-
-type ProviderConfigInfobip struct {
-	APIKey string `json:"api_key,omitempty"`
 }
 
 var _ = SMSProviderConfigSchema.Add("Provider", `
@@ -73,8 +75,7 @@ var _ = SMSProviderConfigSchema.Add("Provider", `
 		"twilio": { "$ref": "#/$defs/ProviderConfigTwilio" },
 		"nexmo": { "$ref": "#/$defs/ProviderConfigNexmo" },
 		"accessyou": { "$ref": "#/$defs/ProviderConfigAccessYou" },
-		"sendcloud": { "$ref": "#/$defs/ProviderConfigSendCloud" },
-		"infobip": { "$ref": "#/$defs/ProviderConfigInfobip" }
+		"sendcloud": { "$ref": "#/$defs/ProviderConfigSendCloud" }
 	},
 	"allOf": [
 		{
@@ -92,10 +93,6 @@ var _ = SMSProviderConfigSchema.Add("Provider", `
 		{
 			"if": { "properties": { "type": { "const": "sendcloud" } }},
 			"then": { "required": ["sendcloud"] }
-		},
-		{
-			"if": { "properties": { "type": { "const": "infobip" } }},
-			"then": { "required": ["infobip"] }
 		}
 	]
 }
@@ -106,10 +103,12 @@ var _ = SMSProviderConfigSchema.Add("ProviderConfigTwilio", `
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
+		"sender": { "type": "string" },
 		"account_sid": { "type": "string" },
-		"auth_token": {"type": "string"}
+		"auth_token": {"type": "string"},
+		"message_service_sid": {"type": "string"}
 	},
-	"required": ["account_sid", "auth_token"]
+	"required": ["sender", "account_sid", "auth_token", "message_service_sid"]
 }
 `)
 
@@ -118,10 +117,11 @@ var _ = SMSProviderConfigSchema.Add("ProviderConfigNexmo", `
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
+		"sender": { "type": "string" },
 		"api_key": { "type": "string" },
 		"api_secret": {"type": "string"}
 	},
-	"required": ["api_key", "api_secret"]
+	"required": ["sender", "api_key", "api_secret"]
 }
 `)
 
@@ -130,10 +130,13 @@ var _ = SMSProviderConfigSchema.Add("ProviderConfigAccessYou", `
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
+		"sender": { "type": "string" },
+		"base_url": { "type": "string" },
 		"accountno": { "type": "string" },
+		"user": { "type": "string" },
 		"pwd": {"type": "string"}
 	},
-	"required": ["accountno", "pwd"]
+	"required": ["sender", "accountno", "user", "pwd"]
 }
 `)
 
@@ -142,21 +145,12 @@ var _ = SMSProviderConfigSchema.Add("ProviderConfigSendCloud", `
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
+		"sender": { "type": "string" },
+		"base_url": { "type": "string" },
 		"sms_user": { "type": "string" },
 		"sms_key": {"type": "string"}
 	},
-	"required": ["sms_user", "sms_key"]
-}
-`)
-
-var _ = SMSProviderConfigSchema.Add("ProviderConfigInfobip", `
-{
-	"type": "object",
-	"additionalProperties": false,
-	"properties": {
-		"api_key": { "type": "string" }
-	},
-	"required": ["api_key"]
+	"required": ["sender", "sms_user", "sms_key"]
 }
 `)
 
@@ -177,7 +171,7 @@ var _ = SMSProviderConfigSchema.Add("ProviderSelectorSwitchType", `
 type ProviderSelectorSwitchRule struct {
 	Type              ProviderSelectorSwitchType `json:"type,omitempty"`
 	UseProvider       string                     `json:"use_provider,omitempty"`
-	PhonyNumberAlpha2 string                     `json:"phone_number_alpha2,omitempty"`
+	PhoneNumberAlpha2 string                     `json:"phone_number_alpha2,omitempty"`
 }
 
 var _ = SMSProviderConfigSchema.Add("ProviderSelectorSwitchRule", `

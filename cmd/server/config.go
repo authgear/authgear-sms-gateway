@@ -5,7 +5,8 @@ import (
 )
 
 type Config struct {
-	ListenAddr string `envconfig:"LISTEN_ADDR" default:"0.0.0.0:8091"`
+	ListenAddr                   string `envconfig:"LISTEN_ADDR" default:"0.0.0.0:8091"`
+	SMSServiceProviderConfigPath string `envconfig:"SMS_SERVICE_PROVIDER_CONFIG_PATH"`
 }
 
 func LoadConfigFromEnv() (*Config, error) {

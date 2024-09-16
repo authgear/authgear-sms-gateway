@@ -7,25 +7,27 @@ config:
       twilio:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
+        message_service_sid: "my-message-service-sid"
+        sender: "+85212345678"
     - name: nexmo
       type: nexmo
       nexmo:
         api_key: "my-api-key"
         api_secret: "my-secret"
+        sender: "+85212345678"
     - name: accessyou
       type: accessyou
       accessyou:
         accountno: "my-accountno"
+        user: "my-user"
         pwd: "my-pwd"
+        sender: "my-sender"
     - name: sendcloud
       type: sendcloud
       sendcloud:
         sms_user: "my-sms-user"
         sms_key: "my-sms-key"
-    - name: infobip
-      type: infobip
-      infobip:
-        api_key: "my-api-key"
+        sender: "my-sender"
   provider_selector:
     switch:
       - type: match_phone_number_alpha2
@@ -35,13 +37,13 @@ config:
         use_provider: sendcloud
         phone_number_alpha2: CN
       - type: default
-        use_provider: infobip
+        use_provider: twilio
 ---
 name: failed-provider-type
 error: |-
   invalid configuration:
   /providers/0/type: enum
-    map[actual:twillio expected:[twilio nexmo accessyou sendcloud infobip]]
+    map[actual:twillio expected:[twilio nexmo accessyou sendcloud]]
 config:
   providers:
     - name: twilio
@@ -49,6 +51,8 @@ config:
       twilio:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
+        message_service_sid: "my-message-service-sid"
+        sender: "my-sender"
   provider_selector:
     switch:
       - type: match_phone_number_alpha2
@@ -69,6 +73,8 @@ config:
       twilio:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
+        message_service_sid: "my-message-service-sid"
+        sender: "my-sender"
   provider_selector:
     switch:
       - type: match_phone_number_alpha2
