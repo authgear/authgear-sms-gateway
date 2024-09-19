@@ -157,14 +157,15 @@ var _ = SMSProviderConfigSchema.Add("ProviderConfigSendCloud", `
 type ProviderSelectorSwitchType string
 
 const (
-	ProviderSelectorSwitchTypeMatchPhoneNumberAlpha2 ProviderSelectorSwitchType = "match_phone_number_alpha2"
-	ProviderSelectorSwitchTypeDefault                ProviderSelectorSwitchType = "default"
+	ProviderSelectorSwitchTypeMatchPhoneNumberAlpha2         ProviderSelectorSwitchType = "match_phone_number_alpha2"
+	ProviderSelectorSwitchTypeMatchAppIDAndPhoneNumberAlpha2 ProviderSelectorSwitchType = "match_app_id_and_phone_number_alpha2"
+	ProviderSelectorSwitchTypeDefault                        ProviderSelectorSwitchType = "default"
 )
 
 var _ = SMSProviderConfigSchema.Add("ProviderSelectorSwitchType", `
 {
 	"type": "string",
-	"enum": ["match_phone_number_alpha2", "default"]
+	"enum": ["match_phone_number_alpha2", "match_app_id_and_phone_number_alpha2", "default"]
 }
 `)
 
@@ -172,6 +173,7 @@ type ProviderSelectorSwitchRule struct {
 	Type              ProviderSelectorSwitchType `json:"type,omitempty"`
 	UseProvider       string                     `json:"use_provider,omitempty"`
 	PhoneNumberAlpha2 string                     `json:"phone_number_alpha2,omitempty"`
+	AppID             string                     `json:"app_id,omitempty"`
 }
 
 var _ = SMSProviderConfigSchema.Add("ProviderSelectorSwitchRule", `
@@ -181,11 +183,16 @@ var _ = SMSProviderConfigSchema.Add("ProviderSelectorSwitchRule", `
 	"properties": {
 		"type": { "$ref": "#/$defs/ProviderSelectorSwitchType" },
 		"use_provider": { "type": "string" },
-		"phone_number_alpha2": { "type": "string" }
+		"phone_number_alpha2": { "type": "string" },
+		"app_id": { "type": "string" }
 	},
 	"allOf": [
 		{
 			"if": { "properties": { "type": { "const": "phone_number_alpha2" } }},
+			"then": { "required": ["phone_number_alpha2"] }
+		},
+		{
+			"if": { "properties": { "type": { "const": "app_id_and_phone_number_alpha2" } }},
 			"then": { "required": ["phone_number_alpha2"] }
 		}
 	],
