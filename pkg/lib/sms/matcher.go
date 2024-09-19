@@ -10,6 +10,7 @@ import (
 )
 
 type MatchContext struct {
+	AppID       string
 	PhoneNumber string
 }
 
