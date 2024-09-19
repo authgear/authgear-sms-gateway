@@ -26,8 +26,9 @@ func NewSendHandler(logger *slog.Logger, smsService *sms.SMSService) *SendHandle
 }
 
 type RequestBody struct {
-	To   type_util.SensitivePhoneNumber `json:"to,omitempty"`
-	Body string                         `json:"body,omitempty"`
+	AppID string                         `json:"app_id,omitempty"`
+	To    type_util.SensitivePhoneNumber `json:"to,omitempty"`
+	Body  string                         `json:"body,omitempty"`
 }
 
 var RequestSchema = validation.NewSimpleSchema(`
@@ -35,6 +36,7 @@ var RequestSchema = validation.NewSimpleSchema(`
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
+		"app_id": { "type": "string" },
 		"to": { "type": "string" },
 		"body": { "type": "string" }
 	},
@@ -48,7 +50,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	h.Logger.Info(fmt.Sprintf("Attempt to send sms to %v. Body: %v", body.To, body.Body))
+	h.Logger.Info(fmt.Sprintf("Attempt to send sms to %v. Body: %v. AppID: %v", body.To, body.Body, body.AppID))
 	err = h.SMSService.Send(body.To, body.Body)
 	if err != nil {
 		panic(err)
