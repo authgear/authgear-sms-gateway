@@ -28,6 +28,17 @@ config:
         sms_user: "my-sms-user"
         sms_key: "my-sms-key"
         sender: "my-sender"
+        templates:
+          - template_id: "919888"
+            template_msg_type: "2"
+          - template_id: "919879"
+            template_msg_type: "2"
+        template_assignments:
+          - authgear_template_name: "verficiation_sms.txt"
+            default_template_id: "919888"
+            by_languages:
+              - authgear_languag: en
+                template_id: "919888"
   provider_selector:
     switch:
       - type: match_app_id_and_phone_number_alpha2
