@@ -28,8 +28,8 @@ func NewSMSService(logger *slog.Logger, smsProviderConfig *config.SMSProviderCon
 	}, nil
 }
 
-func (s *SMSService) Send(to type_util.SensitivePhoneNumber, body string) error {
-	client, err := s.SMSProviderSelector.GetClientByMatch(&MatchContext{PhoneNumber: string(to)})
+func (s *SMSService) Send(appID string, to type_util.SensitivePhoneNumber, body string) error {
+	client, err := s.SMSProviderSelector.GetClientByMatch(&MatchContext{AppID: appID, PhoneNumber: string(to)})
 	if err != nil {
 		return err
 	}

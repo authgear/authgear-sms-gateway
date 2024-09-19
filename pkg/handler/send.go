@@ -51,7 +51,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	h.Logger.Info(fmt.Sprintf("Attempt to send sms to %v. Body: %v. AppID: %v", body.To, body.Body, body.AppID))
-	err = h.SMSService.Send(body.To, body.Body)
+	err = h.SMSService.Send(body.AppID, body.To, body.Body)
 	if err != nil {
 		panic(err)
 	}
