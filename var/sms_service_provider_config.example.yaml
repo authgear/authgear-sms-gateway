@@ -25,8 +25,18 @@ providers:
       sms_user: "my-sms-user"
       sms_key: "my-sms-key"
       sender: "my-sender"
+  - name: sendcloud_chinese_app
+    type: sendcloud
+    sendcloud:
+      sms_user: "my-sms-user"
+      sms_key: "my-sms-key"
+      sender: "my-sender"
 provider_selector:
   switch:
+    - type: match_app_id_and_phone_number_alpha2
+      use_provider: sendcloud_chinese_app
+      phone_number_alpha2: CN
+      app_id: chinese-app
     - type: match_phone_number_alpha2
       use_provider: accessyou
       phone_number_alpha2: HK
