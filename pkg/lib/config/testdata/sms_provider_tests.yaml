@@ -30,6 +30,14 @@ config:
         sender: "my-sender"
   provider_selector:
     switch:
+      - type: match_app_id_and_phone_number_alpha2
+        use_provider: accessyou
+        phone_number_alpha2: HK
+        app_id: "123"
+      - type: match_app_id_and_phone_number_alpha2
+        use_provider: sendcloud
+        phone_number_alpha2: CN
+        app_id: "123"
       - type: match_phone_number_alpha2
         use_provider: accessyou
         phone_number_alpha2: HK
