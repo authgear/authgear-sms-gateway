@@ -7,6 +7,7 @@ import (
 
 	"github.com/authgear/authgear-server/pkg/util/httputil"
 
+	"github.com/authgear/authgear-server/pkg/api"
 	"github.com/authgear/authgear-server/pkg/util/validation"
 
 	sms_infra "github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms"
@@ -14,15 +15,25 @@ import (
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/type_util"
 )
 
+type JSONResponseWriter interface {
+	WriteResponse(rw http.ResponseWriter, resp *api.Response)
+}
+
 type SendHandler struct {
 	Logger     *slog.Logger
 	SMSService *sms.SMSService
+	JSON       JSONResponseWriter
 }
 
-func NewSendHandler(logger *slog.Logger, smsService *sms.SMSService) *SendHandler {
+func NewSendHandler(
+	logger *slog.Logger,
+	smsService *sms.SMSService,
+	jsonResponseWriter JSONResponseWriter,
+) *SendHandler {
 	return &SendHandler{
 		Logger:     logger,
 		SMSService: smsService,
+		JSON:       jsonResponseWriter,
 	}
 }
 
@@ -56,6 +67,10 @@ var _ = RequestSchema.Add("SendRequestSchema", `
 `)
 var _ = RequestSchema.Add("TemplateVariables", sms_infra.TemplateVariablesSchema)
 
+type Result struct {
+	ClientResponse string `json:"client_response"`
+}
+
 func init() {
 	RequestSchema.Instantiate()
 }
@@ -64,10 +79,11 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var body RequestBody
 	err := httputil.BindJSONBody(r, w, RequestSchema.Validator(), &body)
 	if err != nil {
-		panic(err)
+		h.JSON.WriteResponse(w, &api.Response{Error: err})
+		return
 	}
 	h.Logger.Info(fmt.Sprintf("Attempt to send sms to %v. Body: %v. AppID: %v", body.To, body.Body, body.AppID))
-	err = h.SMSService.Send(
+	clientResponse, err := h.SMSService.Send(
 		body.AppID,
 		body.To,
 		body.Body,
@@ -76,7 +92,13 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		body.TemplateVariables,
 	)
 	if err != nil {
-		panic(err)
+		h.JSON.WriteResponse(w, &api.Response{Error: err})
+		return
 	}
-	fmt.Fprintf(w, "OK")
+
+	h.JSON.WriteResponse(w, &api.Response{
+		Result: Result{
+			ClientResponse: string(clientResponse),
+		},
+	})
 }

@@ -1,6 +1,7 @@
 package sms
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -39,9 +40,9 @@ func (t *TwilioClient) Send(
 	templateName string,
 	languageTag string,
 	templateVariables *TemplateVariables,
-) error {
+) (ClientResponse, error) {
 	if t.TwilioClient == nil {
-		return ErrMissingTwilioConfiguration
+		return []byte{}, ErrMissingTwilioConfiguration
 	}
 
 	params := &api.CreateMessageParams{}
@@ -53,12 +54,13 @@ func (t *TwilioClient) Send(
 		params.SetFrom(t.Sender)
 	}
 
-	_, err := t.TwilioClient.Api.CreateMessage(params)
+	resp, err := t.TwilioClient.Api.CreateMessage(params)
 	if err != nil {
-		return fmt.Errorf("twilio: %w", err)
+		return ClientResponse{}, fmt.Errorf("twilio: %w", err)
 	}
 
-	return nil
+	j, err := json.Marshal(resp)
+	return ClientResponse(j), err
 }
 
 var _ RawClient = &TwilioClient{}

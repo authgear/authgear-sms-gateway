@@ -9,8 +9,10 @@ import (
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms/sendcloud"
 )
 
+type ClientResponse []byte
+
 type RawClient interface {
-	Send(to string, body string, templateName string, languageTag string, templateVariables *TemplateVariables) error
+	Send(to string, body string, templateName string, languageTag string, templateVariables *TemplateVariables) (ClientResponse, error)
 	GetName() string
 }
 

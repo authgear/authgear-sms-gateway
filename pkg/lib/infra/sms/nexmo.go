@@ -1,6 +1,7 @@
 package sms
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -34,9 +35,9 @@ func (n *NexmoClient) Send(
 	templateName string,
 	languageTag string,
 	templateVariables *TemplateVariables,
-) error {
+) (ClientResponse, error) {
 	if n.NexmoClient == nil {
-		return ErrMissingNexmoConfiguration
+		return ClientResponse{}, ErrMissingNexmoConfiguration
 	}
 
 	message := nexmo.SMSMessage{
@@ -49,21 +50,22 @@ func (n *NexmoClient) Send(
 
 	resp, err := n.NexmoClient.SMS.Send(&message)
 	if err != nil {
-		return fmt.Errorf("nexmo: %w", err)
+		return ClientResponse{}, fmt.Errorf("nexmo: %w", err)
 	}
 
 	if resp.MessageCount == 0 {
 		err = errors.New("nexmo: no sms is sent")
-		return err
+		return ClientResponse{}, err
 	}
 
 	report := resp.Messages[0]
 	if report.ErrorText != "" {
 		err = fmt.Errorf("nexmo: %s", report.ErrorText)
-		return err
+		return ClientResponse{}, err
 	}
 
-	return nil
+	j, err := json.Marshal(resp)
+	return ClientResponse(j), err
 }
 
 var _ RawClient = &NexmoClient{}

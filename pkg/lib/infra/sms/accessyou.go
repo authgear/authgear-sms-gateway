@@ -58,7 +58,7 @@ func (n *AccessYouClient) Send(
 	templateName string,
 	languageTag string,
 	templateVariables *TemplateVariables,
-) error {
+) (ClientResponse, error) {
 	// Access you phone number should have no +
 	m1 := regexp.MustCompile(`[\+\-]+`)
 	to = m1.ReplaceAllString(to, "")
@@ -79,7 +79,7 @@ func (n *AccessYouClient) Send(
 	resp, err := n.Client.Do(req)
 	if err != nil {
 		n.Logger.Error(fmt.Sprintf("%v", err))
-		return err
+		return ClientResponse{}, err
 	}
 	defer resp.Body.Close()
 
@@ -96,10 +96,10 @@ func (n *AccessYouClient) Send(
 	err = json.Unmarshal(respData, &accessYouResponse)
 	if err != nil {
 		n.Logger.Error(fmt.Sprintf("Unmarshal error: %v", err))
-		return err
+		return ClientResponse{}, err
 	}
 	n.Logger.Info(fmt.Sprintf("%v", accessYouResponse))
-	return nil
+	return ClientResponse(respData), nil
 }
 
 type AccessYouResponse struct {

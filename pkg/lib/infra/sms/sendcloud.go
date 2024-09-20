@@ -83,10 +83,10 @@ func (n *SendCloudClient) Send(
 	templateName string,
 	languageTag string,
 	templateVariables *TemplateVariables,
-) error {
+) (ClientResponse, error) {
 	template, err := n.TemplateResolver.Resolve(templateName, languageTag)
 	if err != nil {
-		return err
+		return ClientResponse{}, err
 	}
 	sendCloudRequest := NewSendCloudRequest(
 		string(template.TemplateMsgType),
@@ -111,14 +111,14 @@ func (n *SendCloudClient) Send(
 
 	if err != nil {
 		n.Logger.Error(fmt.Sprintf("Client.Do error: %v", err))
-		return err
+		return ClientResponse{}, err
 	}
 	defer resp.Body.Close()
 
 	respData, err := io.ReadAll(resp.Body)
 	n.Logger.Error(fmt.Sprintf("resp: %v", string(respData)))
 
-	return nil
+	return ClientResponse(respData), nil
 }
 
 var _ RawClient = &SendCloudClient{}
