@@ -4,9 +4,13 @@ on:
   push:
     branches:
     - '*'
+    - '!gh-pages'
+    tags:
+    - '*'
   pull_request:
     branches:
     - '*'
+    - '!gh-pages'
 
 jobs:
   test:
@@ -30,3 +34,27 @@ jobs:
       if: ${{ !cancelled() }}
     - run: make check-tidy
       if: ${{ !cancelled() }}
+
+  image:
+    runs-on: ubuntu-24.04
+    needs: ["test"]
+    env:
+      TARGET: server
+      IMAGE_NAME: authgear-sms-gateway
+    steps:
+    - uses: actions/checkout@v4
+    - run: make build-image TARGET=$TARGET IMAGE_NAME=$IMAGE_NAME
+    - run: make tag-image IMAGE_NAME=$IMAGE_NAME
+    - name: docker login
+      if: ${{ github.repository == 'authgear/authgear-sms-gateway' && github.event_name == 'push' }}
+      env:
+        DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.QUAY_ROBOT_TOKEN }}
+      run: |
+        printf "$DOCKER_PASSWORD" | docker login --password-stdin --username "$DOCKER_USERNAME" quay.io
+    - run: make push-image IMAGE_NAME=$IMAGE_NAME
+      if: ${{ github.repository == 'authgear/authgear-sms-gateway' && github.event_name == 'push' }}
+    - name: docker logout
+      if: ${{ always() }}
+      run: |
+        docker logout quay.io
