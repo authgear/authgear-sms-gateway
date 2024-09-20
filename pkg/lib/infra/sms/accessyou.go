@@ -52,7 +52,13 @@ func (n *AccessYouClient) GetName() string {
 	return n.Name
 }
 
-func (n *AccessYouClient) Send(to string, body string) error {
+func (n *AccessYouClient) Send(
+	to string,
+	body string,
+	templateName string,
+	languageTag string,
+	templateVariables *TemplateVariables,
+) error {
 	// Access you phone number should have no +
 	m1 := regexp.MustCompile(`[\+\-]+`)
 	to = m1.ReplaceAllString(to, "")

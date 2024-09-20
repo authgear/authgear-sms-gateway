@@ -33,7 +33,13 @@ func (t *TwilioClient) GetName() string {
 	return t.Name
 }
 
-func (t *TwilioClient) Send(to string, body string) error {
+func (t *TwilioClient) Send(
+	to string,
+	body string,
+	templateName string,
+	languageTag string,
+	templateVariables *TemplateVariables,
+) error {
 	if t.TwilioClient == nil {
 		return ErrMissingTwilioConfiguration
 	}
