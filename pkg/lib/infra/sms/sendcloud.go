@@ -1,9 +1,6 @@
 package sms
 
 import (
-	"crypto/md5"
-	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -11,78 +8,6 @@ import (
 )
 
 var ErrMissingSendCloudConfiguration = errors.New("accessyou: configuration is missing")
-
-type SendCloudMsgType int
-
-const (
-	SendCloudMsgTypeSMS SendCloudMsgType = 0
-)
-
-type SendCloudRequest struct {
-	msgType       SendCloudMsgType
-	phone         []string
-	sendRequestId string
-	smsUser       string
-	templateId    int
-	vars          map[string]interface{}
-}
-
-func NewSendCloudRequest(
-	msgType SendCloudMsgType,
-	phone []string,
-	smsUser string,
-	templateId int,
-	vars map[string]interface{},
-) *SendCloudRequest {
-	s := &SendCloudRequest{
-		msgType:    msgType,
-		phone:      phone,
-		smsUser:    smsUser,
-		templateId: templateId,
-		vars:       vars,
-	}
-	presign := s.Presign()
-	h := md5.Sum([]byte(presign))
-	sendRequestId := hex.EncodeToString(h[:])
-	return &SendCloudRequest{
-		msgType:       msgType,
-		phone:         phone,
-		sendRequestId: sendRequestId,
-		smsUser:       smsUser,
-		templateId:    templateId,
-		vars:          vars,
-	}
-}
-
-func (r *SendCloudRequest) Presign() string {
-	vars, _ := json.Marshal(r.vars)
-	return strings.Join([]string{
-		fmt.Sprintf("msgType=%v", r.msgType),
-		fmt.Sprintf("phone=%v", strings.Join(r.phone, ",")),
-		fmt.Sprintf("sendRequestId=%v", r.sendRequestId),
-		fmt.Sprintf("smsUser=%v", r.smsUser),
-		fmt.Sprintf("templateId=%v", r.templateId),
-		fmt.Sprintf("vars=%v", vars),
-	}, "&")
-}
-
-func (r *SendCloudRequest) ToMap() map[string]interface{} {
-	vars, _ := json.Marshal(r.vars)
-	return map[string]interface{}{
-		"msgType":       r.msgType,
-		"phone":         strings.Join(r.phone, ","),
-		"sendRequestId": r.sendRequestId,
-		"smsUser":       r.smsUser,
-		"templateId":    r.templateId,
-		"vars":          vars,
-	}
-}
-
-func Sign(key string, content string) string {
-	signStr := fmt.Sprintf("%v&%v&%v", key, content, key)
-	h := md5.Sum([]byte(signStr))
-	return hex.EncodeToString(h[:])
-}
 
 type SendCloudClient struct {
 	Name    string
