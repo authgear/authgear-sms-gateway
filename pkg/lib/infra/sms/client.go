@@ -6,6 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms/sendcloud"
 )
 
 type RawClient interface {
@@ -41,11 +42,20 @@ func NewClientFromConfigProvider(p *config.Provider, logger *slog.Logger) (RawCl
 			logger,
 		), nil
 	case config.ProviderTypeSendCloud:
+		templateResolver, err := sendcloud.NewSendCloudTemplateResolver(
+			p.SendCloud.Templates,
+			p.SendCloud.TemplateAssignments,
+		)
+		if err != nil {
+			return nil, err
+		}
 		return NewSendCloudClient(
 			p.Name,
 			p.SendCloud.BaseUrl,
 			p.SendCloud.SMSUser,
 			p.SendCloud.SMSKey,
+			templateResolver,
+			logger,
 		), nil
 	default:
 		return nil, errors.New(fmt.Sprintf("Unknown type %s", p.Type))
