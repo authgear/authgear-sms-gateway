@@ -70,25 +70,19 @@ func NewSendCloudClient(
 	}
 }
 
-func (n *SendCloudClient) Send(
-	to string,
-	body string,
-	templateName string,
-	languageTag string,
-	templateVariables *TemplateVariables,
-) (ClientResponse, error) {
-	template, err := n.TemplateResolver.Resolve(templateName, languageTag)
+func (n *SendCloudClient) Send(options *SendOptions) (*SendResult, error) {
+	template, err := n.TemplateResolver.Resolve(options.TemplateName, options.LanguageTag)
 	if err != nil {
-		return ClientResponse{}, err
+		return nil, err
 	}
 	sendCloudRequest := NewSendCloudRequest(
 		string(template.TemplateMsgType),
 		[]string{
-			to,
+			options.To,
 		},
 		n.SMSUser,
 		string(template.TemplateID),
-		makeVarsFromTemplateVariables(templateVariables),
+		makeVarsFromTemplateVariables(options.TemplateVariables),
 	)
 
 	n.Logger.Debug(fmt.Sprintf("Presign: %v", sendCloudRequest.Presign()))
@@ -104,14 +98,16 @@ func (n *SendCloudClient) Send(
 
 	if err != nil {
 		n.Logger.Error(fmt.Sprintf("Client.Do error: %v", err))
-		return ClientResponse{}, err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	respData, err := io.ReadAll(resp.Body)
 	n.Logger.Error(fmt.Sprintf("resp: %v", string(respData)))
 
-	return ClientResponse(respData), nil
+	return &SendResult{
+		ClientResponse: respData,
+	}, nil
 }
 
 var _ RawClient = &SendCloudClient{}

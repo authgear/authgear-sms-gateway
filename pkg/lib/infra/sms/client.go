@@ -9,10 +9,20 @@ import (
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms/sendcloud"
 )
 
-type ClientResponse []byte
+type SendOptions struct {
+	To                string
+	Body              string
+	TemplateName      string
+	LanguageTag       string
+	TemplateVariables *TemplateVariables
+}
+
+type SendResult struct {
+	ClientResponse []byte
+}
 
 type RawClient interface {
-	Send(to string, body string, templateName string, languageTag string, templateVariables *TemplateVariables) (ClientResponse, error)
+	Send(options *SendOptions) (*SendResult, error)
 }
 
 func NewClientFromConfigProvider(p *config.Provider, logger *slog.Logger) RawClient {

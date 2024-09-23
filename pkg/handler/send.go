@@ -83,7 +83,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	h.Logger.Info(fmt.Sprintf("Attempt to send sms to %v. Body: %v. AppID: %v", body.To, body.Body, body.AppID))
-	clientResponse, err := h.SMSService.Send(
+	sendResult, err := h.SMSService.Send(
 		body.AppID,
 		body.To,
 		body.Body,
@@ -98,7 +98,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	h.JSON.WriteResponse(w, &api.Response{
 		Result: Result{
-			ClientResponse: string(clientResponse),
+			ClientResponse: string(sendResult.ClientResponse),
 		},
 	})
 }

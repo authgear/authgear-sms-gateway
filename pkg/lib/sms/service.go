@@ -34,9 +34,15 @@ func (s *SMSService) Send(
 	templateName string,
 	languageTag string,
 	templateVariables *TemplateVariables,
-) (ClientResponse, error) {
+) (*SendResult, error) {
 	clientName := GetClientNameByMatch(s.SMSProviderConfig, &MatchContext{AppID: appID, PhoneNumber: string(to)})
 	client := s.SMSClientMap.GetClientByName(clientName)
 	s.Logger.Info(fmt.Sprintf("Client %v is selected for %v", clientName, to))
-	return client.Send(string(to), body, templateName, languageTag, templateVariables)
+	return client.Send(&SendOptions{
+		To:                string(to),
+		Body:              body,
+		TemplateName:      templateName,
+		LanguageTag:       languageTag,
+		TemplateVariables: templateVariables,
+	})
 }

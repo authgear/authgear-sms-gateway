@@ -28,20 +28,14 @@ func NewTwilioClient(accountSID string, authToken string, sender string, messagi
 	}
 }
 
-func (t *TwilioClient) Send(
-	to string,
-	body string,
-	templateName string,
-	languageTag string,
-	templateVariables *TemplateVariables,
-) (ClientResponse, error) {
+func (t *TwilioClient) Send(options *SendOptions) (*SendResult, error) {
 	if t.TwilioClient == nil {
-		return []byte{}, ErrMissingTwilioConfiguration
+		return nil, ErrMissingTwilioConfiguration
 	}
 
 	params := &api.CreateMessageParams{}
-	params.SetBody(body)
-	params.SetTo(to)
+	params.SetBody(options.Body)
+	params.SetTo(options.To)
 	if t.MessagingServiceSID != "" {
 		params.SetMessagingServiceSid(t.MessagingServiceSID)
 	} else {
@@ -50,11 +44,13 @@ func (t *TwilioClient) Send(
 
 	resp, err := t.TwilioClient.Api.CreateMessage(params)
 	if err != nil {
-		return ClientResponse{}, fmt.Errorf("twilio: %w", err)
+		return nil, fmt.Errorf("twilio: %w", err)
 	}
 
 	j, err := json.Marshal(resp)
-	return ClientResponse(j), err
+	return &SendResult{
+		ClientResponse: j,
+	}, err
 }
 
 var _ RawClient = &TwilioClient{}
