@@ -220,10 +220,12 @@ var _ = SMSProviderConfigSchema.Add("SMSProviderConfig", `
 `)
 
 func (c *SMSProviderConfig) Validate(ctx *validation.Context) {
-	c.ValidateProvider(ctx)
+	c.ValidateProviderSelectorUseProvider(ctx)
+	c.ValidateProviderSelectorDefault(ctx)
+	c.ValidateSendCloudConfigs(ctx)
 }
 
-func (c *SMSProviderConfig) ValidateProvider(ctx *validation.Context) {
+func (c *SMSProviderConfig) ValidateProviderSelectorUseProvider(ctx *validation.Context) {
 	providers := c.Providers
 	for i, switchCase := range c.ProviderSelector.Switch {
 		useProvider := switchCase.UseProvider
@@ -232,6 +234,46 @@ func (c *SMSProviderConfig) ValidateProvider(ctx *validation.Context) {
 			ctx.Child("provider_selector", "switch", strconv.Itoa(i), "use_provider").EmitErrorMessage(fmt.Sprintf("provider %s not found", useProvider))
 		}
 	}
+}
+
+func (c *SMSProviderConfig) ValidateProviderSelectorDefault(ctx *validation.Context) {
+	for _, switchCase := range c.ProviderSelector.Switch {
+		if switchCase.Type == ProviderSelectorSwitchTypeDefault {
+			return
+		}
+	}
+	ctx.Child("provider_selector", "switch").EmitErrorMessage(fmt.Sprintf("provider selector default not found"))
+}
+
+func (c *SMSProviderConfig) ValidateSendCloudConfigs(ctx *validation.Context) {
+	for i, provider := range c.Providers {
+		if provider.Type == ProviderTypeSendCloud {
+			c.ValidateSendCloudConfig(ctx.Child("providers", strconv.Itoa(i), "sendcloud"), provider.SendCloud)
+		}
+	}
+}
+
+func (c *SMSProviderConfig) ValidateSendCloudConfig(ctx *validation.Context, sendCloudConfig *ProviderConfigSendCloud) {
+	templates := sendCloudConfig.Templates
+	for i, templateAssignment := range sendCloudConfig.TemplateAssignments {
+		ctxTemplateAssignment := ctx.Child("template_assignments", strconv.Itoa(i))
+		defaultTemplateID := templateAssignment.DefaultTemplateID
+		idx := slices.IndexFunc(templates, func(t *SendCloudTemplate) bool { return t.TemplateID == defaultTemplateID })
+
+		if idx == -1 {
+			ctxTemplateAssignment.Child("default_template_id").EmitErrorMessage(fmt.Sprintf("template_id %v not found", defaultTemplateID))
+		}
+
+		for j, byLanguage := range templateAssignment.ByLanguages {
+			ctxByLanguage := ctxTemplateAssignment.Child("by_languages", strconv.Itoa(j))
+			templateID := byLanguage.TemplateID
+			idx = slices.IndexFunc(templates, func(t *SendCloudTemplate) bool { return t.TemplateID == templateID })
+			if idx == -1 {
+				ctxByLanguage.Child("template_id").EmitErrorMessage(fmt.Sprintf("template_id %v not found", templateID))
+			}
+		}
+	}
+
 }
 
 func ParseSMSProviderConfigFromYAML(inputYAML []byte) (*SMSProviderConfig, error) {
