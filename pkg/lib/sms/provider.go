@@ -15,7 +15,7 @@ type SMSProviders struct {
 	Logger  *slog.Logger
 }
 
-func NewSMSProviders(c *config.SMSProviderConfig, logger *slog.Logger) (*SMSProviders, error) {
+func NewSMSProviders(c *config.SMSProviderConfig, logger *slog.Logger) *SMSProviders {
 	var clients []sms.RawClient
 	var clientMap = make(map[string]sms.RawClient)
 
@@ -27,7 +27,7 @@ func NewSMSProviders(c *config.SMSProviderConfig, logger *slog.Logger) (*SMSProv
 	return &SMSProviders{
 		Clients: clients,
 		Map:     clientMap,
-	}, nil
+	}
 }
 
 func (s *SMSProviders) GetClientByName(name string) sms.RawClient {

@@ -14,16 +14,13 @@ type SMSService struct {
 	SMSProviderSelector *SMSProviderSelector
 }
 
-func NewSMSService(logger *slog.Logger, smsProviderConfig *config.SMSProviderConfig) (*SMSService, error) {
-	smsProviders, err := NewSMSProviders(smsProviderConfig, logger)
-	if err != nil {
-		return nil, err
-	}
+func NewSMSService(logger *slog.Logger, smsProviderConfig *config.SMSProviderConfig) *SMSService {
+	smsProviders := NewSMSProviders(smsProviderConfig, logger)
 	smsProviderSelector := NewSMSProviderSelector(smsProviderConfig, smsProviders)
 	return &SMSService{
 		Logger:              logger,
 		SMSProviderSelector: smsProviderSelector,
-	}, nil
+	}
 }
 
 func (s *SMSService) Send(
