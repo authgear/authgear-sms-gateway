@@ -14,7 +14,6 @@ import (
 )
 
 type AccessYouClient struct {
-	Name      string
 	BaseUrl   string
 	Client    *http.Client
 	AccountNo string
@@ -25,7 +24,6 @@ type AccessYouClient struct {
 }
 
 func NewAccessYouClient(
-	name string,
 	baseUrl string,
 	accountNo string,
 	user string,
@@ -37,7 +35,6 @@ func NewAccessYouClient(
 		baseUrl = "http://sms.accessyou-anyip.com"
 	}
 	return &AccessYouClient{
-		Name:      name,
 		BaseUrl:   baseUrl,
 		Client:    &http.Client{},
 		AccountNo: accountNo,
@@ -48,20 +45,10 @@ func NewAccessYouClient(
 	}
 }
 
-func (n *AccessYouClient) GetName() string {
-	return n.Name
-}
-
-func (n *AccessYouClient) Send(
-	to string,
-	body string,
-	templateName string,
-	languageTag string,
-	templateVariables *TemplateVariables,
-) (ClientResponse, error) {
+func (n *AccessYouClient) Send(options *SendOptions) (*SendResult, error) {
 	// Access you phone number should have no +
 	m1 := regexp.MustCompile(`[\+\-]+`)
-	to = m1.ReplaceAllString(to, "")
+	to := m1.ReplaceAllString(options.To, "")
 	req, _ := http.NewRequest(
 		"POST",
 		fmt.Sprintf(
@@ -70,7 +57,7 @@ func (n *AccessYouClient) Send(
 			n.AccountNo,
 			n.Pwd,
 			to,
-			url.QueryEscape(body),
+			url.QueryEscape(options.Body),
 			n.User,
 			n.Sender),
 		nil)
@@ -79,7 +66,7 @@ func (n *AccessYouClient) Send(
 	resp, err := n.Client.Do(req)
 	if err != nil {
 		n.Logger.Error(fmt.Sprintf("%v", err))
-		return ClientResponse{}, err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
@@ -96,10 +83,12 @@ func (n *AccessYouClient) Send(
 	err = json.Unmarshal(respData, &accessYouResponse)
 	if err != nil {
 		n.Logger.Error(fmt.Sprintf("Unmarshal error: %v", err))
-		return ClientResponse{}, err
+		return nil, err
 	}
 	n.Logger.Info(fmt.Sprintf("%v", accessYouResponse))
-	return ClientResponse(respData), nil
+	return &SendResult{
+		ClientResponse: respData,
+	}, nil
 }
 
 type AccessYouResponse struct {

@@ -61,20 +61,20 @@ func (m *MatcherDefault) Match(ctx *MatchContext) bool {
 
 var _ Matcher = &MatcherDefault{}
 
-func ParseMatcher(rule *config.ProviderSelectorSwitchRule) (Matcher, error) {
+func ParseMatcher(rule *config.ProviderSelectorSwitchRule) Matcher {
 	switch rule.Type {
 	case config.ProviderSelectorSwitchTypeMatchPhoneNumberAlpha2:
 		return &MatcherPhoneNumberAlpha2{
 			Code: rule.PhoneNumberAlpha2,
-		}, nil
+		}
 	case config.ProviderSelectorSwitchTypeMatchAppIDAndPhoneNumberAlpha2:
 		return &MatcherAppIDAndPhoneNumberAlpha2{
 			AppID: rule.AppID,
 			Code:  rule.PhoneNumberAlpha2,
-		}, nil
+		}
 	case config.ProviderSelectorSwitchTypeDefault:
-		return &MatcherDefault{}, nil
+		return &MatcherDefault{}
 	default:
-		return nil, errors.New(fmt.Sprintf("Unknown rule type %s", rule.Type))
+		panic(errors.New(fmt.Sprintf("Unknown rule type %s", rule.Type)))
 	}
 }

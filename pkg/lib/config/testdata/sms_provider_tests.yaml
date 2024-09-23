@@ -101,3 +101,126 @@ config:
         phone_number_alpha2: HK
       - type: default
         use_provider: infobip
+---
+name: failed-provider-selector-missing-default
+error: |-
+  invalid configuration:
+  /provider_selector/switch: provider selector default not found
+config:
+  providers:
+    - name: twilio
+      type: twilio
+      twilio:
+        account_sid: "my-account-sid"
+        auth_token: "my-auth-token"
+        message_service_sid: "my-message-service-sid"
+        sender: "+85212345678"
+    - name: nexmo
+      type: nexmo
+      nexmo:
+        api_key: "my-api-key"
+        api_secret: "my-secret"
+        sender: "+85212345678"
+    - name: accessyou
+      type: accessyou
+      accessyou:
+        accountno: "my-accountno"
+        user: "my-user"
+        pwd: "my-pwd"
+        sender: "my-sender"
+    - name: sendcloud
+      type: sendcloud
+      sendcloud:
+        sms_user: "my-sms-user"
+        sms_key: "my-sms-key"
+        sender: "my-sender"
+        templates:
+          - template_id: "919888"
+            template_msg_type: "2"
+          - template_id: "919879"
+            template_msg_type: "2"
+        template_assignments:
+          - authgear_template_name: "verficiation_sms.txt"
+            default_template_id: "919888"
+            by_languages:
+              - authgear_languag: en
+                template_id: "919888"
+  provider_selector:
+    switch:
+      - type: match_app_id_and_phone_number_alpha2
+        use_provider: accessyou
+        phone_number_alpha2: HK
+        app_id: "123"
+      - type: match_app_id_and_phone_number_alpha2
+        use_provider: sendcloud
+        phone_number_alpha2: CN
+        app_id: "123"
+      - type: match_phone_number_alpha2
+        use_provider: accessyou
+        phone_number_alpha2: HK
+      - type: match_phone_number_alpha2
+        use_provider: sendcloud
+        phone_number_alpha2: CN
+---
+name: failed-sendcloud-config
+error: |-
+  invalid configuration:
+  /providers/3/sendcloud/template_assignments/0/default_template_id: template_id 919889 not found
+  /providers/3/sendcloud/template_assignments/0/by_languages/0/template_id: template_id 919890 not found
+config:
+  providers:
+    - name: twilio
+      type: twilio
+      twilio:
+        account_sid: "my-account-sid"
+        auth_token: "my-auth-token"
+        message_service_sid: "my-message-service-sid"
+        sender: "+85212345678"
+    - name: nexmo
+      type: nexmo
+      nexmo:
+        api_key: "my-api-key"
+        api_secret: "my-secret"
+        sender: "+85212345678"
+    - name: accessyou
+      type: accessyou
+      accessyou:
+        accountno: "my-accountno"
+        user: "my-user"
+        pwd: "my-pwd"
+        sender: "my-sender"
+    - name: sendcloud
+      type: sendcloud
+      sendcloud:
+        sms_user: "my-sms-user"
+        sms_key: "my-sms-key"
+        sender: "my-sender"
+        templates:
+          - template_id: "919888"
+            template_msg_type: "2"
+          - template_id: "919879"
+            template_msg_type: "2"
+        template_assignments:
+          - authgear_template_name: "verficiation_sms.txt"
+            default_template_id: "919889"
+            by_languages:
+              - authgear_languag: en
+                template_id: "919890"
+  provider_selector:
+    switch:
+      - type: match_app_id_and_phone_number_alpha2
+        use_provider: accessyou
+        phone_number_alpha2: HK
+        app_id: "123"
+      - type: match_app_id_and_phone_number_alpha2
+        use_provider: sendcloud
+        phone_number_alpha2: CN
+        app_id: "123"
+      - type: match_phone_number_alpha2
+        use_provider: accessyou
+        phone_number_alpha2: HK
+      - type: match_phone_number_alpha2
+        use_provider: sendcloud
+        phone_number_alpha2: CN
+      - type: default
+        use_provider: twilio

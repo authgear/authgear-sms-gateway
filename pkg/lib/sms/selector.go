@@ -5,56 +5,24 @@ import (
 	"fmt"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
-	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms"
 )
 
-type Selector struct {
-	Matcher Matcher
-	Client  sms.RawClient
-}
-
-type SMSProviderSelector struct {
-	Selectors     []*Selector
-	DefaultClient sms.RawClient
-}
-
-func NewSMSProviderSelector(c *config.SMSProviderConfig, clients *SMSProviders) (*SMSProviderSelector, error) {
-	var selectors []*Selector
-	var defaultClient sms.RawClient
+func GetClientNameByMatch(c *config.SMSProviderConfig, ctx *MatchContext) string {
+	var defaultClient string
 	for _, providerSelector := range c.ProviderSelector.Switch {
-		client, err := clients.GetClientByName(providerSelector.UseProvider)
-		if err != nil {
-			return nil, err
-		}
-		matcher, err := ParseMatcher(providerSelector)
-		if err != nil {
-			return nil, err
-		}
+		matcher := ParseMatcher(providerSelector)
 		switch m := matcher.(type) {
 		case *MatcherDefault:
-			defaultClient = client
+			defaultClient = providerSelector.UseProvider
 			break
 		default:
-			selectors = append(selectors, &Selector{
-				Matcher: m,
-				Client:  client,
-			})
+			if m.Match(ctx) {
+				return providerSelector.UseProvider
+			}
 		}
 	}
-	return &SMSProviderSelector{
-		Selectors:     selectors,
-		DefaultClient: defaultClient,
-	}, nil
-}
-
-func (s *SMSProviderSelector) GetClientByMatch(ctx *MatchContext) (sms.RawClient, error) {
-	for _, selector := range s.Selectors {
-		if selector.Matcher.Match(ctx) {
-			return selector.Client, nil
-		}
+	if defaultClient == "" {
+		panic(errors.New(fmt.Sprintf("Cannot select provider given %v", ctx)))
 	}
-	if s.DefaultClient != nil {
-		return s.DefaultClient, nil
-	}
-	return nil, errors.New(fmt.Sprintf("Cannot select provider given %v", ctx))
+	return defaultClient
 }

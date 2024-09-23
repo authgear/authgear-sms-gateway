@@ -10,23 +10,21 @@ import (
 )
 
 type SMSService struct {
-	Logger              *slog.Logger
-	SMSProviderSelector *SMSProviderSelector
+	Logger            *slog.Logger
+	SMSProviderConfig *config.SMSProviderConfig
+	SMSClientMap      SMSClientMap
 }
 
-func NewSMSService(logger *slog.Logger, smsProviderConfig *config.SMSProviderConfig) (*SMSService, error) {
-	smsProviders, err := NewSMSProviders(smsProviderConfig, logger)
-	if err != nil {
-		return nil, err
-	}
-	smsProviderSelector, err := NewSMSProviderSelector(smsProviderConfig, smsProviders)
-	if err != nil {
-		return nil, err
-	}
+func NewSMSService(
+	logger *slog.Logger,
+	smsProviderConfig *config.SMSProviderConfig,
+	smsClientMap SMSClientMap,
+) *SMSService {
 	return &SMSService{
-		Logger:              logger,
-		SMSProviderSelector: smsProviderSelector,
-	}, nil
+		Logger:            logger,
+		SMSProviderConfig: smsProviderConfig,
+		SMSClientMap:      smsClientMap,
+	}
 }
 
 func (s *SMSService) Send(
@@ -36,11 +34,15 @@ func (s *SMSService) Send(
 	templateName string,
 	languageTag string,
 	templateVariables *TemplateVariables,
-) (ClientResponse, error) {
-	client, err := s.SMSProviderSelector.GetClientByMatch(&MatchContext{AppID: appID, PhoneNumber: string(to)})
-	if err != nil {
-		return ClientResponse{}, err
-	}
-	s.Logger.Info(fmt.Sprintf("Client %v is selected for %v", client.GetName(), to))
-	return client.Send(string(to), body, templateName, languageTag, templateVariables)
+) (*SendResult, error) {
+	clientName := GetClientNameByMatch(s.SMSProviderConfig, &MatchContext{AppID: appID, PhoneNumber: string(to)})
+	client := s.SMSClientMap.GetClientByName(clientName)
+	s.Logger.Info(fmt.Sprintf("Client %v is selected for %v", clientName, to))
+	return client.Send(&SendOptions{
+		To:                string(to),
+		Body:              body,
+		TemplateName:      templateName,
+		LanguageTag:       languageTag,
+		TemplateVariables: templateVariables,
+	})
 }

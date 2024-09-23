@@ -45,10 +45,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	smsService, err := sms.NewSMSService(logger, smsProviderConfig)
-	if err != nil {
-		panic(err)
-	}
+	smsClientMap := sms.NewSMSClientMap(smsProviderConfig, logger)
+	smsService := sms.NewSMSService(logger, smsProviderConfig, smsClientMap)
 
 	http.Handle("/healthz", handler.NewHealthzHandler())
 	http.Handle("/send", handler.NewSendHandler(

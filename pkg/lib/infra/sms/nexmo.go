@@ -11,61 +11,51 @@ import (
 var ErrMissingNexmoConfiguration = errors.New("nexmo: configuration is missing")
 
 type NexmoClient struct {
-	Name        string
 	NexmoClient *nexmo.Client
 	Sender      string
 }
 
-func NewNexmoClient(name string, apiKey string, apiSecret string, sender string) *NexmoClient {
+func NewNexmoClient(apiKey string, apiSecret string, sender string) *NexmoClient {
 	nexmoClient, _ := nexmo.NewClient(apiKey, apiSecret)
 	return &NexmoClient{
-		Name:        name,
 		NexmoClient: nexmoClient,
 		Sender:      sender,
 	}
 }
 
-func (n *NexmoClient) GetName() string {
-	return n.Name
-}
-
-func (n *NexmoClient) Send(
-	to string,
-	body string,
-	templateName string,
-	languageTag string,
-	templateVariables *TemplateVariables,
-) (ClientResponse, error) {
+func (n *NexmoClient) Send(options *SendOptions) (*SendResult, error) {
 	if n.NexmoClient == nil {
-		return ClientResponse{}, ErrMissingNexmoConfiguration
+		return nil, ErrMissingNexmoConfiguration
 	}
 
 	message := nexmo.SMSMessage{
 		From:  n.Sender,
-		To:    to,
+		To:    options.To,
 		Type:  nexmo.Text,
-		Text:  body,
+		Text:  options.Body,
 		Class: nexmo.Standard,
 	}
 
 	resp, err := n.NexmoClient.SMS.Send(&message)
 	if err != nil {
-		return ClientResponse{}, fmt.Errorf("nexmo: %w", err)
+		return nil, fmt.Errorf("nexmo: %w", err)
 	}
 
 	if resp.MessageCount == 0 {
 		err = errors.New("nexmo: no sms is sent")
-		return ClientResponse{}, err
+		return nil, err
 	}
 
 	report := resp.Messages[0]
 	if report.ErrorText != "" {
 		err = fmt.Errorf("nexmo: %s", report.ErrorText)
-		return ClientResponse{}, err
+		return nil, err
 	}
 
 	j, err := json.Marshal(resp)
-	return ClientResponse(j), err
+	return &SendResult{
+		ClientResponse: j,
+	}, err
 }
 
 var _ RawClient = &NexmoClient{}
