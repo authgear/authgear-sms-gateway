@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/twilio/twilio-go"
 	api "github.com/twilio/twilio-go/rest/api/v2010"
@@ -47,10 +48,14 @@ func (t *TwilioClient) Send(options *SendOptions) (*SendResult, error) {
 		return nil, fmt.Errorf("twilio: %w", err)
 	}
 
+	numSegments, atoiError := strconv.Atoi(*resp.NumSegments)
+
 	j, err := json.Marshal(resp)
 	return &SendResult{
 		ClientResponse: j,
 		Success:        resp.ErrorCode != nil,
+		HasNumSegments: atoiError == nil,
+		NumSegments:    numSegments,
 	}, err
 }
 
