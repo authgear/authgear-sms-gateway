@@ -26,10 +26,7 @@ func NewSMSProviderSelector(c *config.SMSProviderConfig, clients *SMSProviders) 
 		if err != nil {
 			return nil, err
 		}
-		matcher, err := ParseMatcher(providerSelector)
-		if err != nil {
-			return nil, err
-		}
+		matcher := ParseMatcher(providerSelector)
 		switch m := matcher.(type) {
 		case *MatcherDefault:
 			defaultClient = client
