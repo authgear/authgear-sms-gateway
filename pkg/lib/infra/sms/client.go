@@ -13,14 +13,12 @@ type ClientResponse []byte
 
 type RawClient interface {
 	Send(to string, body string, templateName string, languageTag string, templateVariables *TemplateVariables) (ClientResponse, error)
-	GetName() string
 }
 
 func NewClientFromConfigProvider(p *config.Provider, logger *slog.Logger) RawClient {
 	switch p.Type {
 	case config.ProviderTypeTwilio:
 		return NewTwilioClient(
-			p.Name,
 			p.Twilio.AccountSID,
 			p.Twilio.AuthToken,
 			p.Twilio.Sender,
@@ -28,14 +26,12 @@ func NewClientFromConfigProvider(p *config.Provider, logger *slog.Logger) RawCli
 		)
 	case config.ProviderTypeNexmo:
 		return NewNexmoClient(
-			p.Name,
 			p.Nexmo.APIKey,
 			p.Nexmo.APISecret,
 			p.Nexmo.Sender,
 		)
 	case config.ProviderTypeAccessYou:
 		return NewAccessYouClient(
-			p.Name,
 			p.AccessYou.BaseUrl,
 			p.AccessYou.AccountNo,
 			p.AccessYou.User,
@@ -49,7 +45,6 @@ func NewClientFromConfigProvider(p *config.Provider, logger *slog.Logger) RawCli
 			p.SendCloud.TemplateAssignments,
 		)
 		return NewSendCloudClient(
-			p.Name,
 			p.SendCloud.BaseUrl,
 			p.SendCloud.SMSUser,
 			p.SendCloud.SMSKey,

@@ -12,15 +12,13 @@ import (
 var ErrMissingTwilioConfiguration = errors.New("twilio: configuration is missing")
 
 type TwilioClient struct {
-	Name                string
 	TwilioClient        *twilio.RestClient
 	Sender              string
 	MessagingServiceSID string
 }
 
-func NewTwilioClient(name string, accountSID string, authToken string, sender string, messagingServiceSID string) *TwilioClient {
+func NewTwilioClient(accountSID string, authToken string, sender string, messagingServiceSID string) *TwilioClient {
 	return &TwilioClient{
-		Name: name,
 		TwilioClient: twilio.NewRestClientWithParams(twilio.ClientParams{
 			Username: accountSID,
 			Password: authToken,
@@ -28,10 +26,6 @@ func NewTwilioClient(name string, accountSID string, authToken string, sender st
 		Sender:              sender,
 		MessagingServiceSID: messagingServiceSID,
 	}
-}
-
-func (t *TwilioClient) GetName() string {
-	return t.Name
 }
 
 func (t *TwilioClient) Send(

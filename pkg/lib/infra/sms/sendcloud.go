@@ -42,7 +42,6 @@ func makeVarsFromTemplateVariables(variables *TemplateVariables) map[string]inte
 }
 
 type SendCloudClient struct {
-	Name             string
 	BaseUrl          string
 	Client           *http.Client
 	SMSUser          string
@@ -52,7 +51,6 @@ type SendCloudClient struct {
 }
 
 func NewSendCloudClient(
-	name string,
 	baseUrl string,
 	smsUser string,
 	smsKey string,
@@ -63,7 +61,6 @@ func NewSendCloudClient(
 		baseUrl = "https://api.sendcloud.net"
 	}
 	return &SendCloudClient{
-		Name:             name,
 		BaseUrl:          baseUrl,
 		Client:           &http.Client{},
 		SMSUser:          smsUser,
@@ -71,10 +68,6 @@ func NewSendCloudClient(
 		TemplateResolver: templateResolver,
 		Logger:           logger,
 	}
-}
-
-func (n *SendCloudClient) GetName() string {
-	return n.Name
 }
 
 func (n *SendCloudClient) Send(

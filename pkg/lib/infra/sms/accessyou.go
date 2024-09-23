@@ -14,7 +14,6 @@ import (
 )
 
 type AccessYouClient struct {
-	Name      string
 	BaseUrl   string
 	Client    *http.Client
 	AccountNo string
@@ -25,7 +24,6 @@ type AccessYouClient struct {
 }
 
 func NewAccessYouClient(
-	name string,
 	baseUrl string,
 	accountNo string,
 	user string,
@@ -37,7 +35,6 @@ func NewAccessYouClient(
 		baseUrl = "http://sms.accessyou-anyip.com"
 	}
 	return &AccessYouClient{
-		Name:      name,
 		BaseUrl:   baseUrl,
 		Client:    &http.Client{},
 		AccountNo: accountNo,
@@ -46,10 +43,6 @@ func NewAccessYouClient(
 		Sender:    sender,
 		Logger:    logger,
 	}
-}
-
-func (n *AccessYouClient) GetName() string {
-	return n.Name
 }
 
 func (n *AccessYouClient) Send(

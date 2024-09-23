@@ -11,22 +11,16 @@ import (
 var ErrMissingNexmoConfiguration = errors.New("nexmo: configuration is missing")
 
 type NexmoClient struct {
-	Name        string
 	NexmoClient *nexmo.Client
 	Sender      string
 }
 
-func NewNexmoClient(name string, apiKey string, apiSecret string, sender string) *NexmoClient {
+func NewNexmoClient(apiKey string, apiSecret string, sender string) *NexmoClient {
 	nexmoClient, _ := nexmo.NewClient(apiKey, apiSecret)
 	return &NexmoClient{
-		Name:        name,
 		NexmoClient: nexmoClient,
 		Sender:      sender,
 	}
-}
-
-func (n *NexmoClient) GetName() string {
-	return n.Name
 }
 
 func (n *NexmoClient) Send(
