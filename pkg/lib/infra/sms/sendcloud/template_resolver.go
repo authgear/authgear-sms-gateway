@@ -50,13 +50,13 @@ type SendCloudTemplateAssignment struct {
 	ByLanguageMap        map[AuthgearLanguage]*ByLanguage
 }
 
-func NewSendCloudTemplateAssignment(templateAssignment *config.SendCloudTemplateAssignment, templateIDMap map[TemplateID]*SendCloudTemplate) (*SendCloudTemplateAssignment, error) {
+func NewSendCloudTemplateAssignment(templateAssignment *config.SendCloudTemplateAssignment, templateIDMap map[TemplateID]*SendCloudTemplate) *SendCloudTemplateAssignment {
 	byLanguages := make([]*ByLanguage, len(templateAssignment.ByLanguages))
 	byLanguageMap := make(map[AuthgearLanguage]*ByLanguage)
 	for i, byLanguage := range templateAssignment.ByLanguages {
 		template := templateIDMap[TemplateID(byLanguage.TemplateID)]
 		if template == nil {
-			return nil, errors.New(fmt.Sprintf("Cannot find template with id %v", byLanguage.TemplateID))
+			panic(errors.New(fmt.Sprintf("Cannot find template with id %v", byLanguage.TemplateID)))
 		}
 		b := NewByLanguage(AuthgearLanguage(byLanguage.AuthgearLanguage), template)
 		byLanguages[i] = b
@@ -65,7 +65,7 @@ func NewSendCloudTemplateAssignment(templateAssignment *config.SendCloudTemplate
 
 	defaultTemplate := templateIDMap[TemplateID(templateAssignment.DefaultTemplateID)]
 	if defaultTemplate == nil {
-		return nil, errors.New(fmt.Sprintf("Cannot find template with id %v", templateAssignment.DefaultTemplateID))
+		panic(errors.New(fmt.Sprintf("Cannot find template with id %v", templateAssignment.DefaultTemplateID)))
 	}
 
 	return &SendCloudTemplateAssignment{
@@ -73,7 +73,7 @@ func NewSendCloudTemplateAssignment(templateAssignment *config.SendCloudTemplate
 		DefaultTemplate:      defaultTemplate,
 		ByLanguages:          byLanguages,
 		ByLanguageMap:        byLanguageMap,
-	}, nil
+	}
 }
 
 type SendCloudTemplateResolver struct {
@@ -88,7 +88,7 @@ var _ ISendCloudTemplateResolver = &SendCloudTemplateResolver{}
 func NewSendCloudTemplateResolver(
 	templates []*config.SendCloudTemplate,
 	templateAssignments []*config.SendCloudTemplateAssignment,
-) (*SendCloudTemplateResolver, error) {
+) *SendCloudTemplateResolver {
 	ts := make([]*SendCloudTemplate, len(templates))
 	templateIDMap := make(map[TemplateID]*SendCloudTemplate)
 	for i, template := range templates {
@@ -100,10 +100,7 @@ func NewSendCloudTemplateResolver(
 	tas := make([]*SendCloudTemplateAssignment, len(templateAssignments))
 	templateAssignmentMapByTemplateName := make(map[AuthgearTemplateName]*SendCloudTemplateAssignment)
 	for i, templateAssignment := range templateAssignments {
-		ta, err := NewSendCloudTemplateAssignment(templateAssignment, templateIDMap)
-		if err != nil {
-			return nil, err
-		}
+		ta := NewSendCloudTemplateAssignment(templateAssignment, templateIDMap)
 		tas[i] = ta
 		templateAssignmentMapByTemplateName[ta.AuthgearTemplateName] = ta
 	}
@@ -113,7 +110,7 @@ func NewSendCloudTemplateResolver(
 		templateIDMap:                       templateIDMap,
 		templateAssignments:                 tas,
 		templateAssignmentMapByTemplateName: templateAssignmentMapByTemplateName,
-	}, nil
+	}
 }
 
 func (s *SendCloudTemplateResolver) Resolve(templateName string, languageTag string) (*SendCloudTemplate, error) {

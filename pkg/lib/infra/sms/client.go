@@ -44,13 +44,10 @@ func NewClientFromConfigProvider(p *config.Provider, logger *slog.Logger) (RawCl
 			logger,
 		), nil
 	case config.ProviderTypeSendCloud:
-		templateResolver, err := sendcloud.NewSendCloudTemplateResolver(
+		templateResolver := sendcloud.NewSendCloudTemplateResolver(
 			p.SendCloud.Templates,
 			p.SendCloud.TemplateAssignments,
 		)
-		if err != nil {
-			return nil, err
-		}
 		return NewSendCloudClient(
 			p.Name,
 			p.SendCloud.BaseUrl,

@@ -10,37 +10,38 @@ import (
 
 func TestTemplateResolver(t *testing.T) {
 	Convey("TemplateResolver error", t, func() {
-		templateResolver, err := NewSendCloudTemplateResolver(
-			[]*config.SendCloudTemplate{
-				&config.SendCloudTemplate{
-					TemplateID:      "919880",
-					TemplateMsgType: "2",
+		fn := func() {
+			var _ = NewSendCloudTemplateResolver(
+				[]*config.SendCloudTemplate{
+					&config.SendCloudTemplate{
+						TemplateID:      "919880",
+						TemplateMsgType: "2",
+					},
+					&config.SendCloudTemplate{
+						TemplateID:      "919877",
+						TemplateMsgType: "2",
+					},
 				},
-				&config.SendCloudTemplate{
-					TemplateID:      "919877",
-					TemplateMsgType: "2",
-				},
-			},
-			[]*config.SendCloudTemplateAssignment{
-				&config.SendCloudTemplateAssignment{
-					AuthgearTemplateName: "verification_sms.txt",
-					DefaultTemplateID:    "919880",
-					ByLanguages: []*config.SendCloudTemplateAssignmentByLanguage{
-						&config.SendCloudTemplateAssignmentByLanguage{
-							AuthgearLanguage: "zh",
-							TemplateID:       "919878",
+				[]*config.SendCloudTemplateAssignment{
+					&config.SendCloudTemplateAssignment{
+						AuthgearTemplateName: "verification_sms.txt",
+						DefaultTemplateID:    "919880",
+						ByLanguages: []*config.SendCloudTemplateAssignmentByLanguage{
+							&config.SendCloudTemplateAssignmentByLanguage{
+								AuthgearLanguage: "zh",
+								TemplateID:       "919878",
+							},
 						},
 					},
 				},
-			},
-		)
+			)
+		}
 
-		So(err.Error(), ShouldEqual, "Cannot find template with id 919878")
-		So(templateResolver, ShouldBeNil)
+		So(fn, ShouldPanic)
 	})
 
 	Convey("TemplateResolver", t, func() {
-		templateResolver, err := NewSendCloudTemplateResolver(
+		templateResolver := NewSendCloudTemplateResolver(
 			[]*config.SendCloudTemplate{
 				&config.SendCloudTemplate{
 					TemplateID:      "919880",
@@ -64,8 +65,6 @@ func TestTemplateResolver(t *testing.T) {
 				},
 			},
 		)
-
-		So(err, ShouldBeNil)
 
 		Convey("Should resolve", func() {
 			template, err := templateResolver.Resolve("verification_sms.txt", "zh")
