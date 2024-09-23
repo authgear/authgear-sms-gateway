@@ -18,14 +18,11 @@ type SMSProviderSelector struct {
 	DefaultClient sms.RawClient
 }
 
-func NewSMSProviderSelector(c *config.SMSProviderConfig, clients *SMSProviders) (*SMSProviderSelector, error) {
+func NewSMSProviderSelector(c *config.SMSProviderConfig, clients *SMSProviders) *SMSProviderSelector {
 	var selectors []*Selector
 	var defaultClient sms.RawClient
 	for _, providerSelector := range c.ProviderSelector.Switch {
-		client, err := clients.GetClientByName(providerSelector.UseProvider)
-		if err != nil {
-			return nil, err
-		}
+		client := clients.GetClientByName(providerSelector.UseProvider)
 		matcher := ParseMatcher(providerSelector)
 		switch m := matcher.(type) {
 		case *MatcherDefault:
@@ -41,7 +38,7 @@ func NewSMSProviderSelector(c *config.SMSProviderConfig, clients *SMSProviders) 
 	return &SMSProviderSelector{
 		Selectors:     selectors,
 		DefaultClient: defaultClient,
-	}, nil
+	}
 }
 
 func (s *SMSProviderSelector) GetClientByMatch(ctx *MatchContext) (sms.RawClient, error) {

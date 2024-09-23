@@ -19,10 +19,7 @@ func NewSMSService(logger *slog.Logger, smsProviderConfig *config.SMSProviderCon
 	if err != nil {
 		return nil, err
 	}
-	smsProviderSelector, err := NewSMSProviderSelector(smsProviderConfig, smsProviders)
-	if err != nil {
-		return nil, err
-	}
+	smsProviderSelector := NewSMSProviderSelector(smsProviderConfig, smsProviders)
 	return &SMSService{
 		Logger:              logger,
 		SMSProviderSelector: smsProviderSelector,

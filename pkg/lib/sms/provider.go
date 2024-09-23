@@ -30,10 +30,10 @@ func NewSMSProviders(c *config.SMSProviderConfig, logger *slog.Logger) (*SMSProv
 	}, nil
 }
 
-func (s *SMSProviders) GetClientByName(name string) (sms.RawClient, error) {
+func (s *SMSProviders) GetClientByName(name string) sms.RawClient {
 	client, exists := s.Map[name]
 	if !exists {
-		return nil, errors.New(fmt.Sprintf("Unknown client %s", name))
+		panic(errors.New(fmt.Sprintf("Unknown client %s", name)))
 	}
-	return client, nil
+	return client
 }
