@@ -9,14 +9,9 @@ import (
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms"
 )
 
-type SMSProviders struct {
-	Clients []sms.RawClient
-	Map     map[string]sms.RawClient
-	Logger  *slog.Logger
-}
+type SMSClientMap map[string]sms.RawClient
 
-func NewSMSProviders(c *config.SMSProviderConfig, logger *slog.Logger) *SMSProviders {
-	var clients []sms.RawClient
+func NewSMSClientMap(c *config.SMSProviderConfig, logger *slog.Logger) SMSClientMap {
 	var clientMap = make(map[string]sms.RawClient)
 
 	for _, provider := range c.Providers {
@@ -24,15 +19,12 @@ func NewSMSProviders(c *config.SMSProviderConfig, logger *slog.Logger) *SMSProvi
 		clientMap[provider.Name] = client
 	}
 
-	return &SMSProviders{
-		Clients: clients,
-		Map:     clientMap,
-	}
+	return SMSClientMap(clientMap)
 }
 
-func (s *SMSProviders) GetClientByName(name string) sms.RawClient {
-	client, exists := s.Map[name]
-	if !exists {
+func (s SMSClientMap) GetClientByName(name string) sms.RawClient {
+	client := s[name]
+	if client == nil {
 		panic(errors.New(fmt.Sprintf("Unknown client %s", name)))
 	}
 	return client
