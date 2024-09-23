@@ -16,7 +16,7 @@ type RawClient interface {
 	GetName() string
 }
 
-func NewClientFromConfigProvider(p *config.Provider, logger *slog.Logger) (RawClient, error) {
+func NewClientFromConfigProvider(p *config.Provider, logger *slog.Logger) RawClient {
 	switch p.Type {
 	case config.ProviderTypeTwilio:
 		return NewTwilioClient(
@@ -25,14 +25,14 @@ func NewClientFromConfigProvider(p *config.Provider, logger *slog.Logger) (RawCl
 			p.Twilio.AuthToken,
 			p.Twilio.Sender,
 			p.Twilio.MessagingServiceSID,
-		), nil
+		)
 	case config.ProviderTypeNexmo:
 		return NewNexmoClient(
 			p.Name,
 			p.Nexmo.APIKey,
 			p.Nexmo.APISecret,
 			p.Nexmo.Sender,
-		), nil
+		)
 	case config.ProviderTypeAccessYou:
 		return NewAccessYouClient(
 			p.Name,
@@ -42,7 +42,7 @@ func NewClientFromConfigProvider(p *config.Provider, logger *slog.Logger) (RawCl
 			p.AccessYou.Pwd,
 			p.AccessYou.Sender,
 			logger,
-		), nil
+		)
 	case config.ProviderTypeSendCloud:
 		templateResolver := sendcloud.NewSendCloudTemplateResolver(
 			p.SendCloud.Templates,
@@ -55,8 +55,8 @@ func NewClientFromConfigProvider(p *config.Provider, logger *slog.Logger) (RawCl
 			p.SendCloud.SMSKey,
 			templateResolver,
 			logger,
-		), nil
+		)
 	default:
-		return nil, errors.New(fmt.Sprintf("Unknown type %s", p.Type))
+		panic(errors.New(fmt.Sprintf("Unknown type %s", p.Type)))
 	}
 }

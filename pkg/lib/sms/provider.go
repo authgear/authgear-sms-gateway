@@ -20,11 +20,7 @@ func NewSMSProviders(c *config.SMSProviderConfig, logger *slog.Logger) (*SMSProv
 	var clientMap = make(map[string]sms.RawClient)
 
 	for _, provider := range c.Providers {
-		client, err := sms.NewClientFromConfigProvider(provider, logger)
-		if err != nil {
-			return nil, err
-		}
-		clients = append(clients, client)
+		client := sms.NewClientFromConfigProvider(provider, logger)
 		clientMap[provider.Name] = client
 	}
 
