@@ -9,6 +9,11 @@ vendor:
 	go install golang.org/x/vuln/cmd/govulncheck@latest
 	go install golang.org/x/tools/cmd/goimports@latest
 
+.PHONY: generate
+generate:
+	go generate ./pkg/... ./cmd/...
+	$(MAKE) fmt
+
 .PHONY: start
 start:
 	go run ./cmd/server
