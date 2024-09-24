@@ -55,6 +55,7 @@ func (n *NexmoClient) Send(options *SendOptions) (*SendResult, error) {
 	j, err := json.Marshal(resp)
 	return &SendResult{
 		ClientResponse: j,
+		Success:        report.Status == nexmo.ResponseSuccess,
 	}, err
 }
 
