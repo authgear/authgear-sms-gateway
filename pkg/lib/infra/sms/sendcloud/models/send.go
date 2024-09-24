@@ -47,6 +47,10 @@ func NewSendRequest(
 
 func (r *SendRequest) Presign() string {
 	vars, _ := json.Marshal(r.vars)
+
+	// According to the [doc](https://www.sendcloud.net/doc/sms/),
+	// - The keys should be arranged alphabetically
+	// - The values no need to be url encoded
 	return strings.Join([]string{
 		fmt.Sprintf("msgType=%v", r.msgType),
 		fmt.Sprintf("phone=%v", strings.Join(r.phone, ",")),
