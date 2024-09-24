@@ -50,6 +50,10 @@ func SendSMS(
 
 	respData, err := io.ReadAll(resp.Body)
 
+	if err != nil {
+		return nil, nil, err
+	}
+
 	respData = fixRespData(respData)
 
 	sendSMSResponse, err := models.ParseSendSMSResponse(respData)
