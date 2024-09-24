@@ -65,6 +65,7 @@ func (n *AccessYouClient) Send(options *SendOptions) (*SendResult, error) {
 
 	return &SendResult{
 		ClientResponse: respData,
+		Success:        sendSMSResponse.Status == "100",
 	}, nil
 }
 
