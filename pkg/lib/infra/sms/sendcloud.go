@@ -3,12 +3,12 @@ package sms
 import (
 	"errors"
 	"fmt"
-	"io"
 	"log/slog"
 	"net/http"
-	"strings"
 
 	. "github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms/sendcloud"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms/sendcloud/apis"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms/sendcloud/models"
 )
 
 var ErrMissingSendCloudConfiguration = errors.New("accessyou: configuration is missing")
@@ -75,7 +75,7 @@ func (n *SendCloudClient) Send(options *SendOptions) (*SendResult, error) {
 	if err != nil {
 		return nil, err
 	}
-	sendCloudRequest := NewSendCloudRequest(
+	sendRequest := models.NewSendRequest(
 		string(template.TemplateMsgType),
 		[]string{
 			options.To,
@@ -85,28 +85,11 @@ func (n *SendCloudClient) Send(options *SendOptions) (*SendResult, error) {
 		makeVarsFromTemplateVariables(options.TemplateVariables),
 	)
 
-	n.Logger.Debug(fmt.Sprintf("Presign: %v", sendCloudRequest.Presign()))
-	values := sendCloudRequest.ToValues()
-	values.Set("signature", sendCloudRequest.Sign(n.SMSKey))
-
-	data := values.Encode()
-	n.Logger.Debug(fmt.Sprintf("data: %v", data))
-
-	req, _ := http.NewRequest("POST", fmt.Sprintf("%v/smsapi/send", n.BaseUrl), strings.NewReader(data))
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	resp, err := n.Client.Do(req)
-
-	if err != nil {
-		n.Logger.Error(fmt.Sprintf("Client.Do error: %v", err))
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	respData, err := io.ReadAll(resp.Body)
-	n.Logger.Error(fmt.Sprintf("resp: %v", string(respData)))
+	respData, sendResponse, err := apis.Send(n.Client, n.BaseUrl, &sendRequest, n.SMSKey)
 
 	return &SendResult{
 		ClientResponse: respData,
+		Success:        sendResponse.StatusCode == 200,
 	}, nil
 }
 

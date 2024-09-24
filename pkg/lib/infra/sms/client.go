@@ -19,6 +19,7 @@ type SendOptions struct {
 
 type SendResult struct {
 	ClientResponse []byte
+	Success        bool
 }
 
 type RawClient interface {

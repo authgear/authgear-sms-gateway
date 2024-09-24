@@ -69,6 +69,7 @@ var _ = RequestSchema.Add("TemplateVariables", sms_infra.TemplateVariablesSchema
 
 type Result struct {
 	ClientResponse string `json:"client_response"`
+	Success        bool   `json:"success"`
 }
 
 func init() {
@@ -99,6 +100,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.JSON.WriteResponse(w, &api.Response{
 		Result: Result{
 			ClientResponse: string(sendResult.ClientResponse),
+			Success:        sendResult.Success,
 		},
 	})
 }
