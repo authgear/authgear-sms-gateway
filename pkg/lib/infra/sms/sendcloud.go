@@ -85,10 +85,11 @@ func (n *SendCloudClient) Send(options *SendOptions) (*SendResult, error) {
 		makeVarsFromTemplateVariables(options.TemplateVariables),
 	)
 
-	respData, _, err := apis.Send(n.Client, n.BaseUrl, &sendRequest, n.SMSKey)
+	respData, sendResponse, err := apis.Send(n.Client, n.BaseUrl, &sendRequest, n.SMSKey)
 
 	return &SendResult{
 		ClientResponse: respData,
+		Success:        sendResponse.StatusCode == 200,
 	}, nil
 }
 
