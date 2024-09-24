@@ -2,7 +2,6 @@ package apis
 
 import (
 	"io"
-	"log/slog"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -10,7 +9,13 @@ import (
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms/accessyou/models"
 )
 
+//go:generate mockgen -source=sendsms.go -destination=sendsms_mock_test.go -package apis
+
 var leadingBOMRegexp = regexp.MustCompile(`^[\x{feff}]+`)
+
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
 
 func fixRespData(respData []byte) []byte {
 	// The response data is in format
@@ -20,7 +25,7 @@ func fixRespData(respData []byte) []byte {
 }
 
 func SendSMS(
-	client *http.Client,
+	client HTTPClient,
 	baseUrl string,
 	accountNo string,
 	user string,
