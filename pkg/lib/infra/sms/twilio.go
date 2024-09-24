@@ -50,6 +50,7 @@ func (t *TwilioClient) Send(options *SendOptions) (*SendResult, error) {
 	j, err := json.Marshal(resp)
 	return &SendResult{
 		ClientResponse: j,
+		Success:        resp.ErrorCode != nil,
 	}, err
 }
 
