@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"net/url"
 	"regexp"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms/accessyou/apis"
@@ -60,7 +59,7 @@ func (n *AccessYouClient) Send(options *SendOptions) (*SendResult, error) {
 		n.Pwd,
 		n.Sender,
 		to,
-		url.QueryEscape(options.Body),
+		options.Body,
 	)
 	n.Logger.Info(fmt.Sprintf("%v", sendSMSResponse))
 

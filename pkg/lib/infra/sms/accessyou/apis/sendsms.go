@@ -1,9 +1,10 @@
 package apis
 
 import (
-	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
+	"net/url"
 	"regexp"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms/accessyou/models"
@@ -28,17 +29,26 @@ func SendSMS(
 	to string,
 	body string,
 ) ([]byte, *models.SendSMSResponse, error) {
+	u, err := url.Parse(baseUrl)
+	if err != nil {
+		return nil, nil, err
+	}
+	u.Path = "/sendsms.php"
+
+	queryParams := url.Values{
+		"accountno": {accountNo},
+		"pwd":       {pwd},
+		"tid":       {"1"},
+		"phone":     {to},
+		"a":         {body},
+		"user":      {user},
+		"from":      {sender},
+	}
+	u.RawQuery = queryParams.Encode()
+
 	req, _ := http.NewRequest(
 		"POST",
-		fmt.Sprintf(
-			"%v/sendsms.php?accountno=%v&pwd=%v&tid=1&phone=%v&a=%v&user=%v&from=%v",
-			baseUrl,
-			accountNo,
-			pwd,
-			to,
-			body,
-			user,
-			sender),
+		u.String(),
 		nil)
 	req.Header.Set("Cookie", "dynamic=sms")
 
