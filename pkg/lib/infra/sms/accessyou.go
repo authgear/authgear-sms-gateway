@@ -42,10 +42,16 @@ func NewAccessYouClient(
 	}
 }
 
+var plusHyphensRegexp = regexp.MustCompile(`[\+\-]+`)
+
+func fixPhoneNumber(phoneNumber string) string {
+	// Access you phone number should have no + and -
+	return plusHyphensRegexp.ReplaceAllString(phoneNumber, "")
+}
+
 func (n *AccessYouClient) Send(options *SendOptions) (*SendResult, error) {
-	// Access you phone number should have no +
-	m1 := regexp.MustCompile(`[\+\-]+`)
-	to := m1.ReplaceAllString(string(options.To), "")
+	to := fixPhoneNumber(string(options.To))
+
 	respData, sendSMSResponse, err := apis.SendSMS(
 		n.Client,
 		n.BaseUrl,
