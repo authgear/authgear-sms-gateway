@@ -86,11 +86,13 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.Logger.Info(fmt.Sprintf("Attempt to send sms to %v. Body: %v. AppID: %v", body.To, body.Body, body.AppID))
 	sendResult, err := h.SMSService.Send(
 		body.AppID,
-		body.To,
-		body.Body,
-		body.TemplateName,
-		body.LanguageTag,
-		body.TemplateVariables,
+		&sms_infra.SendOptions{
+			To:                body.To,
+			Body:              body.Body,
+			TemplateName:      body.TemplateName,
+			LanguageTag:       body.LanguageTag,
+			TemplateVariables: body.TemplateVariables,
+		},
 	)
 	if err != nil {
 		h.JSON.WriteResponse(w, &api.Response{Error: err})

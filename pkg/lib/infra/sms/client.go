@@ -7,10 +7,11 @@ import (
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms/sendcloud"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/type_util"
 )
 
 type SendOptions struct {
-	To                string
+	To                type_util.SensitivePhoneNumber
 	Body              string
 	TemplateName      string
 	LanguageTag       string

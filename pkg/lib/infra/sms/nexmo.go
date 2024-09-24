@@ -30,7 +30,7 @@ func (n *NexmoClient) Send(options *SendOptions) (*SendResult, error) {
 
 	message := nexmo.SMSMessage{
 		From:  n.Sender,
-		To:    options.To,
+		To:    string(options.To),
 		Type:  nexmo.Text,
 		Text:  options.Body,
 		Class: nexmo.Standard,

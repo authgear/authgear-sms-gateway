@@ -35,7 +35,7 @@ func (t *TwilioClient) Send(options *SendOptions) (*SendResult, error) {
 
 	params := &api.CreateMessageParams{}
 	params.SetBody(options.Body)
-	params.SetTo(options.To)
+	params.SetTo(string(options.To))
 	if t.MessagingServiceSID != "" {
 		params.SetMessagingServiceSid(t.MessagingServiceSID)
 	} else {

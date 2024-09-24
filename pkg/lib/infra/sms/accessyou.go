@@ -45,7 +45,7 @@ func NewAccessYouClient(
 func (n *AccessYouClient) Send(options *SendOptions) (*SendResult, error) {
 	// Access you phone number should have no +
 	m1 := regexp.MustCompile(`[\+\-]+`)
-	to := m1.ReplaceAllString(options.To, "")
+	to := m1.ReplaceAllString(string(options.To), "")
 	respData, sendSMSResponse, err := apis.SendSMS(
 		n.Client,
 		n.BaseUrl,

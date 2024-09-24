@@ -78,7 +78,7 @@ func (n *SendCloudClient) Send(options *SendOptions) (*SendResult, error) {
 	sendRequest := models.NewSendRequest(
 		string(template.TemplateMsgType),
 		[]string{
-			options.To,
+			string(options.To),
 		},
 		n.SMSUser,
 		string(template.TemplateID),
