@@ -5,7 +5,7 @@ providers:
       account_sid: "my-account-sid"
       auth_token: "my-auth-token"
       message_service_sid: "my-message-service-sid"
-      sender: "my-sender"
+      from: "my-sender"
   - name: accessyou
     type: accessyou
     accessyou:

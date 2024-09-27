@@ -18,17 +18,17 @@ type TwilioClient struct {
 	Client              *http.Client
 	AccountSID          string
 	AuthToken           string
-	Sender              string
+	From                string
 	MessagingServiceSID string
 	Logger              *slog.Logger
 }
 
-func NewTwilioClient(httpClient *http.Client, accountSID string, authToken string, sender string, messagingServiceSID string, logger *slog.Logger) *TwilioClient {
+func NewTwilioClient(httpClient *http.Client, accountSID string, authToken string, from string, messagingServiceSID string, logger *slog.Logger) *TwilioClient {
 	return &TwilioClient{
 		Client:              httpClient,
 		AccountSID:          accountSID,
 		AuthToken:           authToken,
-		Sender:              sender,
+		From:                from,
 		MessagingServiceSID: messagingServiceSID,
 		Logger:              logger,
 	}
@@ -51,7 +51,7 @@ func (t *TwilioClient) send(options *smsclient.SendOptions) ([]byte, *SendRespon
 	if t.MessagingServiceSID != "" {
 		values.Set("MessagingServiceSid", t.MessagingServiceSID)
 	} else {
-		values.Set("From", t.Sender)
+		values.Set("From", t.From)
 	}
 
 	requestBody := values.Encode()

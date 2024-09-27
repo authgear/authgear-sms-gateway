@@ -8,7 +8,7 @@ config:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
         message_service_sid: "my-message-service-sid"
-        sender: "+85212345678"
+        from: "+85212345678"
     - name: accessyou
       type: accessyou
       accessyou:
@@ -64,7 +64,7 @@ config:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
         message_service_sid: "my-message-service-sid"
-        sender: "my-sender"
+        from: "my-sender"
   provider_selector:
     switch:
       - type: match_phone_number_alpha2
@@ -86,7 +86,7 @@ config:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
         message_service_sid: "my-message-service-sid"
-        sender: "my-sender"
+        from: "my-sender"
   provider_selector:
     switch:
       - type: match_phone_number_alpha2
@@ -107,7 +107,7 @@ config:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
         message_service_sid: "my-message-service-sid"
-        sender: "+85212345678"
+        from: "+85212345678"
     - name: accessyou
       type: accessyou
       accessyou:
@@ -161,7 +161,7 @@ config:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
         message_service_sid: "my-message-service-sid"
-        sender: "+85212345678"
+        from: "+85212345678"
     - name: accessyou
       type: accessyou
       accessyou:

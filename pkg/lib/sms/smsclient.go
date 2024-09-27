@@ -19,7 +19,7 @@ func NewClientFromConfigProvider(p *config.Provider, httpClient *http.Client, lo
 			httpClient,
 			p.Twilio.AccountSID,
 			p.Twilio.AuthToken,
-			p.Twilio.Sender,
+			p.Twilio.From,
 			p.Twilio.MessagingServiceSID,
 			logger,
 		)

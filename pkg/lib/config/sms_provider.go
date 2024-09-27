@@ -36,7 +36,7 @@ type Provider struct {
 }
 
 type ProviderConfigTwilio struct {
-	Sender              string `json:"sender,omitempty"`
+	From                string `json:"from,omitempty"`
 	AccountSID          string `json:"account_sid,omitempty"`
 	AuthToken           string `json:"auth_token,omitempty"`
 	MessagingServiceSID string `json:"message_service_sid,omitempty"`
@@ -83,12 +83,12 @@ var _ = RootSchema.Add("ProviderConfigTwilio", `
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
-		"sender": { "type": "string" },
+		"from": { "type": "string" },
 		"account_sid": { "type": "string" },
 		"auth_token": {"type": "string"},
 		"message_service_sid": {"type": "string"}
 	},
-	"required": ["sender", "account_sid", "auth_token", "message_service_sid"]
+	"required": ["from", "account_sid", "auth_token", "message_service_sid"]
 }
 `)
 
