@@ -56,6 +56,7 @@ func (t *TwilioClient) send(options *smsclient.SendOptions) ([]byte, *SendRespon
 
 	requestBody := values.Encode()
 	req, _ := http.NewRequest("POST", u.String(), strings.NewReader(requestBody))
+	req.SetBasicAuth(t.AccountSID, t.AuthToken)
 
 	resp, err := t.Client.Do(req)
 	if err != nil {
