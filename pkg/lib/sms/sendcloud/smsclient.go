@@ -1,15 +1,12 @@
 package sendcloud
 
 import (
-	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
-
-var ErrMissingSendCloudConfiguration = errors.New("accessyou: configuration is missing")
 
 func makeVarsFromTemplateVariables(variables *smsclient.TemplateVariables) map[string]interface{} {
 	wrapped := func(field string) string {
