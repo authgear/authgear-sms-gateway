@@ -4,12 +4,12 @@ go 1.22.5
 
 require (
 	github.com/authgear/authgear-server v0.0.0-20240905095053-d534e462de08
-	github.com/golang/mock v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/nyaruka/phonenumbers v1.4.0
 	github.com/smartystreets/goconvey v1.8.1
 	github.com/twilio/twilio-go v1.15.1
+	gopkg.in/h2non/gock.v1 v1.1.2
 	gopkg.in/yaml.v2 v2.4.0
 	sigs.k8s.io/yaml v1.4.0
 )
@@ -28,10 +28,12 @@ require (
 	github.com/go-webauthn/webauthn v0.8.6 // indirect
 	github.com/go-webauthn/x v0.1.4 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.0 // indirect
+	github.com/golang/mock v1.6.0 // indirect
 	github.com/google/go-tpm v0.9.0 // indirect
 	github.com/google/uuid v1.4.0 // indirect
 	github.com/google/wire v0.5.0 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
+	github.com/h2non/parth v0.0.0-20190131123155-b4df798d6542 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/holiman/uint256 v1.2.4 // indirect
 	github.com/iawaknahc/jsonschema v0.0.0-20211026064614-d05c07b7760d // indirect

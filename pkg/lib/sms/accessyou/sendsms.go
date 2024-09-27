@@ -7,23 +7,16 @@ import (
 	"regexp"
 )
 
-//go:generate mockgen -source=sendsms.go -destination=sendsms_mock_test.go -package accessyou
-
 var leadingBOMRegexp = regexp.MustCompile(`^[\x{feff}]+`)
 
-type HTTPClient interface {
-	Do(req *http.Request) (*http.Response, error)
-}
-
 func fixRespData(respData []byte) []byte {
-	// The response data is in format
-	// "\ufeff{\"msg_status\":\"100\",\"msg_status_desc\":\"Successfully submitted message. \\u6267\\u884c\\u6210\\u529f\",\"phoneno\":\"852********\",\"msg_id\":852309279}"
-	// Remove BOM token from resp json
+	// Remove BOM token from resp json,
+	// See _test.go for details.
 	return leadingBOMRegexp.ReplaceAll(respData, []byte(""))
 }
 
 func SendSMS(
-	client HTTPClient,
+	client *http.Client,
 	baseUrl string,
 	accountNo string,
 	user string,
@@ -62,16 +55,15 @@ func SendSMS(
 	defer resp.Body.Close()
 
 	respData, err := io.ReadAll(resp.Body)
-
 	if err != nil {
 		return nil, nil, err
 	}
-
 	respData = fixRespData(respData)
 
 	sendSMSResponse, err := ParseSendSMSResponse(respData)
 	if err != nil {
 		return respData, nil, err
 	}
+
 	return respData, sendSMSResponse, err
 }

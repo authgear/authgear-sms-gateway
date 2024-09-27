@@ -2,76 +2,19 @@ package accessyou
 
 import (
 	"bytes"
-	"io"
 	"net/http"
-	"net/url"
 	"testing"
 
-	"github.com/golang/mock/gomock"
+	"gopkg.in/h2non/gock.v1"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-var successResponse = []byte(
-	"\ufeff{\"msg_status\":\"100\",\"msg_status_desc\":\"Successfully submitted message. \\u6267\\u884c\\u6210\\u529f\",\"phoneno\":\"85264975244\",\"msg_id\":854998103}",
-)
+var successResponseWithoutBOM = `{"msg_status":"100","msg_status_desc":"Successfully submitted message. 执行成功","phoneno":"85264975244","msg_id":854998103}`
+
+var successResponseWithBOM = "\ufeff" + successResponseWithoutBOM
 
 func TestSendSMS(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	client := NewMockHTTPClient(ctrl)
-
-	test := func(
-		baseUrl string,
-		accountNo string,
-		user string,
-		pwd string,
-		sender string,
-		to string,
-		body string,
-		expect func(clientDo *gomock.Call),
-		callback func([]byte, *SendSMSResponse, error),
-	) {
-		u, err := url.Parse(baseUrl)
-		if err != nil {
-			panic(err)
-		}
-		u.Path = "/sendsms.php"
-
-		queryParams := url.Values{
-			"accountno": {accountNo},
-			"pwd":       {pwd},
-			"tid":       {"1"},
-			"phone":     {to},
-			"a":         {body},
-			"user":      {user},
-			"from":      {sender},
-		}
-		u.RawQuery = queryParams.Encode()
-
-		req, _ := http.NewRequest(
-			"POST",
-			u.String(),
-			nil)
-		req.Header.Set("Cookie", "dynamic=sms")
-
-		expect(client.EXPECT().Do(req))
-
-		respData, sendSMSResponse, err := SendSMS(
-			client,
-			baseUrl,
-			accountNo,
-			user,
-			pwd,
-			sender,
-			to,
-			body,
-		)
-
-		callback(respData, sendSMSResponse, err)
-	}
-
 	Convey("SendSMS success", t, func() {
 		var baseUrl = "https://www.example.com"
 		var accountNo = "accountno"
@@ -80,22 +23,25 @@ func TestSendSMS(t *testing.T) {
 		var body = "This is your OTP 123456"
 		var user = "user"
 		var sender = "sender"
-		test(
-			baseUrl, accountNo, user, pwd, sender, to, body,
-			func(clientDo *gomock.Call) {
-				clientDo.Return(
-					&http.Response{
-						Body: io.NopCloser(bytes.NewReader(successResponse)),
-					},
-					nil)
-			},
-			func(respData []byte, sendSMSResponse *SendSMSResponse, err error) {
-				So(err, ShouldBeNil)
-				So(respData, ShouldEqual, []byte(
-					"{\"msg_status\":\"100\",\"msg_status_desc\":\"Successfully submitted message. \\u6267\\u884c\\u6210\\u529f\",\"phoneno\":\"85264975244\",\"msg_id\":854998103}",
-				))
-				So(sendSMSResponse.Status, ShouldEqual, "100")
-			},
-		)
+
+		httpClient := &http.Client{}
+		gock.InterceptClient(httpClient)
+		defer gock.Off()
+
+		gock.New("https://www.example.com").
+			Post("/sendsms.php").
+			Reply(200).
+			Body(bytes.NewReader([]byte(successResponseWithBOM)))
+
+		rawBody, parsedResponse, err := SendSMS(httpClient, baseUrl, accountNo, user, pwd, sender, to, body)
+
+		So(err, ShouldBeNil)
+		So(rawBody, ShouldResemble, []byte(successResponseWithoutBOM))
+		So(parsedResponse, ShouldResemble, &SendSMSResponse{
+			MessageID:   854998103,
+			Status:      "100",
+			Description: "Successfully submitted message. 执行成功",
+			PhoneNo:     "85264975244",
+		})
 	})
 }
