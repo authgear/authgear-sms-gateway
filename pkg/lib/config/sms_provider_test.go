@@ -43,7 +43,7 @@ func TestSMSProvider(t *testing.T) {
 					panic(err)
 				}
 
-				_, err = config.ParseSMSProviderConfigFromYAML([]byte(inputYAML))
+				_, err = config.ParseRootConfigFromYAML([]byte(inputYAML))
 				if testCase.Error != nil {
 					So(err, ShouldBeError, *testCase.Error)
 				} else {

@@ -11,7 +11,7 @@ import (
 
 type SMSClientMap map[string]sms.RawClient
 
-func NewSMSClientMap(c *config.SMSProviderConfig, logger *slog.Logger) SMSClientMap {
+func NewSMSClientMap(c *config.RootConfig, logger *slog.Logger) SMSClientMap {
 	var clientMap = make(map[string]sms.RawClient)
 
 	for _, provider := range c.Providers {

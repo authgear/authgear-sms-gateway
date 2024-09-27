@@ -65,7 +65,7 @@ provider_selector:
 
 func TestSelector(t *testing.T) {
 	test := func(convey string, configYAML string, ctx *MatchContext, expectedName string) {
-		c, _ := config.ParseSMSProviderConfigFromYAML([]byte(configYAML))
+		c, _ := config.ParseRootConfigFromYAML([]byte(configYAML))
 		res := GetClientNameByMatch(c, ctx)
 		Convey(convey, t, func() {
 			So(res, ShouldEqual, expectedName)

@@ -5,7 +5,7 @@ type SendCloudTemplate struct {
 	TemplateMsgType string `json:"template_msg_type,omitempty"`
 }
 
-var _ = SMSProviderConfigSchema.Add("SendCloudTemplate", `
+var _ = RootSchema.Add("SendCloudTemplate", `
 {
 	"type": "object",
 	"additionalProperties": false,
@@ -22,7 +22,7 @@ type SendCloudTemplateAssignmentByLanguage struct {
 	TemplateID       string `json:"template_id,omitempty"`
 }
 
-var _ = SMSProviderConfigSchema.Add("SendCloudTemplateAssignmentByLanguage", `
+var _ = RootSchema.Add("SendCloudTemplateAssignmentByLanguage", `
 {
 	"type": "object",
 	"additionalProperties": false,
@@ -40,7 +40,7 @@ type SendCloudTemplateAssignment struct {
 	ByLanguages          []*SendCloudTemplateAssignmentByLanguage `json:"by_languages,omitempty"`
 }
 
-var _ = SMSProviderConfigSchema.Add("SendCloudTemplateAssignment", `
+var _ = RootSchema.Add("SendCloudTemplateAssignment", `
 {
 	"type": "object",
 	"additionalProperties": false,
@@ -66,7 +66,7 @@ type ProviderConfigSendCloud struct {
 	TemplateAssignments []*SendCloudTemplateAssignment `json:"template_assignments,omitempty"`
 }
 
-var _ = SMSProviderConfigSchema.Add("ProviderConfigSendCloud", `
+var _ = RootSchema.Add("ProviderConfigSendCloud", `
 {
 	"type": "object",
 	"additionalProperties": false,

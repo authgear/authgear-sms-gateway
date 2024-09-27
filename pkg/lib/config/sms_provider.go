@@ -21,7 +21,7 @@ const (
 	ProviderTypeSendCloud ProviderType = "sendcloud"
 )
 
-var _ = SMSProviderConfigSchema.Add("ProviderType", `
+var _ = RootSchema.Add("ProviderType", `
 {
 	"type": "string",
 	"enum": ["twilio", "nexmo", "accessyou", "sendcloud"]
@@ -58,7 +58,7 @@ type ProviderConfigAccessYou struct {
 	Pwd       string `json:"pwd,omitempty"`
 }
 
-var _ = SMSProviderConfigSchema.Add("Provider", `
+var _ = RootSchema.Add("Provider", `
 {
 	"type": "object",
 	"additionalProperties": false,
@@ -91,7 +91,7 @@ var _ = SMSProviderConfigSchema.Add("Provider", `
 }
 `)
 
-var _ = SMSProviderConfigSchema.Add("ProviderConfigTwilio", `
+var _ = RootSchema.Add("ProviderConfigTwilio", `
 {
 	"type": "object",
 	"additionalProperties": false,
@@ -105,7 +105,7 @@ var _ = SMSProviderConfigSchema.Add("ProviderConfigTwilio", `
 }
 `)
 
-var _ = SMSProviderConfigSchema.Add("ProviderConfigNexmo", `
+var _ = RootSchema.Add("ProviderConfigNexmo", `
 {
 	"type": "object",
 	"additionalProperties": false,
@@ -118,7 +118,7 @@ var _ = SMSProviderConfigSchema.Add("ProviderConfigNexmo", `
 }
 `)
 
-var _ = SMSProviderConfigSchema.Add("ProviderConfigAccessYou", `
+var _ = RootSchema.Add("ProviderConfigAccessYou", `
 {
 	"type": "object",
 	"additionalProperties": false,
@@ -141,7 +141,7 @@ const (
 	ProviderSelectorSwitchTypeDefault                        ProviderSelectorSwitchType = "default"
 )
 
-var _ = SMSProviderConfigSchema.Add("ProviderSelectorSwitchType", `
+var _ = RootSchema.Add("ProviderSelectorSwitchType", `
 {
 	"type": "string",
 	"enum": ["match_phone_number_alpha2", "match_app_id_and_phone_number_alpha2", "default"]
@@ -155,7 +155,7 @@ type ProviderSelectorSwitchRule struct {
 	AppID             string                     `json:"app_id,omitempty"`
 }
 
-var _ = SMSProviderConfigSchema.Add("ProviderSelectorSwitchRule", `
+var _ = RootSchema.Add("ProviderSelectorSwitchRule", `
 {
 	"type": "object",
 	"additionalProperties": false,
@@ -183,7 +183,7 @@ type ProviderSelector struct {
 	Switch []*ProviderSelectorSwitchRule `json:"switch,omitempty"`
 }
 
-var _ = SMSProviderConfigSchema.Add("ProviderSelector", `
+var _ = RootSchema.Add("ProviderSelector", `
 {
 	"type": "object",
 	"additionalProperties": false,
@@ -198,12 +198,12 @@ var _ = SMSProviderConfigSchema.Add("ProviderSelector", `
 }
 `)
 
-type SMSProviderConfig struct {
+type RootConfig struct {
 	Providers        []*Provider       `json:"providers,omitempty"`
 	ProviderSelector *ProviderSelector `json:"provider_selector,omitempty"`
 }
 
-var _ = SMSProviderConfigSchema.Add("SMSProviderConfig", `
+var _ = RootSchema.Add("RootConfig", `
 {
 	"type": "object",
 	"additionalProperties": false,
@@ -219,13 +219,13 @@ var _ = SMSProviderConfigSchema.Add("SMSProviderConfig", `
 }
 `)
 
-func (c *SMSProviderConfig) Validate(ctx *validation.Context) {
+func (c *RootConfig) Validate(ctx *validation.Context) {
 	c.ValidateProviderSelectorUseProvider(ctx)
 	c.ValidateProviderSelectorDefault(ctx)
 	c.ValidateSendCloudConfigs(ctx)
 }
 
-func (c *SMSProviderConfig) ValidateProviderSelectorUseProvider(ctx *validation.Context) {
+func (c *RootConfig) ValidateProviderSelectorUseProvider(ctx *validation.Context) {
 	providers := c.Providers
 	for i, switchCase := range c.ProviderSelector.Switch {
 		useProvider := switchCase.UseProvider
@@ -236,7 +236,7 @@ func (c *SMSProviderConfig) ValidateProviderSelectorUseProvider(ctx *validation.
 	}
 }
 
-func (c *SMSProviderConfig) ValidateProviderSelectorDefault(ctx *validation.Context) {
+func (c *RootConfig) ValidateProviderSelectorDefault(ctx *validation.Context) {
 	for _, switchCase := range c.ProviderSelector.Switch {
 		if switchCase.Type == ProviderSelectorSwitchTypeDefault {
 			return
@@ -245,7 +245,7 @@ func (c *SMSProviderConfig) ValidateProviderSelectorDefault(ctx *validation.Cont
 	ctx.Child("provider_selector", "switch").EmitErrorMessage(fmt.Sprintf("provider selector default not found"))
 }
 
-func (c *SMSProviderConfig) ValidateSendCloudConfigs(ctx *validation.Context) {
+func (c *RootConfig) ValidateSendCloudConfigs(ctx *validation.Context) {
 	for i, provider := range c.Providers {
 		if provider.Type == ProviderTypeSendCloud {
 			c.ValidateSendCloudConfig(ctx.Child("providers", strconv.Itoa(i), "sendcloud"), provider.SendCloud)
@@ -253,7 +253,7 @@ func (c *SMSProviderConfig) ValidateSendCloudConfigs(ctx *validation.Context) {
 	}
 }
 
-func (c *SMSProviderConfig) ValidateSendCloudConfig(ctx *validation.Context, sendCloudConfig *ProviderConfigSendCloud) {
+func (c *RootConfig) ValidateSendCloudConfig(ctx *validation.Context, sendCloudConfig *ProviderConfigSendCloud) {
 	templates := sendCloudConfig.Templates
 	for i, templateAssignment := range sendCloudConfig.TemplateAssignments {
 		ctxTemplateAssignment := ctx.Child("template_assignments", strconv.Itoa(i))
@@ -276,7 +276,7 @@ func (c *SMSProviderConfig) ValidateSendCloudConfig(ctx *validation.Context, sen
 
 }
 
-func ParseSMSProviderConfigFromYAML(inputYAML []byte) (*SMSProviderConfig, error) {
+func ParseRootConfigFromYAML(inputYAML []byte) (*RootConfig, error) {
 	const validationErrorMessage = "invalid configuration"
 
 	jsonData, err := yaml.YAMLToJSON(inputYAML)
@@ -284,12 +284,12 @@ func ParseSMSProviderConfigFromYAML(inputYAML []byte) (*SMSProviderConfig, error
 		return nil, err
 	}
 
-	err = SMSProviderConfigSchema.Validator().ValidateWithMessage(bytes.NewReader(jsonData), validationErrorMessage)
+	err = RootSchema.Validator().ValidateWithMessage(bytes.NewReader(jsonData), validationErrorMessage)
 	if err != nil {
 		return nil, err
 	}
 
-	var config SMSProviderConfig
+	var config RootConfig
 	decoder := json.NewDecoder(bytes.NewReader(jsonData))
 	err = decoder.Decode(&config)
 	if err != nil {

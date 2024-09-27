@@ -4,8 +4,8 @@ import (
 	"github.com/authgear/authgear-server/pkg/util/validation"
 )
 
-var SMSProviderConfigSchema = validation.NewMultipartSchema("SMSProviderConfig")
+var RootSchema = validation.NewMultipartSchema("RootConfig")
 
 func init() {
-	SMSProviderConfigSchema.Instantiate()
+	RootSchema.Instantiate()
 }

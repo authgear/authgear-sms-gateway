@@ -34,15 +34,15 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	cfg, err := config.ParseSMSProviderConfigFromYAML(configYAML)
+	cfg, err := config.ParseRootConfigFromYAML(configYAML)
 	if err != nil {
 		panic(err)
 	}
 	smsClientMap := sms.NewSMSClientMap(cfg, logger)
 	smsService := &sms.SMSService{
-		Logger:            logger,
-		SMSProviderConfig: cfg,
-		SMSClientMap:      smsClientMap,
+		Logger:       logger,
+		RootConfig:   cfg,
+		SMSClientMap: smsClientMap,
 	}
 
 	http.Handle("/healthz", &handler.HealthzHandler{})
