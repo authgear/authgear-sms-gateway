@@ -67,4 +67,3 @@ provider_selector:
       phone_number_alpha2: CN
     - type: default
       use_provider: twilio
-

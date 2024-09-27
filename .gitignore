@@ -8,4 +8,4 @@
 .DS_Store
 
 .env
-var/sms_service_provider_config.yaml
+var/authgear-sms-gateway.yaml

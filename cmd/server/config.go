@@ -5,8 +5,8 @@ import (
 )
 
 type Config struct {
-	ListenAddr                   string `envconfig:"LISTEN_ADDR" default:"0.0.0.0:8091"`
-	SMSServiceProviderConfigPath string `envconfig:"SMS_SERVICE_PROVIDER_CONFIG_PATH"`
+	ListenAddr string `envconfig:"LISTEN_ADDR" default:"0.0.0.0:8091"`
+	ConfigPath string `envconfig:"CONFIG_PATH" default:"./var/authgear-sms-gateway.yaml"`
 }
 
 func LoadConfigFromEnv() (*Config, error) {

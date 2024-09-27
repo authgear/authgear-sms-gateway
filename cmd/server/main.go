@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -22,26 +21,25 @@ func main() {
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		log.Printf("failed to load .env file: %s", err)
 	}
-	cfg, err := LoadConfigFromEnv()
+	envCfg, err := LoadConfigFromEnv()
 	if err != nil {
 		panic(err)
 	}
 
 	logger := logger.NewLogger()
 
-	smsServiceProviderConfigPath, err := filepath.Abs(cfg.SMSServiceProviderConfigPath)
-	smsProviderConfigYAML, err := os.ReadFile(smsServiceProviderConfigPath)
+	configYAML, err := os.ReadFile(envCfg.ConfigPath)
 	if err != nil {
 		panic(err)
 	}
-	smsProviderConfig, err := config.ParseSMSProviderConfigFromYAML([]byte(smsProviderConfigYAML))
+	cfg, err := config.ParseSMSProviderConfigFromYAML(configYAML)
 	if err != nil {
 		panic(err)
 	}
-	smsClientMap := sms.NewSMSClientMap(smsProviderConfig, logger)
+	smsClientMap := sms.NewSMSClientMap(cfg, logger)
 	smsService := &sms.SMSService{
 		Logger:            logger,
-		SMSProviderConfig: smsProviderConfig,
+		SMSProviderConfig: cfg,
 		SMSClientMap:      smsClientMap,
 	}
 
@@ -52,11 +50,11 @@ func main() {
 	})
 
 	server := &http.Server{
-		Addr:              cfg.ListenAddr,
+		Addr:              envCfg.ListenAddr,
 		ReadHeaderTimeout: 3 * time.Second,
 	}
 
-	logger.Info(fmt.Sprintf("Server running at %v", cfg.ListenAddr))
+	logger.Info(fmt.Sprintf("Server running at %v", envCfg.ListenAddr))
 	err = server.ListenAndServe()
 	if err != nil {
 		panic(err)
