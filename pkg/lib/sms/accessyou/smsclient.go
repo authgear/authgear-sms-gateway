@@ -20,6 +20,7 @@ type AccessYouClient struct {
 }
 
 func NewAccessYouClient(
+	httpClient *http.Client,
 	baseUrl string,
 	accountNo string,
 	user string,
@@ -31,8 +32,8 @@ func NewAccessYouClient(
 		baseUrl = "http://sms.accessyou-anyip.com"
 	}
 	return &AccessYouClient{
+		Client:    httpClient,
 		BaseUrl:   baseUrl,
-		Client:    &http.Client{},
 		AccountNo: accountNo,
 		User:      user,
 		Pwd:       pwd,

@@ -25,6 +25,11 @@ func main() {
 		panic(err)
 	}
 
+	// Set timeout to avoid indefinite waiting time.
+	httpClient := &http.Client{
+		Timeout: 5 * time.Second,
+	}
+
 	envCfg, err := LoadEnvConfigFromEnv()
 	if err != nil {
 		panic(err)
@@ -38,7 +43,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	smsClientMap := sms.NewSMSClientMap(cfg, logger)
+	smsClientMap := sms.NewSMSClientMap(cfg, httpClient, logger)
 	smsService := &sms.SMSService{
 		Logger:       logger,
 		RootConfig:   cfg,

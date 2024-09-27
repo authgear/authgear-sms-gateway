@@ -49,6 +49,7 @@ type SendCloudClient struct {
 }
 
 func NewSendCloudClient(
+	httpClient *http.Client,
 	baseUrl string,
 	smsUser string,
 	smsKey string,
@@ -59,8 +60,8 @@ func NewSendCloudClient(
 		baseUrl = "https://api.sendcloud.net"
 	}
 	return &SendCloudClient{
+		Client:           httpClient,
 		BaseUrl:          baseUrl,
-		Client:           &http.Client{},
 		SMSUser:          smsUser,
 		SMSKey:           smsKey,
 		TemplateResolver: templateResolver,

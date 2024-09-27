@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net/http"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/accessyou"
@@ -12,7 +13,7 @@ import (
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/twilio"
 )
 
-func NewClientFromConfigProvider(p *config.Provider, logger *slog.Logger) smsclient.RawClient {
+func NewClientFromConfigProvider(p *config.Provider, httpClient *http.Client, logger *slog.Logger) smsclient.RawClient {
 	switch p.Type {
 	case config.ProviderTypeTwilio:
 		return twilio.NewTwilioClient(
@@ -23,6 +24,7 @@ func NewClientFromConfigProvider(p *config.Provider, logger *slog.Logger) smscli
 		)
 	case config.ProviderTypeAccessYou:
 		return accessyou.NewAccessYouClient(
+			httpClient,
 			p.AccessYou.BaseUrl,
 			p.AccessYou.AccountNo,
 			p.AccessYou.User,
@@ -36,6 +38,7 @@ func NewClientFromConfigProvider(p *config.Provider, logger *slog.Logger) smscli
 			p.SendCloud.TemplateAssignments,
 		)
 		return sendcloud.NewSendCloudClient(
+			httpClient,
 			p.SendCloud.BaseUrl,
 			p.SendCloud.SMSUser,
 			p.SendCloud.SMSKey,

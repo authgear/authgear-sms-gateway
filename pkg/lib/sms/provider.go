@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net/http"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
@@ -11,11 +12,11 @@ import (
 
 type SMSClientMap map[string]smsclient.RawClient
 
-func NewSMSClientMap(c *config.RootConfig, logger *slog.Logger) SMSClientMap {
+func NewSMSClientMap(c *config.RootConfig, httpClient *http.Client, logger *slog.Logger) SMSClientMap {
 	var clientMap = make(map[string]smsclient.RawClient)
 
 	for _, provider := range c.Providers {
-		client := NewClientFromConfigProvider(provider, logger)
+		client := NewClientFromConfigProvider(provider, httpClient, logger)
 		clientMap[provider.Name] = client
 	}
 
