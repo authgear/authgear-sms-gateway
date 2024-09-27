@@ -16,8 +16,7 @@ $ make vendor
 ### Set up environment
 
 ```sh
-$ cp .env.example .env
-$ cp var/sms_service_provider_config.example.yaml var/sms_service_provider_config.yaml
+$ cp var/authgear-sms-gateway.example.yaml var/authgear-sms-gateway.yaml
 ```
 
 ## Run
@@ -35,7 +34,11 @@ $ curl --request POST \
   --url http://localhost:8091/send \
   --header 'Content-Type: application/json' \
   --data '{
+    "app_id": "accounts",
     "to": "+85298765432",
     "body": "Your OTP is 123456"
+    "language_tag": "zh-HK",
+    "template_name": "verficiation_sms.txt",
+    "template_variables": {}
 }'
 ```
