@@ -11,9 +11,6 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"github.com/authgear/authgear-server/pkg/util/httputil"
-	authgearserverlog "github.com/authgear/authgear-server/pkg/util/log"
-
 	"github.com/authgear/authgear-sms-gateway/pkg/handler"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/logger"
@@ -32,10 +29,6 @@ func main() {
 
 	logger := logger.NewLogger()
 
-	jsonResponseWriter := httputil.JSONResponseWriter{
-		Logger: httputil.NewJSONResponseWriterLogger(authgearserverlog.NewFactory(authgearserverlog.LevelInfo)),
-	}
-
 	smsServiceProviderConfigPath, err := filepath.Abs(cfg.SMSServiceProviderConfigPath)
 	smsProviderConfigYAML, err := os.ReadFile(smsServiceProviderConfigPath)
 	if err != nil {
@@ -49,9 +42,7 @@ func main() {
 	smsService := sms.NewSMSService(logger, smsProviderConfig, smsClientMap)
 
 	http.Handle("/healthz", handler.NewHealthzHandler())
-	http.Handle("/send", handler.NewSendHandler(
-		logger, smsService, &jsonResponseWriter,
-	))
+	http.Handle("/send", handler.NewSendHandler(logger, smsService))
 
 	server := &http.Server{
 		Addr:              cfg.ListenAddr,
