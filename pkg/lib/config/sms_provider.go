@@ -16,7 +16,6 @@ type ProviderType string
 
 const (
 	ProviderTypeTwilio    ProviderType = "twilio"
-	ProviderTypeNexmo     ProviderType = "nexmo"
 	ProviderTypeAccessYou ProviderType = "accessyou"
 	ProviderTypeSendCloud ProviderType = "sendcloud"
 )
@@ -24,7 +23,7 @@ const (
 var _ = RootSchema.Add("ProviderType", `
 {
 	"type": "string",
-	"enum": ["twilio", "nexmo", "accessyou", "sendcloud"]
+	"enum": ["twilio", "accessyou", "sendcloud"]
 }
 `)
 
@@ -32,7 +31,6 @@ type Provider struct {
 	Name      string                   `json:"name,omitempty"`
 	Type      ProviderType             `json:"type,omitempty"`
 	Twilio    *ProviderConfigTwilio    `json:"twilio,omitempty" nullable:"true"`
-	Nexmo     *ProviderConfigNexmo     `json:"nexmo,omitempty" nullable:"true"`
 	AccessYou *ProviderConfigAccessYou `json:"accessyou,omitempty" nullable:"true"`
 	SendCloud *ProviderConfigSendCloud `json:"sendcloud,omitempty" nullable:"true"`
 }
@@ -42,12 +40,6 @@ type ProviderConfigTwilio struct {
 	AccountSID          string `json:"account_sid,omitempty"`
 	AuthToken           string `json:"auth_token,omitempty"`
 	MessagingServiceSID string `json:"message_service_sid,omitempty"`
-}
-
-type ProviderConfigNexmo struct {
-	Sender    string `json:"sender,omitempty"`
-	APIKey    string `json:"api_key,omitempty"`
-	APISecret string `json:"api_secret,omitempty"`
 }
 
 type ProviderConfigAccessYou struct {
@@ -66,7 +58,6 @@ var _ = RootSchema.Add("Provider", `
 		"name": { "type": "string" },
 		"type": { "$ref": "#/$defs/ProviderType" },
 		"twilio": { "$ref": "#/$defs/ProviderConfigTwilio" },
-		"nexmo": { "$ref": "#/$defs/ProviderConfigNexmo" },
 		"accessyou": { "$ref": "#/$defs/ProviderConfigAccessYou" },
 		"sendcloud": { "$ref": "#/$defs/ProviderConfigSendCloud" }
 	},
@@ -74,10 +65,6 @@ var _ = RootSchema.Add("Provider", `
 		{
 			"if": { "properties": { "type": { "const": "twilio" } }},
 			"then": { "required": ["twilio"] }
-		},
-		{
-			"if": { "properties": { "type": { "const": "nexmo" } }},
-			"then": { "required": ["nexmo"] }
 		},
 		{
 			"if": { "properties": { "type": { "const": "accessyou" } }},
@@ -102,19 +89,6 @@ var _ = RootSchema.Add("ProviderConfigTwilio", `
 		"message_service_sid": {"type": "string"}
 	},
 	"required": ["sender", "account_sid", "auth_token", "message_service_sid"]
-}
-`)
-
-var _ = RootSchema.Add("ProviderConfigNexmo", `
-{
-	"type": "object",
-	"additionalProperties": false,
-	"properties": {
-		"sender": { "type": "string" },
-		"api_key": { "type": "string" },
-		"api_secret": {"type": "string"}
-	},
-	"required": ["sender", "api_key", "api_secret"]
 }
 `)
 

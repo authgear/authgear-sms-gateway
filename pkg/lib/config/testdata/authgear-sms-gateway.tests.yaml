@@ -9,12 +9,6 @@ config:
         auth_token: "my-auth-token"
         message_service_sid: "my-message-service-sid"
         sender: "+85212345678"
-    - name: nexmo
-      type: nexmo
-      nexmo:
-        api_key: "my-api-key"
-        api_secret: "my-secret"
-        sender: "+85212345678"
     - name: accessyou
       type: accessyou
       accessyou:
@@ -62,7 +56,7 @@ name: failed-provider-type
 error: |-
   invalid configuration:
   /providers/0/type: enum
-    map[actual:twillio expected:[twilio nexmo accessyou sendcloud]]
+    map[actual:twillio expected:[twilio accessyou sendcloud]]
 config:
   providers:
     - name: twilio
@@ -115,12 +109,6 @@ config:
         auth_token: "my-auth-token"
         message_service_sid: "my-message-service-sid"
         sender: "+85212345678"
-    - name: nexmo
-      type: nexmo
-      nexmo:
-        api_key: "my-api-key"
-        api_secret: "my-secret"
-        sender: "+85212345678"
     - name: accessyou
       type: accessyou
       accessyou:
@@ -165,8 +153,8 @@ config:
 name: failed-sendcloud-config
 error: |-
   invalid configuration:
-  /providers/3/sendcloud/template_assignments/0/default_template_id: template_id 919889 not found
-  /providers/3/sendcloud/template_assignments/0/by_languages/0/template_id: template_id 919890 not found
+  /providers/2/sendcloud/template_assignments/0/default_template_id: template_id 919889 not found
+  /providers/2/sendcloud/template_assignments/0/by_languages/0/template_id: template_id 919890 not found
 config:
   providers:
     - name: twilio
@@ -175,12 +163,6 @@ config:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
         message_service_sid: "my-message-service-sid"
-        sender: "+85212345678"
-    - name: nexmo
-      type: nexmo
-      nexmo:
-        api_key: "my-api-key"
-        api_secret: "my-secret"
         sender: "+85212345678"
     - name: accessyou
       type: accessyou

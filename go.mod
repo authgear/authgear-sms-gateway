@@ -7,7 +7,6 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/njern/gonexmo v2.0.0+incompatible
 	github.com/nyaruka/phonenumbers v1.4.0
 	github.com/smartystreets/goconvey v1.8.1
 	github.com/twilio/twilio-go v1.15.1

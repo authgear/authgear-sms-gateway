@@ -7,7 +7,6 @@ import (
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/accessyou"
-	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/nexmo"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/sendcloud"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/twilio"
@@ -21,12 +20,6 @@ func NewClientFromConfigProvider(p *config.Provider, logger *slog.Logger) smscli
 			p.Twilio.AuthToken,
 			p.Twilio.Sender,
 			p.Twilio.MessagingServiceSID,
-		)
-	case config.ProviderTypeNexmo:
-		return nexmo.NewNexmoClient(
-			p.Nexmo.APIKey,
-			p.Nexmo.APISecret,
-			p.Nexmo.Sender,
 		)
 	case config.ProviderTypeAccessYou:
 		return accessyou.NewAccessYouClient(

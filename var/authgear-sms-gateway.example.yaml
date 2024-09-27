@@ -6,12 +6,6 @@ providers:
       auth_token: "my-auth-token"
       message_service_sid: "my-message-service-sid"
       sender: "my-sender"
-  - name: nexmo
-    type: nexmo
-    nexmo:
-      api_key: "my-api-key"
-      api_secret: "my-secret"
-      sender: "my-sender"
   - name: accessyou
     type: accessyou
     accessyou:
