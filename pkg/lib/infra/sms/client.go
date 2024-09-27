@@ -21,8 +21,7 @@ type SendOptions struct {
 type SendResult struct {
 	ClientResponse []byte
 	Success        bool
-	HasNumSegments bool
-	NumSegments    int
+	SegmentCount   *int
 }
 
 type RawClient interface {

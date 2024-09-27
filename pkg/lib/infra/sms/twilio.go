@@ -48,14 +48,22 @@ func (t *TwilioClient) Send(options *SendOptions) (*SendResult, error) {
 		return nil, fmt.Errorf("twilio: %w", err)
 	}
 
-	numSegments, atoiError := strconv.Atoi(*resp.NumSegments)
+	var segmentCount *int
+	if resp.NumSegments != nil {
+		if i, err := strconv.Atoi(*resp.NumSegments); err == nil {
+			segmentCount = &i
+		}
+	}
 
 	j, err := json.Marshal(resp)
+	if err != nil {
+		return nil, err
+	}
+
 	return &SendResult{
 		ClientResponse: j,
 		Success:        resp.ErrorCode != nil,
-		HasNumSegments: atoiError == nil,
-		NumSegments:    numSegments,
+		SegmentCount:   segmentCount,
 	}, err
 }
 
