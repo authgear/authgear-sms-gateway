@@ -25,7 +25,7 @@ func main() {
 		panic(err)
 	}
 
-	envCfg, err := LoadConfigFromEnv()
+	envCfg, err := LoadEnvConfigFromEnv()
 	if err != nil {
 		panic(err)
 	}

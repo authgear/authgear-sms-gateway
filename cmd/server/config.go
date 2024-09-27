@@ -4,13 +4,13 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
-type Config struct {
+type EnvConfig struct {
 	ListenAddr string `envconfig:"LISTEN_ADDR" default:"0.0.0.0:8091"`
 	ConfigPath string `envconfig:"CONFIG_PATH" default:"./var/authgear-sms-gateway.yaml"`
 }
 
-func LoadConfigFromEnv() (*Config, error) {
-	var cfg Config
+func LoadEnvConfigFromEnv() (*EnvConfig, error) {
+	var cfg EnvConfig
 	err := envconfig.Process("", &cfg)
 	if err != nil {
 		return nil, err
