@@ -1,7 +1,6 @@
 package sms
 
 import (
-	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -26,7 +25,7 @@ func NewSMSClientMap(c *config.RootConfig, httpClient *http.Client, logger *slog
 func (s SMSClientMap) GetClientByName(name string) smsclient.RawClient {
 	client := s[name]
 	if client == nil {
-		panic(errors.New(fmt.Sprintf("Unknown client %s", name)))
+		panic(fmt.Errorf("Unknown client %v", name))
 	}
 	return client
 }

@@ -1,7 +1,6 @@
 package sms
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/nyaruka/phonenumbers"
@@ -75,6 +74,6 @@ func ParseMatcher(rule *config.ProviderSelectorSwitchRule) Matcher {
 	case config.ProviderSelectorSwitchTypeDefault:
 		return &MatcherDefault{}
 	default:
-		panic(errors.New(fmt.Sprintf("Unknown rule type %s", rule.Type)))
+		panic(fmt.Errorf("Unknown rule type %s", rule.Type))
 	}
 }

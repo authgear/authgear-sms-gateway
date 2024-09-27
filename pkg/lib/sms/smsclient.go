@@ -1,7 +1,6 @@
 package sms
 
 import (
-	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -46,6 +45,6 @@ func NewClientFromConfigProvider(p *config.Provider, httpClient *http.Client, lo
 			logger,
 		)
 	default:
-		panic(errors.New(fmt.Sprintf("Unknown type %s", p.Type)))
+		panic(fmt.Errorf("Unknown type %s", p.Type))
 	}
 }

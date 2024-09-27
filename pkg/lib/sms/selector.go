@@ -1,7 +1,6 @@
 package sms
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
@@ -22,7 +21,7 @@ func GetClientNameByMatch(c *config.RootConfig, ctx *MatchContext) string {
 		}
 	}
 	if defaultClient == "" {
-		panic(errors.New(fmt.Sprintf("Cannot select provider given %v", ctx)))
+		panic(fmt.Errorf("Cannot select provider given %v", ctx))
 	}
 	return defaultClient
 }
