@@ -52,12 +52,14 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.Logger.Info("received send request",
+	logger := h.Logger.With(
 		"app_id", body.AppID,
 		"to", body.To,
 		"template_name", body.TemplateName,
 		"language_tag", body.LanguageTag,
 	)
+
+	logger.Info("received send request")
 
 	sendResult, err := h.SMSService.Send(
 		body.AppID,
@@ -72,6 +74,10 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		var errorUnknownResponse *smsclient.ErrorUnknownResponse
 		if errors.As(err, &errorUnknownResponse) {
+			logger.Error("unknown response",
+				"dumped_response", string(errorUnknownResponse.DumpedResponse),
+				"error", err.Error(),
+			)
 			h.write(w, &ResponseBody{
 				Code:             CodeUnknownResponse,
 				DumpedResponse:   errorUnknownResponse.DumpedResponse,
@@ -80,12 +86,21 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		logger.Error("unknown error",
+			"error", err.Error(),
+		)
 		h.write(w, &ResponseBody{
 			Code:             CodeUnknownError,
 			ErrorDescription: err.Error(),
 		})
 		return
 	}
+
+	var attrs []slog.Attr
+	if sendResult.SegmentCount != nil {
+		attrs = append(attrs, slog.Int("segment_count", *sendResult.SegmentCount))
+	}
+	logger.LogAttrs(r.Context(), slog.LevelInfo, "finished send request", attrs...)
 
 	h.write(w, &ResponseBody{
 		Code:           CodeOK,
