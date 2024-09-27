@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -17,16 +16,19 @@ import (
 )
 
 func main() {
+	logger := logger.NewLogger()
+
 	err := godotenv.Load()
-	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		log.Printf("failed to load .env file: %s", err)
+	if errors.Is(err, os.ErrNotExist) {
+		logger.Warn("skip loading .env as it is absent")
+	} else if err != nil {
+		panic(err)
 	}
+
 	envCfg, err := LoadConfigFromEnv()
 	if err != nil {
 		panic(err)
 	}
-
-	logger := logger.NewLogger()
 
 	configYAML, err := os.ReadFile(envCfg.ConfigPath)
 	if err != nil {
