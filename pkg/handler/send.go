@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -28,8 +27,6 @@ var _ = RequestSchema.Add("SendRequestSchema", `
 		"app_id": { "type": "string" },
 		"to": { "type": "string" },
 		"body": { "type": "string" },
-		"app_id": { "type": "string" },
-		"message_type": { "type": "string" },
 		"template_name": { "type": "string" },
 		"language_tag": { "type": "string" },
 		"template_variables": { "$refs": "#/$defs/TemplateVariables" }
@@ -54,7 +51,12 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.Logger.Info(fmt.Sprintf("Attempt to send sms to %v. Body: %v. AppID: %v", body.To, body.Body, body.AppID))
+	h.Logger.Info("received send request",
+		"app_id", body.AppID,
+		"to", body.To,
+		"template_name", body.TemplateName,
+		"language_tag", body.LanguageTag,
+	)
 
 	sendResult, err := h.SMSService.Send(
 		body.AppID,

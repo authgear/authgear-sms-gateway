@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -61,7 +60,9 @@ func main() {
 		ReadHeaderTimeout: 3 * time.Second,
 	}
 
-	logger.Info(fmt.Sprintf("Server running at %v", envCfg.ListenAddr))
+	logger.Info("listening",
+		"addr", envCfg.ListenAddr,
+	)
 	err = server.ListenAndServe()
 	if err != nil {
 		panic(err)

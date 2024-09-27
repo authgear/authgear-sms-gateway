@@ -25,6 +25,7 @@ func SendSMS(
 	to string,
 	body string,
 ) ([]byte, *SendSMSResponse, error) {
+	// TODO: Add logs
 	u, err := url.Parse(baseUrl)
 	if err != nil {
 		return nil, nil, err

@@ -1,7 +1,6 @@
 package sms
 
 import (
-	"fmt"
 	"log/slog"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
@@ -20,6 +19,9 @@ func (s *SMSService) Send(
 ) (*smsclient.SendResult, error) {
 	clientName := GetClientNameByMatch(s.RootConfig, &MatchContext{AppID: appID, PhoneNumber: string(sendOptions.To)})
 	client := s.SMSClientMap.GetClientByName(clientName)
-	s.Logger.Info(fmt.Sprintf("Client %v is selected for %v", clientName, sendOptions.To))
+	s.Logger.Info("selected client",
+		"to", sendOptions.To,
+		"client_name", clientName,
+	)
 	return client.Send(sendOptions)
 }

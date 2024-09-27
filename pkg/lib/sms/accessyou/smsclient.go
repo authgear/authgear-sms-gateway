@@ -1,7 +1,6 @@
 package accessyou
 
 import (
-	"fmt"
 	"log/slog"
 	"net/http"
 	"regexp"
@@ -62,10 +61,7 @@ func (n *AccessYouClient) Send(options *smsclient.SendOptions) (*smsclient.SendR
 		to,
 		options.Body,
 	)
-	n.Logger.Info(fmt.Sprintf("%v", sendSMSResponse))
-
 	if err != nil {
-		n.Logger.Error(fmt.Sprintf("%v", err))
 		return nil, err
 	}
 
