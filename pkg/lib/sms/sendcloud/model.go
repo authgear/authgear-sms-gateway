@@ -76,11 +76,11 @@ func (r *SendRequest) ToMap() map[string]interface{} {
 func (r *SendRequest) ToValues() url.Values {
 	vars, _ := json.Marshal(r.vars)
 	values := url.Values{}
-	values.Set("msgType", fmt.Sprintf("%v", r.msgType))
+	values.Set("msgType", r.msgType)
 	values.Set("phone", strings.Join(r.phone, ","))
 	values.Set("sendRequestId", r.sendRequestId)
 	values.Set("smsUser", r.smsUser)
-	values.Set("templateId", fmt.Sprintf("%v", r.templateId))
+	values.Set("templateId", r.templateId)
 	values.Set("vars", string(vars))
 	return values
 }
