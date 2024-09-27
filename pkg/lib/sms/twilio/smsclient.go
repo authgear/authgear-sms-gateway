@@ -63,7 +63,8 @@ func (t *TwilioClient) Send(options *smsclient.SendOptions) (*smsclient.SendResu
 	}
 
 	return &smsclient.SendResult{
-		ClientResponse: j,
+		// FIXME: Switch to call Twilio via REST.
+		DumpedResponse: j,
 		Success:        resp.ErrorCode != nil,
 		SegmentCount:   segmentCount,
 	}, err

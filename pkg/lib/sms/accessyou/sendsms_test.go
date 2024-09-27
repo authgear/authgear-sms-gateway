@@ -33,10 +33,10 @@ func TestSendSMS(t *testing.T) {
 			Reply(200).
 			Body(bytes.NewReader([]byte(successResponseWithBOM)))
 
-		rawBody, parsedResponse, err := SendSMS(httpClient, baseUrl, accountNo, user, pwd, sender, to, body)
+		dumpedResponse, parsedResponse, err := SendSMS(httpClient, baseUrl, accountNo, user, pwd, sender, to, body)
 
 		So(err, ShouldBeNil)
-		So(rawBody, ShouldResemble, []byte(successResponseWithoutBOM))
+		So(string(dumpedResponse), ShouldEqual, "HTTP/1.1 200 OK\r\nContent-Length: 131\r\n\r\n"+successResponseWithBOM)
 		So(parsedResponse, ShouldResemble, &SendSMSResponse{
 			MessageID:   854998103,
 			Status:      "100",

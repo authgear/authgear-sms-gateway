@@ -4,6 +4,14 @@ import (
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sensitive"
 )
 
+type ErrorUnknownResponse struct {
+	DumpedResponse []byte
+}
+
+func (e *ErrorUnknownResponse) Error() string {
+	return string(e.DumpedResponse)
+}
+
 type TemplateVariables struct {
 	AppName     string `json:"app_name"`
 	ClientID    string `json:"client_id"`
@@ -50,7 +58,7 @@ type SendOptions struct {
 }
 
 type SendResult struct {
-	ClientResponse []byte
+	DumpedResponse []byte
 	Success        bool
 	SegmentCount   *int
 }

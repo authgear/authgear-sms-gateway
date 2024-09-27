@@ -25,6 +25,9 @@ const (
 	// CodeInvalidRequest means the request is invalid.
 	CodeInvalidRequest Code = "invalid_request"
 
+	// CodeUnknownResponse means the response from the SMS provider is unknown.
+	CodeUnknownResponse Code = "unknown_response"
+
 	// CodeUnknownError means any other error.
 	CodeUnknownError Code = "unknown_error"
 )
@@ -43,8 +46,8 @@ func (c Code) HTTPStatusCode() int {
 }
 
 type ResponseBody struct {
-	Code                       Code   `json:"code"`
-	ErrorDescription           string `json:"error_description,omitempty"`
-	UnderlyingHTTPResponseBody string `json:"underlying_http_response_body,omitempty"`
-	SegmentCount               *int   `json:"segment_count,omitempty"`
+	Code             Code   `json:"code"`
+	ErrorDescription string `json:"error_description,omitempty"`
+	DumpedResponse   []byte `json:"dumped_response,omitempty"`
+	SegmentCount     *int   `json:"segment_count,omitempty"`
 }

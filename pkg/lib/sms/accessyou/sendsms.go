@@ -1,10 +1,14 @@
 package accessyou
 
 import (
+	"errors"
 	"io"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"regexp"
+
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
 var leadingBOMRegexp = regexp.MustCompile(`^[\x{feff}]+`)
@@ -55,16 +59,31 @@ func SendSMS(
 	}
 	defer resp.Body.Close()
 
-	respData, err := io.ReadAll(resp.Body)
+	dumpedResponse, err := httputil.DumpResponse(resp, true)
 	if err != nil {
 		return nil, nil, err
 	}
-	respData = fixRespData(respData)
 
-	sendSMSResponse, err := ParseSendSMSResponse(respData)
+	respData, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return respData, nil, err
+		return nil, nil, errors.Join(
+			err,
+			&smsclient.ErrorUnknownResponse{
+				DumpedResponse: dumpedResponse,
+			},
+		)
 	}
 
-	return respData, sendSMSResponse, err
+	respData = fixRespData(respData)
+	sendSMSResponse, err := ParseSendSMSResponse(respData)
+	if err != nil {
+		return nil, nil, errors.Join(
+			err,
+			&smsclient.ErrorUnknownResponse{
+				DumpedResponse: dumpedResponse,
+			},
+		)
+	}
+
+	return dumpedResponse, sendSMSResponse, nil
 }

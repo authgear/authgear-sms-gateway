@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"net/http"
 
@@ -68,8 +69,17 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			TemplateVariables: body.TemplateVariables,
 		},
 	)
-	// TODO: handle err.
 	if err != nil {
+		var errorUnknownResponse *smsclient.ErrorUnknownResponse
+		if errors.As(err, &errorUnknownResponse) {
+			h.write(w, &ResponseBody{
+				Code:             CodeUnknownResponse,
+				DumpedResponse:   errorUnknownResponse.DumpedResponse,
+				ErrorDescription: err.Error(),
+			})
+			return
+		}
+
 		h.write(w, &ResponseBody{
 			Code:             CodeUnknownError,
 			ErrorDescription: err.Error(),
@@ -78,9 +88,9 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.write(w, &ResponseBody{
-		Code:                       CodeOK,
-		UnderlyingHTTPResponseBody: string(sendResult.ClientResponse),
-		SegmentCount:               sendResult.SegmentCount,
+		Code:           CodeOK,
+		DumpedResponse: sendResult.DumpedResponse,
+		SegmentCount:   sendResult.SegmentCount,
 	})
 }
 
