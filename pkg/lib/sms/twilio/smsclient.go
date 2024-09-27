@@ -1,6 +1,7 @@
 package twilio
 
 import (
+	"context"
 	"errors"
 	"io"
 	"log/slog"
@@ -86,6 +87,31 @@ func (t *TwilioClient) send(options *smsclient.SendOptions) ([]byte, *SendRespon
 			},
 		)
 	}
+
+	attrs := []slog.Attr{}
+	if sendResponse.Status != nil {
+		attrs = append(attrs, slog.String("status", *sendResponse.Status))
+	}
+	if sendResponse.SID != nil {
+		attrs = append(attrs, slog.String("sid", *sendResponse.SID))
+	}
+	if sendResponse.DateCreated != nil {
+		attrs = append(attrs, slog.String("date_created", *sendResponse.DateCreated))
+	}
+	if sendResponse.DateSent != nil {
+		attrs = append(attrs, slog.String("date_sent", *sendResponse.DateSent))
+	}
+	if sendResponse.DateUpdated != nil {
+		attrs = append(attrs, slog.String("date_updated", *sendResponse.DateUpdated))
+	}
+	if sendResponse.ErrorCode != nil {
+		attrs = append(attrs, slog.Int("error_code", *sendResponse.ErrorCode))
+	}
+	if sendResponse.ErrorMessage != nil {
+		attrs = append(attrs, slog.String("error_message", *sendResponse.ErrorMessage))
+	}
+
+	t.Logger.LogAttrs(context.TODO(), slog.LevelInfo, "twilio response", attrs...)
 
 	return dumpedResponse, sendResponse, nil
 }

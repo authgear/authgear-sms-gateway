@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/http/httputil"
 	"strings"
@@ -11,7 +12,7 @@ import (
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
-func Send(client *http.Client, baseUrl string, sendRequest *SendRequest, smsKey string) ([]byte, *SendResponse, error) {
+func Send(client *http.Client, baseUrl string, sendRequest *SendRequest, smsKey string, logger *slog.Logger) ([]byte, *SendResponse, error) {
 	values := sendRequest.ToValues()
 	values.Set("signature", sendRequest.Sign(smsKey))
 
@@ -50,6 +51,12 @@ func Send(client *http.Client, baseUrl string, sendRequest *SendRequest, smsKey 
 			},
 		)
 	}
+
+	logger.Info("sendcloud response",
+		"result", sendResponse.Result,
+		"statusCode", sendResponse.StatusCode,
+		"message", sendResponse.Message,
+	)
 
 	return dumpedResponse, sendResponse, nil
 }

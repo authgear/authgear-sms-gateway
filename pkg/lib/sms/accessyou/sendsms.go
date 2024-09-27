@@ -3,6 +3,7 @@ package accessyou
 import (
 	"errors"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -28,8 +29,8 @@ func SendSMS(
 	sender string,
 	to string,
 	body string,
+	logger *slog.Logger,
 ) ([]byte, *SendSMSResponse, error) {
-	// TODO: Add logs
 	u, err := url.Parse(baseUrl)
 	if err != nil {
 		return nil, nil, err
@@ -84,6 +85,12 @@ func SendSMS(
 			},
 		)
 	}
+
+	logger.Info("accessyou response",
+		"msg_id", sendSMSResponse.MessageID,
+		"msg_status", sendSMSResponse.Status,
+		"msg_status_desc", sendSMSResponse.Description,
+	)
 
 	return dumpedResponse, sendSMSResponse, nil
 }

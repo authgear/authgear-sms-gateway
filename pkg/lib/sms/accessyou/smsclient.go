@@ -60,6 +60,7 @@ func (n *AccessYouClient) Send(options *smsclient.SendOptions) (*smsclient.SendR
 		n.Sender,
 		to,
 		options.Body,
+		n.Logger,
 	)
 	if err != nil {
 		return nil, err

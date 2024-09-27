@@ -81,7 +81,7 @@ func (n *SendCloudClient) Send(options *smsclient.SendOptions) (*smsclient.SendR
 		makeVarsFromTemplateVariables(options.TemplateVariables),
 	)
 
-	dumpedResponse, sendResponse, err := Send(n.Client, n.BaseUrl, &sendRequest, n.SMSKey)
+	dumpedResponse, sendResponse, err := Send(n.Client, n.BaseUrl, &sendRequest, n.SMSKey, n.Logger)
 	if err != nil {
 		return nil, err
 	}

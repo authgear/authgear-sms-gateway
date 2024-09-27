@@ -2,6 +2,8 @@ package accessyou
 
 import (
 	"bytes"
+	"io"
+	"log/slog"
 	"net/http"
 	"testing"
 
@@ -33,7 +35,8 @@ func TestSendSMS(t *testing.T) {
 			Reply(200).
 			Body(bytes.NewReader([]byte(successResponseWithBOM)))
 
-		dumpedResponse, parsedResponse, err := SendSMS(httpClient, baseUrl, accountNo, user, pwd, sender, to, body)
+		logger := slog.New(slog.NewTextHandler(io.Discard, nil))
+		dumpedResponse, parsedResponse, err := SendSMS(httpClient, baseUrl, accountNo, user, pwd, sender, to, body, logger)
 
 		So(err, ShouldBeNil)
 		So(string(dumpedResponse), ShouldEqual, "HTTP/1.1 200 OK\r\nContent-Length: 131\r\n\r\n"+successResponseWithBOM)
