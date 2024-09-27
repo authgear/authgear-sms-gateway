@@ -1,6 +1,7 @@
 package sendcloud
 
 import (
+	// nolint: gosec
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
@@ -33,6 +34,7 @@ func NewSendRequest(
 		vars:       vars,
 	}
 	presign := s.Presign()
+	// nolint: gosec
 	h := md5.Sum([]byte(presign))
 	sendRequestId := hex.EncodeToString(h[:])
 	return SendRequest{
@@ -87,6 +89,7 @@ func (r *SendRequest) ToValues() url.Values {
 
 func (r *SendRequest) Sign(key string) string {
 	signStr := fmt.Sprintf("%v&%v&%v", key, r.Presign(), key)
+	// nolint: gosec
 	h := md5.Sum([]byte(signStr))
 	return hex.EncodeToString(h[:])
 }

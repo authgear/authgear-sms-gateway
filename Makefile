@@ -29,6 +29,7 @@ fmt:
 
 .PHONY: lint
 lint:
+	golangci-lint run ./cmd/... ./pkg/... --timeout 7m
 	go vet ./cmd/... ./pkg/...
 
 .PHONY: check-dockerignore
