@@ -1,73 +1,113 @@
 package twilio
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
+	"io"
+	"log/slog"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"strconv"
-
-	"github.com/twilio/twilio-go"
-	api "github.com/twilio/twilio-go/rest/api/v2010"
+	"strings"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
-var ErrMissingTwilioConfiguration = errors.New("twilio: configuration is missing")
-
 type TwilioClient struct {
-	TwilioClient        *twilio.RestClient
+	Client              *http.Client
+	AccountSID          string
+	AuthToken           string
 	Sender              string
 	MessagingServiceSID string
+	Logger              *slog.Logger
 }
 
-func NewTwilioClient(accountSID string, authToken string, sender string, messagingServiceSID string) *TwilioClient {
+func NewTwilioClient(httpClient *http.Client, accountSID string, authToken string, sender string, messagingServiceSID string, logger *slog.Logger) *TwilioClient {
 	return &TwilioClient{
-		TwilioClient: twilio.NewRestClientWithParams(twilio.ClientParams{
-			Username: accountSID,
-			Password: authToken,
-		}),
+		Client:              httpClient,
+		AccountSID:          accountSID,
+		AuthToken:           authToken,
 		Sender:              sender,
 		MessagingServiceSID: messagingServiceSID,
+		Logger:              logger,
 	}
+}
+
+func (t *TwilioClient) send(options *smsclient.SendOptions) ([]byte, *SendResponse, error) {
+	// Written against
+	// https://www.twilio.com/docs/messaging/api/message-resource#create-a-message-resource
+
+	u, err := url.Parse("https://api.twilio.com/2010-04-01/Accounts")
+	if err != nil {
+		return nil, nil, err
+	}
+	u = u.JoinPath(t.AccountSID, "Messages.json")
+
+	values := url.Values{}
+	values.Set("Body", options.Body)
+	values.Set("To", string(options.To))
+
+	if t.MessagingServiceSID != "" {
+		values.Set("MessagingServiceSid", t.MessagingServiceSID)
+	} else {
+		values.Set("From", t.Sender)
+	}
+
+	requestBody := values.Encode()
+	req, _ := http.NewRequest("POST", u.String(), strings.NewReader(requestBody))
+
+	resp, err := t.Client.Do(req)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer resp.Body.Close()
+
+	dumpedResponse, err := httputil.DumpResponse(resp, true)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	respData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, nil, errors.Join(
+			err,
+			&smsclient.ErrorUnknownResponse{
+				DumpedResponse: dumpedResponse,
+			},
+		)
+	}
+
+	sendResponse, err := ParseSendResponse(respData)
+	if err != nil {
+		return nil, nil, errors.Join(
+			err,
+			&smsclient.ErrorUnknownResponse{
+				DumpedResponse: dumpedResponse,
+			},
+		)
+	}
+
+	return dumpedResponse, sendResponse, nil
 }
 
 func (t *TwilioClient) Send(options *smsclient.SendOptions) (*smsclient.SendResult, error) {
-	if t.TwilioClient == nil {
-		return nil, ErrMissingTwilioConfiguration
-	}
-
-	params := &api.CreateMessageParams{}
-	params.SetBody(options.Body)
-	params.SetTo(string(options.To))
-	if t.MessagingServiceSID != "" {
-		params.SetMessagingServiceSid(t.MessagingServiceSID)
-	} else {
-		params.SetFrom(t.Sender)
-	}
-
-	resp, err := t.TwilioClient.Api.CreateMessage(params)
-	if err != nil {
-		return nil, fmt.Errorf("twilio: %w", err)
-	}
-
-	var segmentCount *int
-	if resp.NumSegments != nil {
-		if i, err := strconv.Atoi(*resp.NumSegments); err == nil {
-			segmentCount = &i
-		}
-	}
-
-	j, err := json.Marshal(resp)
+	dumpedResponse, sendSMSResponse, err := t.send(options)
 	if err != nil {
 		return nil, err
 	}
 
+	var segmentCount *int
+	if sendSMSResponse.NumSegments != nil {
+		if parsed, err := strconv.Atoi(*sendSMSResponse.NumSegments); err == nil {
+			segmentCount = &parsed
+		}
+	}
+
 	return &smsclient.SendResult{
-		// FIXME: Switch to call Twilio via REST.
-		DumpedResponse: j,
-		Success:        resp.ErrorCode != nil,
+		DumpedResponse: dumpedResponse,
+		Success:        sendSMSResponse.ErrorCode == nil,
 		SegmentCount:   segmentCount,
-	}, err
+	}, nil
 }
 
 var _ smsclient.RawClient = &TwilioClient{}

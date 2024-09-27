@@ -16,10 +16,12 @@ func NewClientFromConfigProvider(p *config.Provider, httpClient *http.Client, lo
 	switch p.Type {
 	case config.ProviderTypeTwilio:
 		return twilio.NewTwilioClient(
+			httpClient,
 			p.Twilio.AccountSID,
 			p.Twilio.AuthToken,
 			p.Twilio.Sender,
 			p.Twilio.MessagingServiceSID,
+			logger,
 		)
 	case config.ProviderTypeAccessYou:
 		return accessyou.NewAccessYouClient(
