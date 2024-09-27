@@ -13,9 +13,9 @@ import (
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
 )
 
-func TestSMSProvider(t *testing.T) {
-	Convey("SMSProvider", t, func() {
-		f, err := os.Open("testdata/sms_provider_tests.yaml")
+func TestRootConfigValidation(t *testing.T) {
+	Convey("RootConfig", t, func() {
+		f, err := os.Open("testdata/authgear-sms-gateway.tests.yaml")
 		if err != nil {
 			panic(err)
 		}
