@@ -6,23 +6,23 @@ import (
 	"log/slog"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
-	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
-type SMSClientMap map[string]sms.RawClient
+type SMSClientMap map[string]smsclient.RawClient
 
 func NewSMSClientMap(c *config.RootConfig, logger *slog.Logger) SMSClientMap {
-	var clientMap = make(map[string]sms.RawClient)
+	var clientMap = make(map[string]smsclient.RawClient)
 
 	for _, provider := range c.Providers {
-		client := sms.NewClientFromConfigProvider(provider, logger)
+		client := NewClientFromConfigProvider(provider, logger)
 		clientMap[provider.Name] = client
 	}
 
 	return SMSClientMap(clientMap)
 }
 
-func (s SMSClientMap) GetClientByName(name string) sms.RawClient {
+func (s SMSClientMap) GetClientByName(name string) smsclient.RawClient {
 	client := s[name]
 	if client == nil {
 		panic(errors.New(fmt.Sprintf("Unknown client %s", name)))

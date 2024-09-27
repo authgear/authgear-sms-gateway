@@ -1,4 +1,4 @@
-package sms
+package nexmo
 
 import (
 	"encoding/json"
@@ -6,6 +6,8 @@ import (
 	"fmt"
 
 	nexmo "github.com/njern/gonexmo"
+
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
 var ErrMissingNexmoConfiguration = errors.New("nexmo: configuration is missing")
@@ -23,7 +25,7 @@ func NewNexmoClient(apiKey string, apiSecret string, sender string) *NexmoClient
 	}
 }
 
-func (n *NexmoClient) Send(options *SendOptions) (*SendResult, error) {
+func (n *NexmoClient) Send(options *smsclient.SendOptions) (*smsclient.SendResult, error) {
 	if n.NexmoClient == nil {
 		return nil, ErrMissingNexmoConfiguration
 	}
@@ -53,10 +55,10 @@ func (n *NexmoClient) Send(options *SendOptions) (*SendResult, error) {
 	}
 
 	j, err := json.Marshal(resp)
-	return &SendResult{
+	return &smsclient.SendResult{
 		ClientResponse: j,
 		Success:        report.Status == nexmo.ResponseSuccess,
 	}, err
 }
 
-var _ RawClient = &NexmoClient{}
+var _ smsclient.RawClient = &NexmoClient{}

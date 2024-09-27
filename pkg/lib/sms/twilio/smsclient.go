@@ -1,4 +1,4 @@
-package sms
+package twilio
 
 import (
 	"encoding/json"
@@ -8,6 +8,8 @@ import (
 
 	"github.com/twilio/twilio-go"
 	api "github.com/twilio/twilio-go/rest/api/v2010"
+
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
 var ErrMissingTwilioConfiguration = errors.New("twilio: configuration is missing")
@@ -29,7 +31,7 @@ func NewTwilioClient(accountSID string, authToken string, sender string, messagi
 	}
 }
 
-func (t *TwilioClient) Send(options *SendOptions) (*SendResult, error) {
+func (t *TwilioClient) Send(options *smsclient.SendOptions) (*smsclient.SendResult, error) {
 	if t.TwilioClient == nil {
 		return nil, ErrMissingTwilioConfiguration
 	}
@@ -60,11 +62,11 @@ func (t *TwilioClient) Send(options *SendOptions) (*SendResult, error) {
 		return nil, err
 	}
 
-	return &SendResult{
+	return &smsclient.SendResult{
 		ClientResponse: j,
 		Success:        resp.ErrorCode != nil,
 		SegmentCount:   segmentCount,
 	}, err
 }
 
-var _ RawClient = &TwilioClient{}
+var _ smsclient.RawClient = &TwilioClient{}

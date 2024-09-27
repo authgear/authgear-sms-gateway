@@ -1,4 +1,4 @@
-package models
+package sendcloud
 
 import (
 	"crypto/md5"

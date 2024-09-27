@@ -1,4 +1,4 @@
-package sms
+package sendcloud
 
 import (
 	"errors"
@@ -6,14 +6,12 @@ import (
 	"log/slog"
 	"net/http"
 
-	. "github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms/sendcloud"
-	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms/sendcloud/apis"
-	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms/sendcloud/models"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
 var ErrMissingSendCloudConfiguration = errors.New("accessyou: configuration is missing")
 
-func makeVarsFromTemplateVariables(variables *TemplateVariables) map[string]interface{} {
+func makeVarsFromTemplateVariables(variables *smsclient.TemplateVariables) map[string]interface{} {
 	wrapped := func(field string) string {
 		return fmt.Sprintf("%%%v%%", field)
 	}
@@ -70,12 +68,12 @@ func NewSendCloudClient(
 	}
 }
 
-func (n *SendCloudClient) Send(options *SendOptions) (*SendResult, error) {
+func (n *SendCloudClient) Send(options *smsclient.SendOptions) (*smsclient.SendResult, error) {
 	template, err := n.TemplateResolver.Resolve(options.TemplateName, options.LanguageTag)
 	if err != nil {
 		return nil, err
 	}
-	sendRequest := models.NewSendRequest(
+	sendRequest := NewSendRequest(
 		string(template.TemplateMsgType),
 		[]string{
 			string(options.To),
@@ -85,12 +83,12 @@ func (n *SendCloudClient) Send(options *SendOptions) (*SendResult, error) {
 		makeVarsFromTemplateVariables(options.TemplateVariables),
 	)
 
-	respData, sendResponse, err := apis.Send(n.Client, n.BaseUrl, &sendRequest, n.SMSKey)
+	respData, sendResponse, err := Send(n.Client, n.BaseUrl, &sendRequest, n.SMSKey)
 
-	return &SendResult{
+	return &smsclient.SendResult{
 		ClientResponse: respData,
 		Success:        sendResponse.StatusCode == 200,
 	}, nil
 }
 
-var _ RawClient = &SendCloudClient{}
+var _ smsclient.RawClient = &SendCloudClient{}

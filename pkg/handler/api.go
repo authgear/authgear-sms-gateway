@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	sms_infra "github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/type_util"
 )
 
@@ -13,7 +13,7 @@ type RequestBody struct {
 	Body              string                         `json:"body,omitempty"`
 	TemplateName      string                         `json:"template_name"`
 	LanguageTag       string                         `json:"language_tag"`
-	TemplateVariables *sms_infra.TemplateVariables   `json:"template_variables"`
+	TemplateVariables *smsclient.TemplateVariables   `json:"template_variables"`
 }
 
 type Code string

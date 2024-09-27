@@ -1,4 +1,4 @@
-package apis
+package accessyou
 
 import (
 	"bytes"
@@ -10,8 +10,6 @@ import (
 	"github.com/golang/mock/gomock"
 
 	. "github.com/smartystreets/goconvey/convey"
-
-	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms/accessyou/models"
 )
 
 var successResponse = []byte(
@@ -33,7 +31,7 @@ func TestSendSMS(t *testing.T) {
 		to string,
 		body string,
 		expect func(clientDo *gomock.Call),
-		callback func([]byte, *models.SendSMSResponse, error),
+		callback func([]byte, *SendSMSResponse, error),
 	) {
 		u, err := url.Parse(baseUrl)
 		if err != nil {
@@ -91,7 +89,7 @@ func TestSendSMS(t *testing.T) {
 					},
 					nil)
 			},
-			func(respData []byte, sendSMSResponse *models.SendSMSResponse, err error) {
+			func(respData []byte, sendSMSResponse *SendSMSResponse, err error) {
 				So(err, ShouldBeNil)
 				So(respData, ShouldEqual, []byte(
 					"{\"msg_status\":\"100\",\"msg_status_desc\":\"Successfully submitted message. \\u6267\\u884c\\u6210\\u529f\",\"phoneno\":\"85264975244\",\"msg_id\":854998103}",

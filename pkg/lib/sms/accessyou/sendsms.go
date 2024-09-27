@@ -1,15 +1,13 @@
-package apis
+package accessyou
 
 import (
 	"io"
 	"net/http"
 	"net/url"
 	"regexp"
-
-	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms/accessyou/models"
 )
 
-//go:generate mockgen -source=sendsms.go -destination=sendsms_mock_test.go -package apis
+//go:generate mockgen -source=sendsms.go -destination=sendsms_mock_test.go -package accessyou
 
 var leadingBOMRegexp = regexp.MustCompile(`^[\x{feff}]+`)
 
@@ -33,7 +31,7 @@ func SendSMS(
 	sender string,
 	to string,
 	body string,
-) ([]byte, *models.SendSMSResponse, error) {
+) ([]byte, *SendSMSResponse, error) {
 	u, err := url.Parse(baseUrl)
 	if err != nil {
 		return nil, nil, err
@@ -71,7 +69,7 @@ func SendSMS(
 
 	respData = fixRespData(respData)
 
-	sendSMSResponse, err := models.ParseSendSMSResponse(respData)
+	sendSMSResponse, err := ParseSendSMSResponse(respData)
 	if err != nil {
 		return respData, nil, err
 	}

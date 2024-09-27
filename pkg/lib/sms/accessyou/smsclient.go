@@ -1,4 +1,4 @@
-package sms
+package accessyou
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms/accessyou/apis"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
 type AccessYouClient struct {
@@ -48,10 +48,10 @@ func fixPhoneNumber(phoneNumber string) string {
 	return plusHyphensRegexp.ReplaceAllString(phoneNumber, "")
 }
 
-func (n *AccessYouClient) Send(options *SendOptions) (*SendResult, error) {
+func (n *AccessYouClient) Send(options *smsclient.SendOptions) (*smsclient.SendResult, error) {
 	to := fixPhoneNumber(string(options.To))
 
-	respData, sendSMSResponse, err := apis.SendSMS(
+	respData, sendSMSResponse, err := SendSMS(
 		n.Client,
 		n.BaseUrl,
 		n.AccountNo,
@@ -68,10 +68,10 @@ func (n *AccessYouClient) Send(options *SendOptions) (*SendResult, error) {
 		return nil, err
 	}
 
-	return &SendResult{
+	return &smsclient.SendResult{
 		ClientResponse: respData,
 		Success:        sendSMSResponse.Status == "100",
 	}, nil
 }
 
-var _ RawClient = &AccessYouClient{}
+var _ smsclient.RawClient = &AccessYouClient{}

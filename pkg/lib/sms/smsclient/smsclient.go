@@ -1,4 +1,8 @@
-package sms
+package smsclient
+
+import (
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/type_util"
+)
 
 type TemplateVariables struct {
 	AppName     string `json:"app_name"`
@@ -36,3 +40,21 @@ var TemplateVariablesSchema = `{
 	},
 	"required": []
 }`
+
+type SendOptions struct {
+	To                type_util.SensitivePhoneNumber
+	Body              string
+	TemplateName      string
+	LanguageTag       string
+	TemplateVariables *TemplateVariables
+}
+
+type SendResult struct {
+	ClientResponse []byte
+	Success        bool
+	SegmentCount   *int
+}
+
+type RawClient interface {
+	Send(options *SendOptions) (*SendResult, error)
+}

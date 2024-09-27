@@ -5,7 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
-	. "github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
 type SMSService struct {
@@ -16,8 +16,8 @@ type SMSService struct {
 
 func (s *SMSService) Send(
 	appID string,
-	sendOptions *SendOptions,
-) (*SendResult, error) {
+	sendOptions *smsclient.SendOptions,
+) (*smsclient.SendResult, error) {
 	clientName := GetClientNameByMatch(s.RootConfig, &MatchContext{AppID: appID, PhoneNumber: string(sendOptions.To)})
 	client := s.SMSClientMap.GetClientByName(clientName)
 	s.Logger.Info(fmt.Sprintf("Client %v is selected for %v", clientName, sendOptions.To))

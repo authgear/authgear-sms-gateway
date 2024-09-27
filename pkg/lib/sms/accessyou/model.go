@@ -1,4 +1,4 @@
-package models
+package accessyou
 
 import (
 	"encoding/json"

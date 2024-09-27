@@ -1,15 +1,13 @@
-package apis
+package sendcloud
 
 import (
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
-
-	"github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms/sendcloud/models"
 )
 
-func Send(client *http.Client, baseUrl string, sendRequest *models.SendRequest, smsKey string) ([]byte, *models.SendResponse, error) {
+func Send(client *http.Client, baseUrl string, sendRequest *SendRequest, smsKey string) ([]byte, *SendResponse, error) {
 	values := sendRequest.ToValues()
 	values.Set("signature", sendRequest.Sign(smsKey))
 
@@ -26,7 +24,7 @@ func Send(client *http.Client, baseUrl string, sendRequest *models.SendRequest, 
 
 	respData, err := io.ReadAll(resp.Body)
 
-	sendResponse, err := models.ParseSendResponse(respData)
+	sendResponse, err := ParseSendResponse(respData)
 	if err != nil {
 		return respData, nil, err
 	}

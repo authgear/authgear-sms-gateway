@@ -8,9 +8,9 @@ import (
 
 	"github.com/authgear/authgear-server/pkg/util/httputil"
 	"github.com/authgear/authgear-server/pkg/util/validation"
-	sms_infra "github.com/authgear/authgear-sms-gateway/pkg/lib/infra/sms"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
 type SendHandler struct {
@@ -37,7 +37,7 @@ var _ = RequestSchema.Add("SendRequestSchema", `
 	"required": ["to", "body", "template_name", "language_tag", "template_variables"]
 }
 `)
-var _ = RequestSchema.Add("TemplateVariables", sms_infra.TemplateVariablesSchema)
+var _ = RequestSchema.Add("TemplateVariables", smsclient.TemplateVariablesSchema)
 
 func init() {
 	RequestSchema.Instantiate()
@@ -58,7 +58,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	sendResult, err := h.SMSService.Send(
 		body.AppID,
-		&sms_infra.SendOptions{
+		&smsclient.SendOptions{
 			To:                body.To,
 			Body:              body.Body,
 			TemplateName:      body.TemplateName,
