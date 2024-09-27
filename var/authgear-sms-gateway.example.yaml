@@ -18,7 +18,6 @@ providers:
     sendcloud:
       sms_user: "my-sms-user"
       sms_key: "my-sms-key"
-      sender: "my-sender"
       templates:
         - template_id: "919888"
           template_msg_type: "2"
@@ -35,7 +34,6 @@ providers:
     sendcloud:
       sms_user: "my-sms-user"
       sms_key: "my-sms-key"
-      sender: "my-sender"
       templates:
         - template_id: "919881"
           template_msg_type: "0"

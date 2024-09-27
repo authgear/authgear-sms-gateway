@@ -58,7 +58,6 @@ var _ = RootSchema.Add("SendCloudTemplateAssignment", `
 `)
 
 type ProviderConfigSendCloud struct {
-	Sender              string                         `json:"sender,omitempty"`
 	BaseUrl             string                         `json:"base_url,omitempty"`
 	SMSUser             string                         `json:"sms_user,omitempty"`
 	SMSKey              string                         `json:"sms_key,omitempty"`
@@ -71,7 +70,6 @@ var _ = RootSchema.Add("ProviderConfigSendCloud", `
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
-		"sender": { "type": "string" },
 		"base_url": { "type": "string" },
 		"sms_user": { "type": "string" },
 		"sms_key": {"type": "string"},
@@ -86,6 +84,6 @@ var _ = RootSchema.Add("ProviderConfigSendCloud", `
 			"items": { "$refs": "#/$defs/SendCloudTemplateAssignment" }
 		}
 	},
-	"required": ["sender", "sms_user", "sms_key", "templates", "template_assignments"]
+	"required": ["sms_user", "sms_key", "templates", "template_assignments"]
 }
 `)
