@@ -2,15 +2,13 @@ package accessyou
 
 import (
 	"encoding/json"
-
-	"github.com/authgear/authgear-sms-gateway/pkg/lib/type_util"
 )
 
 type SendSMSResponse struct {
-	MessageID   int                            `json:"msg_id"`
-	Status      string                         `json:"msg_status"`
-	Description string                         `json:"msg_status_desc"`
-	PhoneNo     type_util.SensitivePhoneNumber `json:"phoneno"`
+	MessageID   int    `json:"msg_id"`
+	Status      string `json:"msg_status"`
+	Description string `json:"msg_status_desc"`
+	PhoneNo     string `json:"phoneno"`
 }
 
 func ParseSendSMSResponse(jsonData []byte) (*SendSMSResponse, error) {

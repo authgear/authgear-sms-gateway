@@ -1,7 +1,7 @@
 package smsclient
 
 import (
-	"github.com/authgear/authgear-sms-gateway/pkg/lib/type_util"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sensitive"
 )
 
 type TemplateVariables struct {
@@ -42,7 +42,7 @@ var TemplateVariablesSchema = `{
 }`
 
 type SendOptions struct {
-	To                type_util.SensitivePhoneNumber
+	To                sensitive.PhoneNumber
 	Body              string
 	TemplateName      string
 	LanguageTag       string

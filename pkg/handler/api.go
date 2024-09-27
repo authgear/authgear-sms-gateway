@@ -3,17 +3,17 @@ package handler
 import (
 	"net/http"
 
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sensitive"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
-	"github.com/authgear/authgear-sms-gateway/pkg/lib/type_util"
 )
 
 type RequestBody struct {
-	AppID             string                         `json:"app_id,omitempty"`
-	To                type_util.SensitivePhoneNumber `json:"to,omitempty"`
-	Body              string                         `json:"body,omitempty"`
-	TemplateName      string                         `json:"template_name"`
-	LanguageTag       string                         `json:"language_tag"`
-	TemplateVariables *smsclient.TemplateVariables   `json:"template_variables"`
+	AppID             string                       `json:"app_id,omitempty"`
+	To                sensitive.PhoneNumber        `json:"to,omitempty"`
+	Body              string                       `json:"body,omitempty"`
+	TemplateName      string                       `json:"template_name"`
+	LanguageTag       string                       `json:"language_tag"`
+	TemplateVariables *smsclient.TemplateVariables `json:"template_variables"`
 }
 
 type Code string
