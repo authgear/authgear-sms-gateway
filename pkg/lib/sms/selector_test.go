@@ -16,35 +16,30 @@ providers:
       account_sid: "my-account-sid"
       auth_token: "my-auth-token"
       message_service_sid: "my-message-service-sid"
-      from: "+85212345678"
   - name: p2
     type: twilio
     twilio:
       account_sid: "my-account-sid"
       auth_token: "my-auth-token"
       message_service_sid: "my-message-service-sid"
-      from: "+85212345678"
   - name: p3
     type: twilio
     twilio:
       account_sid: "my-account-sid"
       auth_token: "my-auth-token"
       message_service_sid: "my-message-service-sid"
-      from: "+85212345678"
   - name: p4
     type: twilio
     twilio:
       account_sid: "my-account-sid"
       auth_token: "my-auth-token"
       message_service_sid: "my-message-service-sid"
-      from: "+85212345678"
   - name: p5
     type: twilio
     twilio:
       account_sid: "my-account-sid"
       auth_token: "my-auth-token"
       message_service_sid: "my-message-service-sid"
-      from: "+85212345678"
 provider_selector:
   switch:
     - type: match_app_id_and_phone_number_alpha2

@@ -8,7 +8,6 @@ config:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
         message_service_sid: "my-message-service-sid"
-        from: "+85212345678"
     - name: accessyou
       type: accessyou
       accessyou:
@@ -64,7 +63,6 @@ config:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
         message_service_sid: "my-message-service-sid"
-        from: "my-sender"
   provider_selector:
     switch:
       - type: match_phone_number_alpha2
@@ -86,7 +84,6 @@ config:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
         message_service_sid: "my-message-service-sid"
-        from: "my-sender"
   provider_selector:
     switch:
       - type: match_phone_number_alpha2
@@ -107,7 +104,6 @@ config:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
         message_service_sid: "my-message-service-sid"
-        from: "+85212345678"
     - name: accessyou
       type: accessyou
       accessyou:
@@ -161,7 +157,6 @@ config:
         account_sid: "my-account-sid"
         auth_token: "my-auth-token"
         message_service_sid: "my-message-service-sid"
-        from: "+85212345678"
     - name: accessyou
       type: accessyou
       accessyou:
@@ -201,5 +196,23 @@ config:
       - type: match_phone_number_alpha2
         use_provider: sendcloud
         phone_number_alpha2: CN
+      - type: default
+        use_provider: twilio
+---
+name: failed-twilio-config
+error: |-
+  invalid configuration:
+  /providers/0/twilio: oneOf
+config:
+  providers:
+    - name: twilio
+      type: twilio
+      twilio:
+        account_sid: "my-account-sid"
+        auth_token: "my-auth-token"
+        message_service_sid: "my-message-service-sid"
+        from: "sender"
+  provider_selector:
+    switch:
       - type: default
         use_provider: twilio

@@ -88,7 +88,15 @@ var _ = RootSchema.Add("ProviderConfigTwilio", `
 		"auth_token": {"type": "string"},
 		"message_service_sid": {"type": "string"}
 	},
-	"required": ["from", "account_sid", "auth_token", "message_service_sid"]
+	"required": ["account_sid", "auth_token"],
+	"oneOf": [
+		{
+			"required": ["from"]
+		},
+		{
+			"required": ["message_service_sid"]
+		}
+	]
 }
 `)
 
