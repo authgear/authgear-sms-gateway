@@ -43,7 +43,7 @@ type ProviderConfigTwilio struct {
 }
 
 type ProviderConfigAccessYou struct {
-	Sender    string `json:"sender,omitempty"`
+	From      string `json:"from,omitempty"`
 	BaseUrl   string `json:"base_url,omitempty"`
 	AccountNo string `json:"accountno,omitempty"`
 	User      string `json:"user,omitempty"`
@@ -97,13 +97,13 @@ var _ = RootSchema.Add("ProviderConfigAccessYou", `
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
-		"sender": { "type": "string" },
+		"from": { "type": "string" },
 		"base_url": { "type": "string" },
 		"accountno": { "type": "string" },
 		"user": { "type": "string" },
 		"pwd": {"type": "string"}
 	},
-	"required": ["sender", "accountno", "user", "pwd"]
+	"required": ["from", "accountno", "user", "pwd"]
 }
 `)
 

@@ -14,7 +14,7 @@ type AccessYouClient struct {
 	AccountNo string
 	User      string
 	Pwd       string
-	Sender    string
+	From      string
 	Logger    *slog.Logger
 }
 
@@ -24,7 +24,7 @@ func NewAccessYouClient(
 	accountNo string,
 	user string,
 	pwd string,
-	sender string,
+	from string,
 	logger *slog.Logger,
 ) *AccessYouClient {
 	if baseUrl == "" {
@@ -36,7 +36,7 @@ func NewAccessYouClient(
 		AccountNo: accountNo,
 		User:      user,
 		Pwd:       pwd,
-		Sender:    sender,
+		From:      from,
 		Logger:    logger,
 	}
 }
@@ -57,7 +57,7 @@ func (n *AccessYouClient) Send(options *smsclient.SendOptions) (*smsclient.SendR
 		n.AccountNo,
 		n.User,
 		n.Pwd,
-		n.Sender,
+		n.From,
 		to,
 		options.Body,
 		n.Logger,

@@ -12,7 +12,7 @@ providers:
       accountno: "my-accountno"
       user: "my-user"
       pwd: "my-pwd"
-      sender: "my-sender"
+      from: "my-sender"
   - name: sendcloud
     type: sendcloud
     sendcloud:
