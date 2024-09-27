@@ -14,18 +14,6 @@ type SMSService struct {
 	SMSClientMap      SMSClientMap
 }
 
-func NewSMSService(
-	logger *slog.Logger,
-	smsProviderConfig *config.SMSProviderConfig,
-	smsClientMap SMSClientMap,
-) *SMSService {
-	return &SMSService{
-		Logger:            logger,
-		SMSProviderConfig: smsProviderConfig,
-		SMSClientMap:      smsClientMap,
-	}
-}
-
 func (s *SMSService) Send(
 	appID string,
 	sendOptions *SendOptions,

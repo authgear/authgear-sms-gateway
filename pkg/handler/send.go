@@ -18,16 +18,6 @@ type SendHandler struct {
 	SMSService *sms.SMSService
 }
 
-func NewSendHandler(
-	logger *slog.Logger,
-	smsService *sms.SMSService,
-) *SendHandler {
-	return &SendHandler{
-		Logger:     logger,
-		SMSService: smsService,
-	}
-}
-
 var RequestSchema = validation.NewMultipartSchema("SendRequestSchema")
 
 var _ = RequestSchema.Add("SendRequestSchema", `

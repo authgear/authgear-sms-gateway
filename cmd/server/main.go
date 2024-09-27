@@ -39,10 +39,17 @@ func main() {
 		panic(err)
 	}
 	smsClientMap := sms.NewSMSClientMap(smsProviderConfig, logger)
-	smsService := sms.NewSMSService(logger, smsProviderConfig, smsClientMap)
+	smsService := &sms.SMSService{
+		Logger:            logger,
+		SMSProviderConfig: smsProviderConfig,
+		SMSClientMap:      smsClientMap,
+	}
 
-	http.Handle("/healthz", handler.NewHealthzHandler())
-	http.Handle("/send", handler.NewSendHandler(logger, smsService))
+	http.Handle("/healthz", &handler.HealthzHandler{})
+	http.Handle("/send", &handler.SendHandler{
+		Logger:     logger,
+		SMSService: smsService,
+	})
 
 	server := &http.Server{
 		Addr:              cfg.ListenAddr,
