@@ -13,7 +13,6 @@ func GetClientNameByMatch(c *config.RootConfig, ctx *MatchContext) string {
 		switch m := matcher.(type) {
 		case *MatcherDefault:
 			defaultClient = providerSelector.UseProvider
-			break
 		default:
 			if m.Match(ctx) {
 				return providerSelector.UseProvider

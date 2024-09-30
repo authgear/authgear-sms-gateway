@@ -224,7 +224,7 @@ func (c *RootConfig) ValidateProviderSelectorDefault(ctx *validation.Context) {
 			return
 		}
 	}
-	ctx.Child("provider_selector", "switch").EmitErrorMessage(fmt.Sprintf("provider selector default not found"))
+	ctx.Child("provider_selector", "switch").EmitErrorMessage("provider selector default not found")
 }
 
 func (c *RootConfig) ValidateSendCloudConfigs(ctx *validation.Context) {
