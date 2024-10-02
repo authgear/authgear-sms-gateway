@@ -5,35 +5,57 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
-func makeVarsFromTemplateVariables(variables *smsclient.TemplateVariables) map[string]interface{} {
-	wrapped := func(field string) string {
-		return fmt.Sprintf("%%%v%%", field)
+type EffectiveTemplateVariables map[string]interface{}
+
+func wrapped(field string) string {
+	return fmt.Sprintf("%%%v%%", field)
+}
+
+func (v EffectiveTemplateVariables) WrapKeys() map[string]interface{} {
+	res := make(map[string]interface{})
+	for key, value := range v {
+		res[wrapped(key)] = value
 	}
-	wrapKeys := func(obj map[string]interface{}) map[string]interface{} {
-		res := make(map[string]interface{})
-		for key, value := range obj {
-			res[wrapped(key)] = value
+	return res
+}
+
+func MakeEffectiveTemplateVariables(variables *smsclient.TemplateVariables, mappings []*config.SendCloudTemplateVariableKeyMapping) EffectiveTemplateVariables {
+	res := make(EffectiveTemplateVariables)
+	for _, mapping := range mappings {
+		switch mapping.From {
+		case config.SendCloudTemplateVariableKeyMappingFromAppName:
+			res[mapping.To] = variables.AppName
+		case config.SendCloudTemplateVariableKeyMappingFromClientID:
+			res[mapping.To] = variables.ClientID
+		case config.SendCloudTemplateVariableKeyMappingFromCode:
+			res[mapping.To] = variables.Code
+		case config.SendCloudTemplateVariableKeyMappingFromEmail:
+			res[mapping.To] = variables.Email
+		case config.SendCloudTemplateVariableKeyMappingFromHasPassword:
+			res[mapping.To] = variables.HasPassword
+		case config.SendCloudTemplateVariableKeyMappingFromHost:
+			res[mapping.To] = variables.Host
+		case config.SendCloudTemplateVariableKeyMappingFromLink:
+			res[mapping.To] = variables.Link
+		case config.SendCloudTemplateVariableKeyMappingFromPassword:
+			res[mapping.To] = variables.Password
+		case config.SendCloudTemplateVariableKeyMappingFromPhone:
+			res[mapping.To] = variables.Phone
+		case config.SendCloudTemplateVariableKeyMappingFromState:
+			res[mapping.To] = variables.State
+		case config.SendCloudTemplateVariableKeyMappingFromUILocales:
+			res[mapping.To] = variables.UILocales
+		case config.SendCloudTemplateVariableKeyMappingFromURL:
+			res[mapping.To] = variables.URL
+		case config.SendCloudTemplateVariableKeyMappingFromXState:
+			res[mapping.To] = variables.XState
 		}
-		return res
 	}
-	return wrapKeys(map[string]interface{}{
-		"app":          variables.AppName,
-		"client_id":    variables.ClientID,
-		"code":         variables.Code,
-		"email":        variables.Email,
-		"has_password": variables.HasPassword,
-		"host":         variables.Host,
-		"link":         variables.Link,
-		"password":     variables.Password,
-		"phone":        variables.Phone,
-		"state":        variables.State,
-		"ui_locales":   variables.UILocales,
-		"url":          variables.URL,
-		"x_state":      variables.XState,
-	})
+	return res
 }
 
 type SendCloudClient struct {
@@ -71,6 +93,7 @@ func (n *SendCloudClient) Send(options *smsclient.SendOptions) (*smsclient.SendR
 	if err != nil {
 		return nil, err
 	}
+	templateVariables := MakeEffectiveTemplateVariables(options.TemplateVariables, template.TemplateVariableKeyMappings)
 	sendRequest := NewSendRequest(
 		string(template.TemplateMsgType),
 		[]string{
@@ -78,7 +101,7 @@ func (n *SendCloudClient) Send(options *smsclient.SendOptions) (*smsclient.SendR
 		},
 		n.SMSUser,
 		string(template.TemplateID),
-		makeVarsFromTemplateVariables(options.TemplateVariables),
+		templateVariables.WrapKeys(),
 	)
 
 	dumpedResponse, sendResponse, err := Send(n.Client, n.BaseUrl, &sendRequest, n.SMSKey, n.Logger)
