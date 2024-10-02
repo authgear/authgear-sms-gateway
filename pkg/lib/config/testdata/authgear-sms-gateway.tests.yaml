@@ -23,8 +23,14 @@ config:
         templates:
           - template_id: "919888"
             template_msg_type: "2"
+            template_variable_key_mappings:
+              - from: app_name
+                to: app
           - template_id: "919879"
             template_msg_type: "2"
+            template_variable_key_mappings:
+              - from: app_name
+                to: app
         template_assignments:
           - authgear_template_name: "verficiation_sms.txt"
             default_template_id: "919888"
@@ -119,8 +125,14 @@ config:
         templates:
           - template_id: "919888"
             template_msg_type: "2"
+            template_variable_key_mappings:
+              - from: app_name
+                to: app
           - template_id: "919879"
             template_msg_type: "2"
+            template_variable_key_mappings:
+              - from: app_name
+                to: app
         template_assignments:
           - authgear_template_name: "verficiation_sms.txt"
             default_template_id: "919888"
@@ -147,6 +159,8 @@ config:
 name: failed-sendcloud-config
 error: |-
   invalid configuration:
+  /providers/2/sendcloud/templates/0/template_variable_key_mappings: missing template_variable_key_mappings
+  /providers/2/sendcloud/templates/1/template_variable_key_mappings: missing template_variable_key_mappings
   /providers/2/sendcloud/template_assignments/0/default_template_id: template_id 919889 not found
   /providers/2/sendcloud/template_assignments/0/by_languages/0/template_id: template_id 919890 not found
 config:
@@ -172,6 +186,7 @@ config:
         templates:
           - template_id: "919888"
             template_msg_type: "2"
+            template_variable_key_mappings: []
           - template_id: "919879"
             template_msg_type: "2"
         template_assignments:

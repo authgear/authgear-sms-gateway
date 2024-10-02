@@ -19,14 +19,16 @@ type AuthgearTemplateName string
 type AuthgearLanguage string
 
 type SendCloudTemplate struct {
-	TemplateID      TemplateID
-	TemplateMsgType TemplateMessageType
+	TemplateID                  TemplateID
+	TemplateMsgType             TemplateMessageType
+	TemplateVariableKeyMappings []*config.SendCloudTemplateVariableKeyMapping
 }
 
 func NewSendCloudTemplate(template *config.SendCloudTemplate) *SendCloudTemplate {
 	return &SendCloudTemplate{
-		TemplateID:      TemplateID(template.TemplateID),
-		TemplateMsgType: TemplateMessageType(template.TemplateMsgType),
+		TemplateID:                  TemplateID(template.TemplateID),
+		TemplateMsgType:             TemplateMessageType(template.TemplateMsgType),
+		TemplateVariableKeyMappings: template.TemplateVariableKeyMappings,
 	}
 }
 
