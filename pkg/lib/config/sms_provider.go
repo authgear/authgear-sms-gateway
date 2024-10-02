@@ -39,7 +39,7 @@ type ProviderConfigTwilio struct {
 	From                string `json:"from,omitempty"`
 	AccountSID          string `json:"account_sid,omitempty"`
 	AuthToken           string `json:"auth_token,omitempty"`
-	MessagingServiceSID string `json:"message_service_sid,omitempty"`
+	MessagingServiceSID string `json:"messaging_service_sid,omitempty"`
 }
 
 type ProviderConfigAccessYou struct {
@@ -86,7 +86,7 @@ var _ = RootSchema.Add("ProviderConfigTwilio", `
 		"from": { "type": "string" },
 		"account_sid": { "type": "string" },
 		"auth_token": {"type": "string"},
-		"message_service_sid": {"type": "string"}
+		"messaging_service_sid": {"type": "string"}
 	},
 	"required": ["account_sid", "auth_token"],
 	"oneOf": [
@@ -94,7 +94,7 @@ var _ = RootSchema.Add("ProviderConfigTwilio", `
 			"required": ["from"]
 		},
 		{
-			"required": ["message_service_sid"]
+			"required": ["messaging_service_sid"]
 		}
 	]
 }
