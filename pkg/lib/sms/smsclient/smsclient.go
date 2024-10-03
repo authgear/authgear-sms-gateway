@@ -52,37 +52,37 @@ type SendOptions struct {
 }
 
 type SendResultInfoVariable struct {
-	Key         string
-	ValueLength int
+	Key         string `json:"key,omitempty"`
+	ValueLength int    `json:"value_length"`
 }
 
 type SendResultInfoSendCloud struct {
-	TemplateID                 string
-	SendResultInfoVariableList []*SendResultInfoVariable
+	TemplateID                 string                    `json:"template_id,omitempty"`
+	SendResultInfoVariableList []*SendResultInfoVariable `json:"variables,omitempty"`
 }
 
 type SendResultInfoTwilio struct {
-	BodyLength   int
-	SegmentCount *int
+	BodyLength   int  `json:"body_length,omitempty"`
+	SegmentCount *int `json:"segment_count,omitempty"`
 }
 
-type SendResultInfoAccessYou struct {
-}
+type SendResultInfoAccessYou struct{}
 
 type SendResultInfoRoot struct {
-	ProviderName string
+	ProviderName string `json:"provider_name,omitempty"`
 }
 
 type SendResultInfo struct {
-	SendResultInfoRoot      *SendResultInfoRoot
-	SendResultInfoTwilio    *SendResultInfoTwilio
-	SendResultInfoAccessYou *SendResultInfoAccessYou
-	SendResultInfoSendCloud *SendResultInfoSendCloud
+	SendResultInfoRoot      *SendResultInfoRoot      `json:"root,omitempty"`
+	SendResultInfoTwilio    *SendResultInfoTwilio    `json:"twilio,omitempty"`
+	SendResultInfoAccessYou *SendResultInfoAccessYou `json:"accessyou,omitempty"`
+	SendResultInfoSendCloud *SendResultInfoSendCloud `json:"sendcloud,omitempty"`
 }
 
 type SendResult struct {
-	DumpedResponse []byte
-	Success        bool
+	DumpedResponse []byte          `json:"dumped_response,omitempty"`
+	Success        bool            `json:"success"`
+	Info           *SendResultInfo `json:"info,omitempty"`
 }
 
 func (r *SendResult) Error() string {
@@ -91,5 +91,5 @@ func (r *SendResult) Error() string {
 }
 
 type RawClient interface {
-	Send(options *SendOptions) (*SendResult, *SendResultInfo, error)
+	Send(options *SendOptions) (*SendResult, error)
 }

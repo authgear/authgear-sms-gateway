@@ -61,7 +61,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	logger.Info("received send request")
 
-	sendResult, info, err := h.SMSService.Send(
+	sendResult, err := h.SMSService.Send(
 		body.AppID,
 		&smsclient.SendOptions{
 			To:                body.To,
@@ -72,7 +72,6 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		},
 	)
 
-	responseInfo := MakeSendResultInfo(info)
 	if err != nil {
 		var errorUnsuccessResponse *smsclient.SendResult
 		if errors.As(err, &errorUnsuccessResponse) {
@@ -84,7 +83,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				Code:             CodeUnknownResponse,
 				DumpedResponse:   errorUnsuccessResponse.DumpedResponse,
 				ErrorDescription: err.Error(),
-				Info:             responseInfo,
+				Info:             errorUnsuccessResponse.Info,
 			})
 			return
 		}
@@ -100,15 +99,15 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var attrs []slog.Attr
-	if info.SendResultInfoTwilio != nil && info.SendResultInfoTwilio.SegmentCount != nil {
-		attrs = append(attrs, slog.Int("segment_count", *info.SendResultInfoTwilio.SegmentCount))
+	if sendResult.Info.SendResultInfoTwilio != nil && sendResult.Info.SendResultInfoTwilio.SegmentCount != nil {
+		attrs = append(attrs, slog.Int("segment_count", *sendResult.Info.SendResultInfoTwilio.SegmentCount))
 	}
 	logger.LogAttrs(r.Context(), slog.LevelInfo, "finished send request", attrs...)
 
 	h.write(w, &ResponseBody{
 		Code:           CodeOK,
 		DumpedResponse: sendResult.DumpedResponse,
-		Info:           responseInfo,
+		Info:           sendResult.Info,
 	})
 }
 
