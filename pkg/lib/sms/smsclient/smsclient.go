@@ -1,16 +1,10 @@
 package smsclient
 
 import (
+	"encoding/json"
+
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sensitive"
 )
-
-type ErrorUnknownResponse struct {
-	DumpedResponse []byte
-}
-
-func (e *ErrorUnknownResponse) Error() string {
-	return string(e.DumpedResponse)
-}
 
 type TemplateVariables struct {
 	AppName     string `json:"app_name"`
@@ -57,10 +51,43 @@ type SendOptions struct {
 	TemplateVariables *TemplateVariables
 }
 
+type SendResultInfoVariable struct {
+	Key         string `json:"key,omitempty"`
+	ValueLength int    `json:"value_length"`
+}
+
+type SendResultInfoSendCloud struct {
+	TemplateID                 string                    `json:"template_id,omitempty"`
+	SendResultInfoVariableList []*SendResultInfoVariable `json:"variables,omitempty"`
+}
+
+type SendResultInfoTwilio struct {
+	BodyLength   int  `json:"body_length,omitempty"`
+	SegmentCount *int `json:"segment_count,omitempty"`
+}
+
+type SendResultInfoAccessYou struct{}
+
+type SendResultInfoRoot struct {
+	ProviderName string `json:"provider_name,omitempty"`
+}
+
+type SendResultInfo struct {
+	SendResultInfoRoot      *SendResultInfoRoot      `json:"root,omitempty"`
+	SendResultInfoTwilio    *SendResultInfoTwilio    `json:"twilio,omitempty"`
+	SendResultInfoAccessYou *SendResultInfoAccessYou `json:"accessyou,omitempty"`
+	SendResultInfoSendCloud *SendResultInfoSendCloud `json:"sendcloud,omitempty"`
+}
+
 type SendResult struct {
-	DumpedResponse []byte
-	Success        bool
-	SegmentCount   *int
+	DumpedResponse []byte          `json:"dumped_response,omitempty"`
+	Success        bool            `json:"success"`
+	Info           *SendResultInfo `json:"info,omitempty"`
+}
+
+func (r *SendResult) Error() string {
+	jsonData, _ := json.Marshal(r)
+	return string(jsonData)
 }
 
 type RawClient interface {

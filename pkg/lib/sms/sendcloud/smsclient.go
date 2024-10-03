@@ -89,11 +89,27 @@ func NewSendCloudClient(
 }
 
 func (n *SendCloudClient) Send(options *smsclient.SendOptions) (*smsclient.SendResult, error) {
+	info := &smsclient.SendResultInfo{
+		SendResultInfoSendCloud: &smsclient.SendResultInfoSendCloud{},
+	}
+
 	template, err := n.TemplateResolver.Resolve(options.TemplateName, options.LanguageTag)
 	if err != nil {
 		return nil, err
 	}
+	info.SendResultInfoSendCloud.TemplateID = string(template.TemplateID)
 	templateVariables := MakeEffectiveTemplateVariables(options.TemplateVariables, template.TemplateVariableKeyMappings)
+
+	var sendResultInfoVariableList []*smsclient.SendResultInfoVariable
+
+	for key, value := range templateVariables {
+		sendResultInfoVariableList = append(sendResultInfoVariableList, &smsclient.SendResultInfoVariable{
+			Key:         key,
+			ValueLength: len(fmt.Sprintf("%v", value)),
+		})
+	}
+	info.SendResultInfoSendCloud.SendResultInfoVariableList = sendResultInfoVariableList
+
 	sendRequest := NewSendRequest(
 		string(template.TemplateMsgType),
 		[]string{
@@ -112,6 +128,7 @@ func (n *SendCloudClient) Send(options *smsclient.SendOptions) (*smsclient.SendR
 	return &smsclient.SendResult{
 		DumpedResponse: dumpedResponse,
 		Success:        sendResponse.StatusCode == 200,
+		Info:           info,
 	}, nil
 }
 

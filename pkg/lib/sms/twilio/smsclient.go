@@ -73,7 +73,7 @@ func (t *TwilioClient) send(options *smsclient.SendOptions) ([]byte, *SendRespon
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.ErrorUnknownResponse{
+			&smsclient.SendResult{
 				DumpedResponse: dumpedResponse,
 			},
 		)
@@ -83,7 +83,7 @@ func (t *TwilioClient) send(options *smsclient.SendOptions) ([]byte, *SendRespon
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.ErrorUnknownResponse{
+			&smsclient.SendResult{
 				DumpedResponse: dumpedResponse,
 			},
 		)
@@ -118,6 +118,11 @@ func (t *TwilioClient) send(options *smsclient.SendOptions) ([]byte, *SendRespon
 }
 
 func (t *TwilioClient) Send(options *smsclient.SendOptions) (*smsclient.SendResult, error) {
+	info := &smsclient.SendResultInfo{
+		SendResultInfoTwilio: &smsclient.SendResultInfoTwilio{},
+	}
+	info.SendResultInfoTwilio.BodyLength = len(options.Body)
+
 	dumpedResponse, sendSMSResponse, err := t.send(options)
 	if err != nil {
 		return nil, err
@@ -129,11 +134,12 @@ func (t *TwilioClient) Send(options *smsclient.SendOptions) (*smsclient.SendResu
 			segmentCount = &parsed
 		}
 	}
+	info.SendResultInfoTwilio.SegmentCount = segmentCount
 
 	return &smsclient.SendResult{
 		DumpedResponse: dumpedResponse,
 		Success:        sendSMSResponse.ErrorCode == nil,
-		SegmentCount:   segmentCount,
+		Info:           info,
 	}, nil
 }
 

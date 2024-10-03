@@ -69,7 +69,7 @@ func SendSMS(
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.ErrorUnknownResponse{
+			&smsclient.SendResult{
 				DumpedResponse: dumpedResponse,
 			},
 		)
@@ -80,7 +80,7 @@ func SendSMS(
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.ErrorUnknownResponse{
+			&smsclient.SendResult{
 				DumpedResponse: dumpedResponse,
 			},
 		)

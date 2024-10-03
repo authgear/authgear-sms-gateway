@@ -46,8 +46,8 @@ func (c Code) HTTPStatusCode() int {
 }
 
 type ResponseBody struct {
-	Code             Code   `json:"code"`
-	ErrorDescription string `json:"error_description,omitempty"`
-	DumpedResponse   []byte `json:"dumped_response,omitempty"`
-	SegmentCount     *int   `json:"segment_count,omitempty"`
+	Code             Code                      `json:"code"`
+	ErrorDescription string                    `json:"error_description,omitempty"`
+	DumpedResponse   []byte                    `json:"dumped_response,omitempty"`
+	Info             *smsclient.SendResultInfo `json:"info,omitempty"`
 }
