@@ -48,42 +48,38 @@ func NewSendRequest(
 }
 
 func (r *SendRequest) Presign() string {
-	vars, _ := json.Marshal(r.vars)
-
 	// According to the [doc](https://www.sendcloud.net/doc/sms/),
 	// - The keys should be arranged alphabetically
 	// - The values no need to be url encoded
-	return strings.Join([]string{
+	res := strings.Join([]string{
 		fmt.Sprintf("msgType=%v", r.msgType),
 		fmt.Sprintf("phone=%v", strings.Join(r.phone, ",")),
 		fmt.Sprintf("sendRequestId=%v", r.sendRequestId),
 		fmt.Sprintf("smsUser=%v", r.smsUser),
 		fmt.Sprintf("templateId=%v", r.templateId),
-		fmt.Sprintf("vars=%v", string(vars)),
 	}, "&")
-}
 
-func (r *SendRequest) ToMap() map[string]interface{} {
-	vars, _ := json.Marshal(r.vars)
-	return map[string]interface{}{
-		"msgType":       r.msgType,
-		"phone":         strings.Join(r.phone, ","),
-		"sendRequestId": r.sendRequestId,
-		"smsUser":       r.smsUser,
-		"templateId":    r.templateId,
-		"vars":          vars,
+	if len(r.vars) != 0 {
+		vars, _ := json.Marshal(r.vars)
+		res = strings.Join([]string{
+			res,
+			fmt.Sprintf("vars=%v", string(vars)),
+		}, "&")
 	}
+	return res
 }
 
 func (r *SendRequest) ToValues() url.Values {
-	vars, _ := json.Marshal(r.vars)
 	values := url.Values{}
 	values.Set("msgType", r.msgType)
 	values.Set("phone", strings.Join(r.phone, ","))
 	values.Set("sendRequestId", r.sendRequestId)
 	values.Set("smsUser", r.smsUser)
 	values.Set("templateId", r.templateId)
-	values.Set("vars", string(vars))
+	if len(r.vars) != 0 {
+		vars, _ := json.Marshal(r.vars)
+		values.Set("vars", string(vars))
+	}
 	return values
 }
 

@@ -20,8 +20,18 @@ providers:
       templates:
         - template_id: "919888"
           template_msg_type: "2"
+          template_variable_key_mappings:
+            - from: app_name
+              to: app
+            - from: code
+              to: code
         - template_id: "919879"
           template_msg_type: "2"
+          template_variable_key_mappings:
+            - from: app_name
+              to: app
+            - from: code
+              to: code
       template_assignments:
         - authgear_template_name: "verficiation_sms.txt"
           default_template_id: "919888"
@@ -36,8 +46,18 @@ providers:
       templates:
         - template_id: "919881"
           template_msg_type: "0"
+          template_variable_key_mappings:
+            - from: app_name
+              to: app
+            - from: code
+              to: code
         - template_id: "919878"
           template_msg_type: "0"
+          template_variable_key_mappings:
+            - from: app_name
+              to: app
+            - from: code
+              to: code
       template_assignments:
         - authgear_template_name: "verficiation_sms.txt"
           default_template_id: "919881"

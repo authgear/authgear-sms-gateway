@@ -237,6 +237,13 @@ func (c *RootConfig) ValidateSendCloudConfigs(ctx *validation.Context) {
 
 func (c *RootConfig) ValidateSendCloudConfig(ctx *validation.Context, sendCloudConfig *ProviderConfigSendCloud) {
 	templates := sendCloudConfig.Templates
+	for i, template := range templates {
+		ctxTemplates := ctx.Child("templates", strconv.Itoa(i))
+		if len(template.TemplateVariableKeyMappings) == 0 {
+			ctxTemplates.Child("template_variable_key_mappings").EmitErrorMessage("missing template_variable_key_mappings")
+		}
+	}
+
 	for i, templateAssignment := range sendCloudConfig.TemplateAssignments {
 		ctxTemplateAssignment := ctx.Child("template_assignments", strconv.Itoa(i))
 		defaultTemplateID := templateAssignment.DefaultTemplateID
