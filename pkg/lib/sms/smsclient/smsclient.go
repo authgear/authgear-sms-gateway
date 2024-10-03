@@ -51,10 +51,38 @@ type SendOptions struct {
 	TemplateVariables *TemplateVariables
 }
 
+type SendResultInfoVariable struct {
+	Key         string
+	ValueLength int
+}
+
+type SendResultInfoSendCloud struct {
+	TemplateID                 string
+	SendResultInfoVariableList []*SendResultInfoVariable
+}
+
+type SendResultInfoTwilio struct {
+	BodyLength   int
+	SegmentCount *int
+}
+
+type SendResultInfoAccessYou struct {
+}
+
+type SendResultInfoRoot struct {
+	ProviderName string
+}
+
+type SendResultInfo struct {
+	SendResultInfoRoot      *SendResultInfoRoot
+	SendResultInfoTwilio    *SendResultInfoTwilio
+	SendResultInfoAccessYou *SendResultInfoAccessYou
+	SendResultInfoSendCloud *SendResultInfoSendCloud
+}
+
 type SendResult struct {
 	DumpedResponse []byte
 	Success        bool
-	SegmentCount   *int
 }
 
 func (r *SendResult) Error() string {
@@ -63,5 +91,5 @@ func (r *SendResult) Error() string {
 }
 
 type RawClient interface {
-	Send(options *SendOptions) (*SendResult, error)
+	Send(options *SendOptions) (*SendResult, *SendResultInfo, error)
 }

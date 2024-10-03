@@ -117,10 +117,15 @@ func (t *TwilioClient) send(options *smsclient.SendOptions) ([]byte, *SendRespon
 	return dumpedResponse, sendResponse, nil
 }
 
-func (t *TwilioClient) Send(options *smsclient.SendOptions) (*smsclient.SendResult, error) {
+func (t *TwilioClient) Send(options *smsclient.SendOptions) (*smsclient.SendResult, *smsclient.SendResultInfo, error) {
+	info := &smsclient.SendResultInfo{
+		SendResultInfoTwilio: &smsclient.SendResultInfoTwilio{},
+	}
+	info.SendResultInfoTwilio.BodyLength = len(options.Body)
+
 	dumpedResponse, sendSMSResponse, err := t.send(options)
 	if err != nil {
-		return nil, err
+		return nil, info, err
 	}
 
 	var segmentCount *int
@@ -129,12 +134,12 @@ func (t *TwilioClient) Send(options *smsclient.SendOptions) (*smsclient.SendResu
 			segmentCount = &parsed
 		}
 	}
+	info.SendResultInfoTwilio.SegmentCount = segmentCount
 
 	return &smsclient.SendResult{
 		DumpedResponse: dumpedResponse,
 		Success:        sendSMSResponse.ErrorCode == nil,
-		SegmentCount:   segmentCount,
-	}, nil
+	}, info, nil
 }
 
 var _ smsclient.RawClient = &TwilioClient{}

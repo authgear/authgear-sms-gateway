@@ -61,7 +61,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	logger.Info("received send request")
 
-	sendResult, err := h.SMSService.Send(
+	sendResult, info, err := h.SMSService.Send(
 		body.AppID,
 		&smsclient.SendOptions{
 			To:                body.To,
@@ -97,15 +97,17 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var attrs []slog.Attr
-	if sendResult.SegmentCount != nil {
-		attrs = append(attrs, slog.Int("segment_count", *sendResult.SegmentCount))
+	var segmentCount *int
+	if info.SendResultInfoTwilio != nil && info.SendResultInfoTwilio.SegmentCount != nil {
+		attrs = append(attrs, slog.Int("segment_count", *info.SendResultInfoTwilio.SegmentCount))
+		segmentCount = info.SendResultInfoTwilio.SegmentCount
 	}
 	logger.LogAttrs(r.Context(), slog.LevelInfo, "finished send request", attrs...)
 
 	h.write(w, &ResponseBody{
 		Code:           CodeOK,
 		DumpedResponse: sendResult.DumpedResponse,
-		SegmentCount:   sendResult.SegmentCount,
+		SegmentCount:   segmentCount,
 	})
 }
 

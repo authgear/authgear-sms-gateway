@@ -48,7 +48,11 @@ func fixPhoneNumber(phoneNumber string) string {
 	return plusHyphensRegexp.ReplaceAllString(phoneNumber, "")
 }
 
-func (n *AccessYouClient) Send(options *smsclient.SendOptions) (*smsclient.SendResult, error) {
+func (n *AccessYouClient) Send(options *smsclient.SendOptions) (*smsclient.SendResult, *smsclient.SendResultInfo, error) {
+	info := &smsclient.SendResultInfo{
+		SendResultInfoAccessYou: &smsclient.SendResultInfoAccessYou{},
+	}
+
 	to := fixPhoneNumber(string(options.To))
 
 	dumpedResponse, sendSMSResponse, err := SendSMS(
@@ -63,13 +67,13 @@ func (n *AccessYouClient) Send(options *smsclient.SendOptions) (*smsclient.SendR
 		n.Logger,
 	)
 	if err != nil {
-		return nil, err
+		return nil, info, err
 	}
 
 	return &smsclient.SendResult{
 		DumpedResponse: dumpedResponse,
 		Success:        sendSMSResponse.Status == "100",
-	}, nil
+	}, info, nil
 }
 
 var _ smsclient.RawClient = &AccessYouClient{}
