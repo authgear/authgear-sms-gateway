@@ -63,18 +63,6 @@ func (r *SendRequest) Presign() string {
 	}, "&")
 }
 
-func (r *SendRequest) ToMap() map[string]interface{} {
-	vars, _ := json.Marshal(r.vars)
-	return map[string]interface{}{
-		"msgType":       r.msgType,
-		"phone":         strings.Join(r.phone, ","),
-		"sendRequestId": r.sendRequestId,
-		"smsUser":       r.smsUser,
-		"templateId":    r.templateId,
-		"vars":          vars,
-	}
-}
-
 func (r *SendRequest) ToValues() url.Values {
 	vars, _ := json.Marshal(r.vars)
 	values := url.Values{}
