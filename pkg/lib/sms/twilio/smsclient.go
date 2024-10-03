@@ -73,7 +73,7 @@ func (t *TwilioClient) send(options *smsclient.SendOptions) ([]byte, *SendRespon
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.ErrorUnknownResponse{
+			&smsclient.SendResult{
 				DumpedResponse: dumpedResponse,
 			},
 		)
@@ -83,7 +83,7 @@ func (t *TwilioClient) send(options *smsclient.SendOptions) ([]byte, *SendRespon
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.ErrorUnknownResponse{
+			&smsclient.SendResult{
 				DumpedResponse: dumpedResponse,
 			},
 		)

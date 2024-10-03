@@ -36,7 +36,7 @@ func Send(client *http.Client, baseUrl string, sendRequest *SendRequest, smsKey 
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.ErrorUnknownResponse{
+			&smsclient.SendResult{
 				DumpedResponse: dumpedResponse,
 			},
 		)
@@ -46,7 +46,7 @@ func Send(client *http.Client, baseUrl string, sendRequest *SendRequest, smsKey 
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.ErrorUnknownResponse{
+			&smsclient.SendResult{
 				DumpedResponse: dumpedResponse,
 			},
 		)

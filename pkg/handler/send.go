@@ -72,15 +72,15 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		},
 	)
 	if err != nil {
-		var errorUnknownResponse *smsclient.ErrorUnknownResponse
-		if errors.As(err, &errorUnknownResponse) {
+		var errorUnsuccessResponse *smsclient.SendResult
+		if errors.As(err, &errorUnsuccessResponse) {
 			logger.Error("unknown response",
-				"dumped_response", string(errorUnknownResponse.DumpedResponse),
+				"dumped_response", string(errorUnsuccessResponse.DumpedResponse),
 				"error", err.Error(),
 			)
 			h.write(w, &ResponseBody{
 				Code:             CodeUnknownResponse,
-				DumpedResponse:   errorUnknownResponse.DumpedResponse,
+				DumpedResponse:   errorUnsuccessResponse.DumpedResponse,
 				ErrorDescription: err.Error(),
 			})
 			return

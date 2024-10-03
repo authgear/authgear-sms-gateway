@@ -1,16 +1,10 @@
 package smsclient
 
 import (
+	"encoding/json"
+
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sensitive"
 )
-
-type ErrorUnknownResponse struct {
-	DumpedResponse []byte
-}
-
-func (e *ErrorUnknownResponse) Error() string {
-	return string(e.DumpedResponse)
-}
 
 type TemplateVariables struct {
 	AppName     string `json:"app_name"`
@@ -61,6 +55,11 @@ type SendResult struct {
 	DumpedResponse []byte
 	Success        bool
 	SegmentCount   *int
+}
+
+func (r *SendResult) Error() string {
+	jsonData, _ := json.Marshal(r)
+	return string(jsonData)
 }
 
 type RawClient interface {
