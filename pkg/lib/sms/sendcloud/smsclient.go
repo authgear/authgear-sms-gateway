@@ -4,10 +4,17 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
+
+// Sendcloud will return status code 412 if the phone number is a +86 number with "+86" prefix.
+// It only accepts "+" and country calling code if the phone number is NOT a +86 number.
+func fixPhoneNumber(e164 string) string {
+	return strings.TrimPrefix(e164, "+86")
+}
 
 type EffectiveTemplateVariables map[string]interface{}
 
@@ -113,7 +120,7 @@ func (n *SendCloudClient) Send(options *smsclient.SendOptions) (*smsclient.SendR
 	sendRequest := NewSendRequest(
 		string(template.TemplateMsgType),
 		[]string{
-			string(options.To),
+			fixPhoneNumber(string(options.To)),
 		},
 		n.SMSUser,
 		string(template.TemplateID),
