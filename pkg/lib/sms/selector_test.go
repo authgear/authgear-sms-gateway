@@ -50,7 +50,7 @@ provider_selector:
       use_provider: p2
       phone_number_alpha2: CN
       app_id: "123"
-    - type: match_app_id_and_phone_number_alpha2
+    - type: match_phone_number_alpha2
       use_provider: p4
       phone_number_alpha2: CN
     - type: default
