@@ -110,10 +110,10 @@ var _ = RootSchema.Add("SendCloudTemplateAssignment", `
 		"by_languages": {
 			"type": "array",
 			"minItems": 1,
-			"items": { "$ref": "#/defs/SendCloudTemplateAssignmentByLanguage"}
+			"items": { "$ref": "#/$defs/SendCloudTemplateAssignmentByLanguage"}
 		}
 	},
-	"required": ["authgear_template_name", "default_template_idd"]
+	"required": ["authgear_template_name", "default_template_id"]
 }
 `)
 
@@ -136,12 +136,12 @@ var _ = RootSchema.Add("ProviderConfigSendCloud", `
 		"templates": {
 			"type": "array",
 			"minItems": 1,
-			"items": { "$refs": "#/$defs/SendCloudTemplate" }
+			"items": { "$ref": "#/$defs/SendCloudTemplate" }
 		},
 		"template_assignments": {
 			"type": "array",
 			"minItems": 1,
-			"items": { "$refs": "#/$defs/SendCloudTemplateAssignment" }
+			"items": { "$ref": "#/$defs/SendCloudTemplateAssignment" }
 		}
 	},
 	"required": ["sms_user", "sms_key", "templates", "template_assignments"]

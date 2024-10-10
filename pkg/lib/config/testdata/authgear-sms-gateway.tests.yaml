@@ -35,8 +35,10 @@ config:
           - authgear_template_name: "verficiation_sms.txt"
             default_template_id: "919888"
             by_languages:
-              - authgear_languag: en
+              - authgear_language: en
                 template_id: "919888"
+          - authgear_template_name: "authenticate_primary_oob_sms.txt"
+            default_template_id: "919888"
   provider_selector:
     switch:
       - type: match_app_id_and_phone_number_alpha2
@@ -137,7 +139,7 @@ config:
           - authgear_template_name: "verficiation_sms.txt"
             default_template_id: "919888"
             by_languages:
-              - authgear_languag: en
+              - authgear_language: en
                 template_id: "919888"
   provider_selector:
     switch:
@@ -156,13 +158,13 @@ config:
         use_provider: sendcloud
         phone_number_alpha2: CN
 ---
-name: failed-sendcloud-config
+name: failed-sendcloud-config-json-schema
 error: |-
   invalid configuration:
-  /providers/2/sendcloud/templates/0/template_variable_key_mappings: missing template_variable_key_mappings
-  /providers/2/sendcloud/templates/1/template_variable_key_mappings: missing template_variable_key_mappings
-  /providers/2/sendcloud/template_assignments/0/default_template_id: template_id 919889 not found
-  /providers/2/sendcloud/template_assignments/0/by_languages/0/template_id: template_id 919890 not found
+  /providers/2/sendcloud/templates/0/template_variable_key_mappings: minItems
+    map[actual:0 expected:1]
+  /providers/2/sendcloud/templates/1: required
+    map[actual:[template_id template_msg_type] expected:[template_id template_msg_type template_variable_key_mappings] missing:[template_variable_key_mappings]]
 config:
   providers:
     - name: twilio
@@ -193,7 +195,68 @@ config:
           - authgear_template_name: "verficiation_sms.txt"
             default_template_id: "919889"
             by_languages:
-              - authgear_languag: en
+              - authgear_language: en
+                template_id: "919890"
+  provider_selector:
+    switch:
+      - type: match_app_id_and_phone_number_alpha2
+        use_provider: accessyou
+        phone_number_alpha2: HK
+        app_id: "123"
+      - type: match_app_id_and_phone_number_alpha2
+        use_provider: sendcloud
+        phone_number_alpha2: CN
+        app_id: "123"
+      - type: match_phone_number_alpha2
+        use_provider: accessyou
+        phone_number_alpha2: HK
+      - type: match_phone_number_alpha2
+        use_provider: sendcloud
+        phone_number_alpha2: CN
+      - type: default
+        use_provider: twilio
+---
+name: failed-sendcloud-config-custom-validation
+error: |-
+  invalid configuration:
+  /providers/2/sendcloud/template_assignments/0/default_template_id: template_id 919889 not found
+  /providers/2/sendcloud/template_assignments/0/by_languages/0/template_id: template_id 919890 not found
+config:
+  providers:
+    - name: twilio
+      type: twilio
+      twilio:
+        account_sid: "my-account-sid"
+        auth_token: "my-auth-token"
+        messaging_service_sid: "my-messaging-service-sid"
+    - name: accessyou
+      type: accessyou
+      accessyou:
+        accountno: "my-accountno"
+        user: "my-user"
+        pwd: "my-pwd"
+        from: "my-sender"
+    - name: sendcloud
+      type: sendcloud
+      sendcloud:
+        sms_user: "my-sms-user"
+        sms_key: "my-sms-key"
+        templates:
+          - template_id: "919888"
+            template_msg_type: "2"
+            template_variable_key_mappings:
+            - from: code
+              to: code
+          - template_id: "919879"
+            template_msg_type: "2"
+            template_variable_key_mappings:
+            - from: code
+              to: code
+        template_assignments:
+          - authgear_template_name: "verficiation_sms.txt"
+            default_template_id: "919889"
+            by_languages:
+              - authgear_language: en
                 template_id: "919890"
   provider_selector:
     switch:
