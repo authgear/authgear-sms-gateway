@@ -149,12 +149,12 @@ var _ = RootSchema.Add("ProviderSelectorSwitchRule", `
 	},
 	"allOf": [
 		{
-			"if": { "properties": { "type": { "const": "phone_number_alpha2" } }},
+			"if": { "properties": { "type": { "const": "match_phone_number_alpha2" } }},
 			"then": { "required": ["phone_number_alpha2"] }
 		},
 		{
-			"if": { "properties": { "type": { "const": "app_id_and_phone_number_alpha2" } }},
-			"then": { "required": ["phone_number_alpha2"] }
+			"if": { "properties": { "type": { "const": "match_app_id_and_phone_number_alpha2" } }},
+			"then": { "required": ["phone_number_alpha2", "app_id"] }
 		}
 	],
 	"required": ["type", "use_provider"]

@@ -231,3 +231,27 @@ config:
     switch:
       - type: default
         use_provider: twilio
+---
+name: missing-required-fields-in-switch-cases
+error: |-
+  invalid configuration:
+  /provider_selector/switch/0: required
+    map[actual:[type use_provider] expected:[phone_number_alpha2] missing:[phone_number_alpha2]]
+  /provider_selector/switch/1: required
+    map[actual:[type use_provider] expected:[app_id phone_number_alpha2] missing:[app_id phone_number_alpha2]]
+config:
+  providers:
+    - name: twilio
+      type: twilio
+      twilio:
+        account_sid: "my-account-sid"
+        auth_token: "my-auth-token"
+        messaging_service_sid: "my-messaging-service-sid"
+  provider_selector:
+    switch:
+      - type: match_phone_number_alpha2
+        use_provider: twilio
+      - type: match_app_id_and_phone_number_alpha2
+        use_provider: twilio
+      - type: default
+        use_provider: twilio
