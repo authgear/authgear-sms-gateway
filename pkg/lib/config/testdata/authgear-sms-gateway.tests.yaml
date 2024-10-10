@@ -233,7 +233,12 @@ config:
         use_provider: twilio
 ---
 name: missing-required-fields-in-switch-cases
-error: This test should fail
+error: |-
+  invalid configuration:
+  /provider_selector/switch/0: required
+    map[actual:[type use_provider] expected:[phone_number_alpha2] missing:[phone_number_alpha2]]
+  /provider_selector/switch/1: required
+    map[actual:[type use_provider] expected:[app_id phone_number_alpha2] missing:[app_id phone_number_alpha2]]
 config:
   providers:
     - name: twilio
