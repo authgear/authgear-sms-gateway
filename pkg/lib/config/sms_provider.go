@@ -36,10 +36,16 @@ type Provider struct {
 }
 
 type ProviderConfigTwilio struct {
+	AccountSID string `json:"account_sid,omitempty"`
+
+	// From and MessagingServiceSID are mutually exclusive.
 	From                string `json:"from,omitempty"`
-	AccountSID          string `json:"account_sid,omitempty"`
-	AuthToken           string `json:"auth_token,omitempty"`
 	MessagingServiceSID string `json:"messaging_service_sid,omitempty"`
+
+	// AuthToken and (APIKey and APIKeySecret) are mutually exclusive.
+	AuthToken    string `json:"auth_token,omitempty"`
+	APIKey       string `json:"api_key,omitempty"`
+	APIKeySecret string `json:"api_key_secret,omitempty"`
 }
 
 type ProviderConfigAccessYou struct {
@@ -83,18 +89,34 @@ var _ = RootSchema.Add("ProviderConfigTwilio", `
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
-		"from": { "type": "string" },
 		"account_sid": { "type": "string" },
-		"auth_token": {"type": "string"},
-		"messaging_service_sid": {"type": "string"}
+		"from": { "type": "string" },
+		"messaging_service_sid": { "type": "string" },
+		"auth_token": { "type": "string" },
+		"api_key": { "type": "string" },
+		"api_key_secret": { "type": "string" }
 	},
-	"required": ["account_sid", "auth_token"],
-	"oneOf": [
+	"required": ["account_sid"],
+	"allOf": [
 		{
-			"required": ["from"]
+			"oneOf": [
+				{
+					"required": ["from"]
+				},
+				{
+					"required": ["messaging_service_sid"]
+				}
+			]
 		},
 		{
-			"required": ["messaging_service_sid"]
+			"oneOf": [
+				{
+					"required": ["auth_token"]
+				},
+				{
+					"required": ["api_key", "api_key_secret"]
+				}
+			]
 		}
 	]
 }
