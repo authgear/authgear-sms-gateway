@@ -15,14 +15,16 @@ import (
 func NewClientFromConfigProvider(p *config.Provider, httpClient *http.Client, logger *slog.Logger) smsclient.RawClient {
 	switch p.Type {
 	case config.ProviderTypeTwilio:
-		return twilio.NewTwilioClient(
-			httpClient,
-			p.Twilio.AccountSID,
-			p.Twilio.AuthToken,
-			p.Twilio.From,
-			p.Twilio.MessagingServiceSID,
-			logger,
-		)
+		return &twilio.TwilioClient{
+			Client:              httpClient,
+			AccountSID:          p.Twilio.AccountSID,
+			AuthToken:           p.Twilio.AuthToken,
+			APIKey:              p.Twilio.APIKey,
+			APIKeySecret:        p.Twilio.APIKeySecret,
+			From:                p.Twilio.From,
+			MessagingServiceSID: p.Twilio.MessagingServiceSID,
+			Logger:              logger,
+		}
 	case config.ProviderTypeAccessYou:
 		return accessyou.NewAccessYouClient(
 			httpClient,

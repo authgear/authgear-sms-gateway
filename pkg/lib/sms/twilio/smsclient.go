@@ -15,23 +15,18 @@ import (
 )
 
 type TwilioClient struct {
-	Client              *http.Client
-	AccountSID          string
-	AuthToken           string
+	Client *http.Client
+
+	AccountSID string
+
+	AuthToken    string
+	APIKey       string
+	APIKeySecret string
+
 	From                string
 	MessagingServiceSID string
-	Logger              *slog.Logger
-}
 
-func NewTwilioClient(httpClient *http.Client, accountSID string, authToken string, from string, messagingServiceSID string, logger *slog.Logger) *TwilioClient {
-	return &TwilioClient{
-		Client:              httpClient,
-		AccountSID:          accountSID,
-		AuthToken:           authToken,
-		From:                from,
-		MessagingServiceSID: messagingServiceSID,
-		Logger:              logger,
-	}
+	Logger *slog.Logger
 }
 
 func (t *TwilioClient) send(options *smsclient.SendOptions) ([]byte, *SendResponse, error) {
@@ -56,7 +51,19 @@ func (t *TwilioClient) send(options *smsclient.SendOptions) ([]byte, *SendRespon
 
 	requestBody := values.Encode()
 	req, _ := http.NewRequest("POST", u.String(), strings.NewReader(requestBody))
-	req.SetBasicAuth(t.AccountSID, t.AuthToken)
+
+	// https://www.twilio.com/docs/usage/api#authenticate-with-http
+	if t.AuthToken != "" {
+		// When Auth Token is used, username is Account SID, and password is Auth Token.
+		req.SetBasicAuth(t.AccountSID, t.AuthToken)
+	} else if t.APIKey != "" {
+		// When API Key is used, username is API key, and password is API key secret.
+		req.SetBasicAuth(t.APIKey, t.APIKeySecret)
+	} else { //nolint: staticcheck
+		// Normally we should not reach here.
+		// But in case we do, we do not provide the auth header.
+		// And Twilio should returns an error response to us in this case.
+	}
 
 	resp, err := t.Client.Do(req)
 	if err != nil {
