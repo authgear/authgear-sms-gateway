@@ -214,7 +214,7 @@ config:
       - type: default
         use_provider: twilio
 ---
-name: failed-twilio-config
+name: twilio-both-from-and-messaging-service-sid-present
 error: |-
   invalid configuration:
   /providers/0/twilio: oneOf
@@ -227,6 +227,87 @@ config:
         auth_token: "my-auth-token"
         messaging_service_sid: "my-messaging-service-sid"
         from: "sender"
+  provider_selector:
+    switch:
+      - type: default
+        use_provider: twilio
+---
+name: twilio-both-auth-token-and-api-key-present
+error: |-
+  invalid configuration:
+  /providers/0/twilio: oneOf
+config:
+  providers:
+    - name: twilio
+      type: twilio
+      twilio:
+        account_sid: "my-account-sid"
+        messaging_service_sid: "my-messaging-service-sid"
+        auth_token: "my-auth-token"
+        api_key: "api-key"
+        api_key_secret: "api-key-secret"
+  provider_selector:
+    switch:
+      - type: default
+        use_provider: twilio
+---
+name: twilio-auth-token-from
+error: null
+config:
+  providers:
+    - name: twilio
+      type: twilio
+      twilio:
+        account_sid: "my-account-sid"
+        from: "sender"
+        auth_token: "my-auth-token"
+  provider_selector:
+    switch:
+      - type: default
+        use_provider: twilio
+---
+name: twilio-auth-token-messaging-service-sid
+error: null
+config:
+  providers:
+    - name: twilio
+      type: twilio
+      twilio:
+        account_sid: "my-account-sid"
+        messaging_service_sid: "messaging_service_sid"
+        auth_token: "my-auth-token"
+  provider_selector:
+    switch:
+      - type: default
+        use_provider: twilio
+---
+name: twilio-api-key-from
+error: null
+config:
+  providers:
+    - name: twilio
+      type: twilio
+      twilio:
+        account_sid: "my-account-sid"
+        from: "sender"
+        api_key: "api-key"
+        api_key_secret: "api-key-secret"
+  provider_selector:
+    switch:
+      - type: default
+        use_provider: twilio
+---
+name: twilio-api-key-messaging-service-sid
+error: null
+config:
+  providers:
+    - name: twilio
+      type: twilio
+      twilio:
+        account_sid: "my-account-sid"
+        messaging_service_sid: "messaging-service-sid"
+        api_key: "api-key"
+        api_key_secret: "api-key-secret"
   provider_selector:
     switch:
       - type: default
