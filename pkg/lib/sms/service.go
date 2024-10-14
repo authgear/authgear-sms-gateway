@@ -11,9 +11,9 @@ import (
 )
 
 type SMSService struct {
-	Logger       *slog.Logger
-	RootConfig   *config.RootConfig
-	SMSClientMap SMSClientMap
+	Logger         *slog.Logger
+	RootConfig     *config.RootConfig
+	SMSProviderMap SMSProviderMap
 }
 
 func (s *SMSService) Send(
@@ -21,12 +21,12 @@ func (s *SMSService) Send(
 	appID string,
 	sendOptions *smsclient.SendOptions,
 ) (*smsclient.SendResult, error) {
-	clientName := GetClientNameByMatch(s.RootConfig, &MatchContext{AppID: appID, PhoneNumber: string(sendOptions.To)})
-	client := s.SMSClientMap.GetClientByName(clientName)
+	clientName := GetProviderNameByMatch(s.RootConfig, &MatchContext{AppID: appID, PhoneNumber: string(sendOptions.To)})
+	client := s.SMSProviderMap.GetProviderByName(clientName)
 
-	ctx = logger.ContextWithAttrs(ctx, slog.String("client_name", clientName))
+	ctx = logger.ContextWithAttrs(ctx, slog.String("provider_name", clientName))
 
-	s.Logger.InfoContext(ctx, "selected client")
+	s.Logger.InfoContext(ctx, "selected provider")
 
 	result, err := client.Send(ctx, sendOptions)
 	var errSendResult *smsclient.SendResult

@@ -42,11 +42,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	smsClientMap := sms.NewSMSClientMap(cfg, httpClient, logger)
+	smsProviderMap := sms.NewSMSProviderMap(cfg, httpClient, logger)
 	smsService := &sms.SMSService{
-		Logger:       logger,
-		RootConfig:   cfg,
-		SMSClientMap: smsClientMap,
+		Logger:         logger,
+		RootConfig:     cfg,
+		SMSProviderMap: smsProviderMap,
 	}
 
 	http.Handle("/healthz", &handler.HealthzHandler{})

@@ -6,7 +6,7 @@ import (
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
 )
 
-func GetClientNameByMatch(c *config.RootConfig, ctx *MatchContext) string {
+func GetProviderNameByMatch(c *config.RootConfig, ctx *MatchContext) string {
 	var defaultClient string
 	for _, providerSelector := range c.ProviderSelector.Switch {
 		matcher := ParseMatcher(providerSelector)
