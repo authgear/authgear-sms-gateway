@@ -50,6 +50,9 @@ provider_selector:
       use_provider: p2
       phone_number_alpha2: CN
       app_id: "123"
+    - type: match_app_id
+      use_provider: p3
+      app_id: "use_p3"
     - type: match_phone_number_alpha2
       use_provider: p4
       phone_number_alpha2: CN
@@ -78,6 +81,12 @@ func TestSelector(t *testing.T) {
 		config1,
 		&MatchContext{AppID: "123", PhoneNumber: "+8698765432"},
 		"p2",
+	)
+	test(
+		"App ID match. Pick p3",
+		config1,
+		&MatchContext{AppID: "use_p3", PhoneNumber: "+8698765432"},
+		"p3",
 	)
 	test(
 		"App ID and Country Code (HK) not match. Pick default",
