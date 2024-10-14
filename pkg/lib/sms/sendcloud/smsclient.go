@@ -96,7 +96,7 @@ func NewSendCloudClient(
 	}
 }
 
-func (n *SendCloudClient) Send(ctx context.Context, options *smsclient.SendOptions) (*smsclient.SendResult, error) {
+func (n *SendCloudClient) Send(ctx context.Context, options *smsclient.SendOptions) (*smsclient.SendResultSuccess, error) {
 	template, err := n.TemplateResolver.Resolve(options.TemplateName, options.LanguageTag)
 	if err != nil {
 		return nil, err
@@ -133,10 +133,17 @@ func (n *SendCloudClient) Send(ctx context.Context, options *smsclient.SendOptio
 		return nil, err
 	}
 
-	return &smsclient.SendResult{
+	// Success case.
+	if sendResponse.StatusCode == 200 {
+		return &smsclient.SendResultSuccess{
+			DumpedResponse: dumpedResponse,
+		}, nil
+	}
+
+	// Failed case.
+	return nil, &smsclient.SendResultError{
 		DumpedResponse: dumpedResponse,
-		Success:        sendResponse.StatusCode == 200,
-	}, nil
+	}
 }
 
 var _ smsclient.RawClient = &SendCloudClient{}

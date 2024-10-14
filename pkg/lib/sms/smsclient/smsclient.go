@@ -52,16 +52,19 @@ type SendOptions struct {
 	TemplateVariables *TemplateVariables
 }
 
-type SendResult struct {
+type SendResultSuccess struct {
 	DumpedResponse []byte `json:"dumped_response,omitempty"`
-	Success        bool   `json:"success"`
 }
 
-func (r *SendResult) Error() string {
+type SendResultError struct {
+	DumpedResponse []byte `json:"dumped_response,omitempty"`
+}
+
+func (r *SendResultError) Error() string {
 	jsonData, _ := json.Marshal(r)
 	return string(jsonData)
 }
 
 type RawClient interface {
-	Send(ctx context.Context, options *SendOptions) (*SendResult, error)
+	Send(ctx context.Context, options *SendOptions) (*SendResultSuccess, error)
 }

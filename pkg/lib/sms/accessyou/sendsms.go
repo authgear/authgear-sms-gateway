@@ -71,7 +71,7 @@ func SendSMS(
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.SendResult{
+			&smsclient.SendResultError{
 				DumpedResponse: dumpedResponse,
 			},
 		)
@@ -82,7 +82,7 @@ func SendSMS(
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.SendResult{
+			&smsclient.SendResultError{
 				DumpedResponse: dumpedResponse,
 			},
 		)

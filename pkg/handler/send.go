@@ -88,7 +88,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		var errorUnsuccessResponse *smsclient.SendResult
+		var errorUnsuccessResponse *smsclient.SendResultError
 		if errors.As(err, &errorUnsuccessResponse) {
 			h.Logger.ErrorContext(r.Context(), "unsuccessful response",
 				"dumped_response", string(errorUnsuccessResponse.DumpedResponse),

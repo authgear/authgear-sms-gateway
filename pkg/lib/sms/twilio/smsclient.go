@@ -80,7 +80,7 @@ func (t *TwilioClient) send(ctx context.Context, options *smsclient.SendOptions)
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.SendResult{
+			&smsclient.SendResultError{
 				DumpedResponse: dumpedResponse,
 			},
 		)
@@ -90,7 +90,7 @@ func (t *TwilioClient) send(ctx context.Context, options *smsclient.SendOptions)
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.SendResult{
+			&smsclient.SendResultError{
 				DumpedResponse: dumpedResponse,
 			},
 		)
@@ -124,7 +124,7 @@ func (t *TwilioClient) send(ctx context.Context, options *smsclient.SendOptions)
 	return dumpedResponse, sendResponse, nil
 }
 
-func (t *TwilioClient) Send(ctx context.Context, options *smsclient.SendOptions) (*smsclient.SendResult, error) {
+func (t *TwilioClient) Send(ctx context.Context, options *smsclient.SendOptions) (*smsclient.SendResultSuccess, error) {
 	ctx = smsclient.WithSendContext(ctx, func(sendCtx *smsclient.SendContext) {
 		sendCtx.Twilio = &smsclient.SendContextTwilio{
 			BodyLength: len(options.Body),
@@ -147,10 +147,17 @@ func (t *TwilioClient) Send(ctx context.Context, options *smsclient.SendOptions)
 		sendCtx.Twilio.SegmentCount = segmentCount
 	})
 
-	return &smsclient.SendResult{
+	// Success case.
+	if sendSMSResponse.ErrorCode == nil {
+		return &smsclient.SendResultSuccess{
+			DumpedResponse: dumpedResponse,
+		}, nil
+	}
+
+	// Failed case.
+	return nil, &smsclient.SendResultError{
 		DumpedResponse: dumpedResponse,
-		Success:        sendSMSResponse.ErrorCode == nil,
-	}, nil
+	}
 }
 
 var _ smsclient.RawClient = &TwilioClient{}

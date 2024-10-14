@@ -19,7 +19,7 @@ func (s *SMSService) Send(
 	ctx context.Context,
 	appID string,
 	sendOptions *smsclient.SendOptions,
-) (*smsclient.SendResult, error) {
+) (*smsclient.SendResultSuccess, error) {
 	clientName := GetProviderNameByMatch(s.RootConfig, &MatchContext{AppID: appID, PhoneNumber: string(sendOptions.To)})
 	client := s.SMSProviderMap.GetProviderByName(clientName)
 

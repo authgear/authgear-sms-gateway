@@ -37,7 +37,7 @@ func Send(ctx context.Context, client *http.Client, baseUrl string, sendRequest 
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.SendResult{
+			&smsclient.SendResultError{
 				DumpedResponse: dumpedResponse,
 			},
 		)
@@ -47,7 +47,7 @@ func Send(ctx context.Context, client *http.Client, baseUrl string, sendRequest 
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.SendResult{
+			&smsclient.SendResultError{
 				DumpedResponse: dumpedResponse,
 			},
 		)
