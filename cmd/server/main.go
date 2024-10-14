@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 	"os"
 	"time"
@@ -12,10 +13,16 @@ import (
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/logger"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
 func main() {
-	logger := logger.NewLogger()
+	stderrHandler := logger.NewTextHandler()
+	contextHandler := &logger.ContextHandler{
+		ContextKey: smsclient.SendContextKey,
+		Handler:    stderrHandler,
+	}
+	logger := slog.New(contextHandler)
 
 	err := godotenv.Load()
 	if errors.Is(err, os.ErrNotExist) {

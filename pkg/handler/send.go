@@ -9,7 +9,6 @@ import (
 	"github.com/authgear/authgear-server/pkg/util/httputil"
 	"github.com/authgear/authgear-server/pkg/util/validation"
 
-	"github.com/authgear/authgear-sms-gateway/pkg/lib/logger"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
@@ -63,14 +62,6 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				LanguageTag:  body.LanguageTag,
 			}
 		},
-	))
-
-	r = r.WithContext(logger.ContextWithAttrs(
-		r.Context(),
-		slog.String("app_id", body.AppID),
-		slog.Any("to", body.To),
-		slog.String("template_name", body.TemplateName),
-		slog.String("language_tag", body.LanguageTag),
 	))
 
 	h.Logger.InfoContext(r.Context(), "received send request")

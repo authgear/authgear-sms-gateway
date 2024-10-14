@@ -6,7 +6,8 @@ import (
 )
 
 type ContextHandler struct {
-	Handler slog.Handler
+	ContextKey interface{}
+	Handler    slog.Handler
 }
 
 var _ slog.Handler = &ContextHandler{}
@@ -16,8 +17,11 @@ func (h *ContextHandler) Enabled(ctx context.Context, level slog.Level) bool {
 }
 
 func (h *ContextHandler) Handle(ctx context.Context, record slog.Record) error {
-	loggerContext := GetLoggerContext(ctx)
-	record.AddAttrs(loggerContext.Attrs...)
+	loggerContexter, ok := ctx.Value(h.ContextKey).(LoggerContexter)
+	if ok && loggerContexter != nil {
+		attrs := loggerContexter.GetAttrs()
+		record.AddAttrs(attrs...)
+	}
 	return h.Handler.Handle(ctx, record)
 }
 

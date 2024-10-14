@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
-	"github.com/authgear/authgear-sms-gateway/pkg/lib/logger"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
@@ -29,7 +28,6 @@ func (s *SMSService) Send(
 		}
 		sendCtx.Root.ProviderName = clientName
 	})
-	ctx = logger.ContextWithAttrs(ctx, slog.String("provider_name", clientName))
 
 	s.Logger.InfoContext(ctx, "selected provider")
 
