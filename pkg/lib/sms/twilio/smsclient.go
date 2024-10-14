@@ -125,10 +125,11 @@ func (t *TwilioClient) send(ctx context.Context, options *smsclient.SendOptions)
 }
 
 func (t *TwilioClient) Send(ctx context.Context, options *smsclient.SendOptions) (*smsclient.SendResult, error) {
-	info := &smsclient.SendResultInfo{
-		SendResultInfoTwilio: &smsclient.SendResultInfoTwilio{},
-	}
-	info.SendResultInfoTwilio.BodyLength = len(options.Body)
+	ctx = smsclient.WithSendContext(ctx, func(sendCtx *smsclient.SendContext) {
+		sendCtx.Twilio = &smsclient.SendContextTwilio{
+			BodyLength: len(options.Body),
+		}
+	})
 
 	dumpedResponse, sendSMSResponse, err := t.send(ctx, options)
 	if err != nil {
@@ -141,12 +142,14 @@ func (t *TwilioClient) Send(ctx context.Context, options *smsclient.SendOptions)
 			segmentCount = &parsed
 		}
 	}
-	info.SendResultInfoTwilio.SegmentCount = segmentCount
+
+	_ = smsclient.WithSendContext(ctx, func(sendCtx *smsclient.SendContext) {
+		sendCtx.Twilio.SegmentCount = segmentCount
+	})
 
 	return &smsclient.SendResult{
 		DumpedResponse: dumpedResponse,
 		Success:        sendSMSResponse.ErrorCode == nil,
-		Info:           info,
 	}, nil
 }
 

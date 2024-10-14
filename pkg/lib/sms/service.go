@@ -2,7 +2,6 @@ package sms
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
@@ -24,34 +23,19 @@ func (s *SMSService) Send(
 	clientName := GetProviderNameByMatch(s.RootConfig, &MatchContext{AppID: appID, PhoneNumber: string(sendOptions.To)})
 	client := s.SMSProviderMap.GetProviderByName(clientName)
 
+	ctx = smsclient.WithSendContext(ctx, func(sendCtx *smsclient.SendContext) {
+		if sendCtx.Root == nil {
+			sendCtx.Root = &smsclient.SendContextRoot{}
+		}
+		sendCtx.Root.ProviderName = clientName
+	})
 	ctx = logger.ContextWithAttrs(ctx, slog.String("provider_name", clientName))
 
 	s.Logger.InfoContext(ctx, "selected provider")
 
 	result, err := client.Send(ctx, sendOptions)
-	var errSendResult *smsclient.SendResult
-	if errors.As(err, &errSendResult) {
-		if errSendResult.Info == nil {
-			errSendResult.Info = &smsclient.SendResultInfo{}
-		}
-		if errSendResult.Info.SendResultInfoRoot == nil {
-			errSendResult.Info.SendResultInfoRoot = &smsclient.SendResultInfoRoot{}
-		}
-
-		errSendResult.Info.SendResultInfoRoot.ProviderName = clientName
-	}
 	if err != nil {
 		return nil, err
-	}
-
-	if result.Info == nil {
-		result.Info = &smsclient.SendResultInfo{}
-	}
-	if result.Info.SendResultInfoRoot == nil {
-		result.Info.SendResultInfoRoot = &smsclient.SendResultInfoRoot{}
-	}
-	result.Info.SendResultInfoRoot = &smsclient.SendResultInfoRoot{
-		ProviderName: clientName,
 	}
 
 	return result, nil

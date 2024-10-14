@@ -97,26 +97,26 @@ func NewSendCloudClient(
 }
 
 func (n *SendCloudClient) Send(ctx context.Context, options *smsclient.SendOptions) (*smsclient.SendResult, error) {
-	info := &smsclient.SendResultInfo{
-		SendResultInfoSendCloud: &smsclient.SendResultInfoSendCloud{},
-	}
-
 	template, err := n.TemplateResolver.Resolve(options.TemplateName, options.LanguageTag)
 	if err != nil {
 		return nil, err
 	}
-	info.SendResultInfoSendCloud.TemplateID = string(template.TemplateID)
+
 	templateVariables := MakeEffectiveTemplateVariables(options.TemplateVariables, template.TemplateVariableKeyMappings)
-
-	var sendResultInfoVariableList []*smsclient.SendResultInfoVariable
-
+	var variables []*smsclient.SendContextVariable
 	for key, value := range templateVariables {
-		sendResultInfoVariableList = append(sendResultInfoVariableList, &smsclient.SendResultInfoVariable{
+		variables = append(variables, &smsclient.SendContextVariable{
 			Key:         key,
 			ValueLength: len(fmt.Sprintf("%v", value)),
 		})
 	}
-	info.SendResultInfoSendCloud.SendResultInfoVariableList = sendResultInfoVariableList
+
+	ctx = smsclient.WithSendContext(ctx, func(sendCtx *smsclient.SendContext) {
+		sendCtx.SendCloud = &smsclient.SendContextSendCloud{
+			TemplateID: string(template.TemplateID),
+			Variables:  variables,
+		}
+	})
 
 	sendRequest := NewSendRequest(
 		string(template.TemplateMsgType),
@@ -136,7 +136,6 @@ func (n *SendCloudClient) Send(ctx context.Context, options *smsclient.SendOptio
 	return &smsclient.SendResult{
 		DumpedResponse: dumpedResponse,
 		Success:        sendResponse.StatusCode == 200,
-		Info:           info,
 	}, nil
 }
 

@@ -50,10 +50,6 @@ func fixPhoneNumber(phoneNumber string) string {
 }
 
 func (n *AccessYouClient) Send(ctx context.Context, options *smsclient.SendOptions) (*smsclient.SendResult, error) {
-	info := &smsclient.SendResultInfo{
-		SendResultInfoAccessYou: &smsclient.SendResultInfoAccessYou{},
-	}
-
 	to := fixPhoneNumber(string(options.To))
 
 	dumpedResponse, sendSMSResponse, err := SendSMS(
@@ -75,7 +71,6 @@ func (n *AccessYouClient) Send(ctx context.Context, options *smsclient.SendOptio
 	return &smsclient.SendResult{
 		DumpedResponse: dumpedResponse,
 		Success:        sendSMSResponse.Status == "100",
-		Info:           info,
 	}, nil
 }
 

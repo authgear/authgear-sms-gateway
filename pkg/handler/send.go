@@ -53,6 +53,18 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	r = r.WithContext(smsclient.WithSendContext(
+		r.Context(),
+		func(sendCtx *smsclient.SendContext) {
+			sendCtx.Root = &smsclient.SendContextRoot{
+				AppID:        body.AppID,
+				To:           body.To,
+				TemplateName: body.TemplateName,
+				LanguageTag:  body.LanguageTag,
+			}
+		},
+	))
+
 	r = r.WithContext(logger.ContextWithAttrs(
 		r.Context(),
 		slog.String("app_id", body.AppID),
@@ -82,11 +94,12 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				"dumped_response", string(errorUnsuccessResponse.DumpedResponse),
 				"error", err.Error(),
 			)
+			info := smsclient.GetSendContext(r.Context())
 			h.write(w, &ResponseBody{
 				Code:             CodeUnknownResponse,
 				DumpedResponse:   errorUnsuccessResponse.DumpedResponse,
 				ErrorDescription: err.Error(),
-				Info:             errorUnsuccessResponse.Info,
+				Info:             info,
 			})
 			return
 		}
@@ -103,10 +116,11 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	h.Logger.InfoContext(r.Context(), "finished send request")
 
+	info := smsclient.GetSendContext(r.Context())
 	h.write(w, &ResponseBody{
 		Code:           CodeOK,
 		DumpedResponse: sendResult.DumpedResponse,
-		Info:           sendResult.Info,
+		Info:           info,
 	})
 }
 
