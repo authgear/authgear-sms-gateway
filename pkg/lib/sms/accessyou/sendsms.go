@@ -1,6 +1,7 @@
 package accessyou
 
 import (
+	"context"
 	"errors"
 	"io"
 	"log/slog"
@@ -21,6 +22,7 @@ func fixRespData(respData []byte) []byte {
 }
 
 func SendSMS(
+	ctx context.Context,
 	client *http.Client,
 	baseUrl string,
 	accountNo string,
@@ -86,7 +88,7 @@ func SendSMS(
 		)
 	}
 
-	logger.Info("accessyou response",
+	logger.InfoContext(ctx, "accessyou response",
 		"msg_id", sendSMSResponse.MessageID,
 		"msg_status", sendSMSResponse.Status,
 		"msg_status_desc", sendSMSResponse.Description,

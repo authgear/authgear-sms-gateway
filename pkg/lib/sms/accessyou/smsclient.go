@@ -1,6 +1,7 @@
 package accessyou
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
 	"regexp"
@@ -48,7 +49,7 @@ func fixPhoneNumber(phoneNumber string) string {
 	return plusHyphensRegexp.ReplaceAllString(phoneNumber, "")
 }
 
-func (n *AccessYouClient) Send(options *smsclient.SendOptions) (*smsclient.SendResult, error) {
+func (n *AccessYouClient) Send(ctx context.Context, options *smsclient.SendOptions) (*smsclient.SendResult, error) {
 	info := &smsclient.SendResultInfo{
 		SendResultInfoAccessYou: &smsclient.SendResultInfoAccessYou{},
 	}
@@ -56,6 +57,7 @@ func (n *AccessYouClient) Send(options *smsclient.SendOptions) (*smsclient.SendR
 	to := fixPhoneNumber(string(options.To))
 
 	dumpedResponse, sendSMSResponse, err := SendSMS(
+		ctx,
 		n.Client,
 		n.BaseUrl,
 		n.AccountNo,

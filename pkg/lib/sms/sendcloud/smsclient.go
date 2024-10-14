@@ -1,6 +1,7 @@
 package sendcloud
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -95,7 +96,7 @@ func NewSendCloudClient(
 	}
 }
 
-func (n *SendCloudClient) Send(options *smsclient.SendOptions) (*smsclient.SendResult, error) {
+func (n *SendCloudClient) Send(ctx context.Context, options *smsclient.SendOptions) (*smsclient.SendResult, error) {
 	info := &smsclient.SendResultInfo{
 		SendResultInfoSendCloud: &smsclient.SendResultInfoSendCloud{},
 	}
@@ -127,7 +128,7 @@ func (n *SendCloudClient) Send(options *smsclient.SendOptions) (*smsclient.SendR
 		templateVariables.WrapKeys(),
 	)
 
-	dumpedResponse, sendResponse, err := Send(n.Client, n.BaseUrl, &sendRequest, n.SMSKey, n.Logger)
+	dumpedResponse, sendResponse, err := Send(ctx, n.Client, n.BaseUrl, &sendRequest, n.SMSKey, n.Logger)
 	if err != nil {
 		return nil, err
 	}

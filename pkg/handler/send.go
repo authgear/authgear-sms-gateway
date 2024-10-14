@@ -9,6 +9,7 @@ import (
 	"github.com/authgear/authgear-server/pkg/util/httputil"
 	"github.com/authgear/authgear-server/pkg/util/validation"
 
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/logger"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
@@ -52,16 +53,18 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logger := h.Logger.With(
-		"app_id", body.AppID,
-		"to", body.To,
-		"template_name", body.TemplateName,
-		"language_tag", body.LanguageTag,
-	)
+	r = r.WithContext(logger.ContextWithAttrs(
+		r.Context(),
+		slog.String("app_id", body.AppID),
+		slog.Any("to", body.To),
+		slog.String("template_name", body.TemplateName),
+		slog.String("language_tag", body.LanguageTag),
+	))
 
-	logger.Info("received send request")
+	h.Logger.InfoContext(r.Context(), "received send request")
 
 	sendResult, err := h.SMSService.Send(
+		r.Context(),
 		body.AppID,
 		&smsclient.SendOptions{
 			To:                body.To,
@@ -75,7 +78,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		var errorUnsuccessResponse *smsclient.SendResult
 		if errors.As(err, &errorUnsuccessResponse) {
-			logger.Error("unknown response",
+			h.Logger.ErrorContext(r.Context(), "unsuccessful response",
 				"dumped_response", string(errorUnsuccessResponse.DumpedResponse),
 				"error", err.Error(),
 			)
@@ -88,7 +91,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		logger.Error("unknown error",
+		h.Logger.ErrorContext(r.Context(), "unknown error",
 			"error", err.Error(),
 		)
 		h.write(w, &ResponseBody{
@@ -98,11 +101,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var attrs []slog.Attr
-	if sendResult.Info.SendResultInfoTwilio != nil && sendResult.Info.SendResultInfoTwilio.SegmentCount != nil {
-		attrs = append(attrs, slog.Int("segment_count", *sendResult.Info.SendResultInfoTwilio.SegmentCount))
-	}
-	logger.LogAttrs(r.Context(), slog.LevelInfo, "finished send request", attrs...)
+	h.Logger.InfoContext(r.Context(), "finished send request")
 
 	h.write(w, &ResponseBody{
 		Code:           CodeOK,

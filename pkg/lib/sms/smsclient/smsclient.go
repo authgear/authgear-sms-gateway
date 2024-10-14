@@ -1,6 +1,7 @@
 package smsclient
 
 import (
+	"context"
 	"encoding/json"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sensitive"
@@ -91,5 +92,5 @@ func (r *SendResult) Error() string {
 }
 
 type RawClient interface {
-	Send(options *SendOptions) (*SendResult, error)
+	Send(ctx context.Context, options *SendOptions) (*SendResult, error)
 }

@@ -29,7 +29,7 @@ type TwilioClient struct {
 	Logger *slog.Logger
 }
 
-func (t *TwilioClient) send(options *smsclient.SendOptions) ([]byte, *SendResponse, error) {
+func (t *TwilioClient) send(ctx context.Context, options *smsclient.SendOptions) ([]byte, *SendResponse, error) {
 	// Written against
 	// https://www.twilio.com/docs/messaging/api/message-resource#create-a-message-resource
 
@@ -119,18 +119,18 @@ func (t *TwilioClient) send(options *smsclient.SendOptions) ([]byte, *SendRespon
 		attrs = append(attrs, slog.String("error_message", *sendResponse.ErrorMessage))
 	}
 
-	t.Logger.LogAttrs(context.TODO(), slog.LevelInfo, "twilio response", attrs...)
+	t.Logger.LogAttrs(ctx, slog.LevelInfo, "twilio response", attrs...)
 
 	return dumpedResponse, sendResponse, nil
 }
 
-func (t *TwilioClient) Send(options *smsclient.SendOptions) (*smsclient.SendResult, error) {
+func (t *TwilioClient) Send(ctx context.Context, options *smsclient.SendOptions) (*smsclient.SendResult, error) {
 	info := &smsclient.SendResultInfo{
 		SendResultInfoTwilio: &smsclient.SendResultInfoTwilio{},
 	}
 	info.SendResultInfoTwilio.BodyLength = len(options.Body)
 
-	dumpedResponse, sendSMSResponse, err := t.send(options)
+	dumpedResponse, sendSMSResponse, err := t.send(ctx, options)
 	if err != nil {
 		return nil, err
 	}

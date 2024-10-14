@@ -1,10 +1,12 @@
 package sms
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/logger"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
@@ -15,17 +17,18 @@ type SMSService struct {
 }
 
 func (s *SMSService) Send(
+	ctx context.Context,
 	appID string,
 	sendOptions *smsclient.SendOptions,
 ) (*smsclient.SendResult, error) {
 	clientName := GetClientNameByMatch(s.RootConfig, &MatchContext{AppID: appID, PhoneNumber: string(sendOptions.To)})
 	client := s.SMSClientMap.GetClientByName(clientName)
-	s.Logger.Info("selected client",
-		"to", sendOptions.To,
-		"client_name", clientName,
-	)
 
-	result, err := client.Send(sendOptions)
+	ctx = logger.ContextWithAttrs(ctx, slog.String("client_name", clientName))
+
+	s.Logger.InfoContext(ctx, "selected client")
+
+	result, err := client.Send(ctx, sendOptions)
 	var errSendResult *smsclient.SendResult
 	if errors.As(err, &errSendResult) {
 		if errSendResult.Info == nil {
