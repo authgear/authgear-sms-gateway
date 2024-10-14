@@ -141,6 +141,7 @@ type ProviderSelectorSwitchType string
 
 const (
 	ProviderSelectorSwitchTypeMatchPhoneNumberAlpha2         ProviderSelectorSwitchType = "match_phone_number_alpha2"
+	ProviderSelectorSwitchTypeMatchAppID                     ProviderSelectorSwitchType = "match_app_id"
 	ProviderSelectorSwitchTypeMatchAppIDAndPhoneNumberAlpha2 ProviderSelectorSwitchType = "match_app_id_and_phone_number_alpha2"
 	ProviderSelectorSwitchTypeDefault                        ProviderSelectorSwitchType = "default"
 )
@@ -148,7 +149,7 @@ const (
 var _ = RootSchema.Add("ProviderSelectorSwitchType", `
 {
 	"type": "string",
-	"enum": ["match_phone_number_alpha2", "match_app_id_and_phone_number_alpha2", "default"]
+	"enum": ["match_phone_number_alpha2", "match_app_id", "match_app_id_and_phone_number_alpha2", "default"]
 }
 `)
 
@@ -173,6 +174,10 @@ var _ = RootSchema.Add("ProviderSelectorSwitchRule", `
 		{
 			"if": { "properties": { "type": { "const": "match_phone_number_alpha2" } }},
 			"then": { "required": ["phone_number_alpha2"] }
+		},
+		{
+			"if": { "properties": { "type": { "const": "match_app_id" } }},
+			"then": { "required": ["app_id"] }
 		},
 		{
 			"if": { "properties": { "type": { "const": "match_app_id_and_phone_number_alpha2" } }},

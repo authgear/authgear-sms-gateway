@@ -49,6 +49,9 @@ config:
         use_provider: sendcloud
         phone_number_alpha2: CN
         app_id: "123"
+      - type: match_app_id
+        use_provider: twilio
+        app_id: "123"
       - type: match_phone_number_alpha2
         use_provider: accessyou
         phone_number_alpha2: HK
@@ -382,6 +385,8 @@ error: |-
   /provider_selector/switch/0: required
     map[actual:[type use_provider] expected:[phone_number_alpha2] missing:[phone_number_alpha2]]
   /provider_selector/switch/1: required
+    map[actual:[type use_provider] expected:[app_id] missing:[app_id]]
+  /provider_selector/switch/2: required
     map[actual:[type use_provider] expected:[app_id phone_number_alpha2] missing:[app_id phone_number_alpha2]]
 config:
   providers:
@@ -394,6 +399,8 @@ config:
   provider_selector:
     switch:
       - type: match_phone_number_alpha2
+        use_provider: twilio
+      - type: match_app_id
         use_provider: twilio
       - type: match_app_id_and_phone_number_alpha2
         use_provider: twilio
