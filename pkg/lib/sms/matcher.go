@@ -21,6 +21,8 @@ type MatcherPhoneNumberAlpha2 struct {
 	Code string
 }
 
+var _ Matcher = &MatcherPhoneNumberAlpha2{}
+
 func (m *MatcherPhoneNumberAlpha2) Match(ctx *MatchContext) bool {
 	num, err := phonenumbers.Parse(ctx.PhoneNumber, "")
 	if err != nil {
@@ -30,12 +32,30 @@ func (m *MatcherPhoneNumberAlpha2) Match(ctx *MatchContext) bool {
 	return m.Code == regionCode
 }
 
-var _ Matcher = &MatcherPhoneNumberAlpha2{}
+type MatcherAppID struct {
+	AppID string
+}
+
+var _ Matcher = &MatcherAppID{}
+
+func (m *MatcherAppID) Match(ctx *MatchContext) bool {
+	if m.AppID == "" {
+		return false
+	}
+
+	if m.AppID == ctx.AppID {
+		return true
+	}
+
+	return false
+}
 
 type MatcherAppIDAndPhoneNumberAlpha2 struct {
 	AppID string
 	Code  string
 }
+
+var _ Matcher = &MatcherAppIDAndPhoneNumberAlpha2{}
 
 func (m *MatcherAppIDAndPhoneNumberAlpha2) Match(ctx *MatchContext) bool {
 	num, err := phonenumbers.Parse(ctx.PhoneNumber, "")
@@ -50,21 +70,23 @@ func (m *MatcherAppIDAndPhoneNumberAlpha2) Match(ctx *MatchContext) bool {
 	return m.Code == regionCode && m.AppID == ctx.AppID
 }
 
-var _ Matcher = &MatcherAppIDAndPhoneNumberAlpha2{}
-
 type MatcherDefault struct{}
+
+var _ Matcher = &MatcherDefault{}
 
 func (m *MatcherDefault) Match(ctx *MatchContext) bool {
 	return true
 }
-
-var _ Matcher = &MatcherDefault{}
 
 func ParseMatcher(rule *config.ProviderSelectorSwitchRule) Matcher {
 	switch rule.Type {
 	case config.ProviderSelectorSwitchTypeMatchPhoneNumberAlpha2:
 		return &MatcherPhoneNumberAlpha2{
 			Code: rule.PhoneNumberAlpha2,
+		}
+	case config.ProviderSelectorSwitchTypeMatchAppID:
+		return &MatcherAppID{
+			AppID: rule.AppID,
 		}
 	case config.ProviderSelectorSwitchTypeMatchAppIDAndPhoneNumberAlpha2:
 		return &MatcherAppIDAndPhoneNumberAlpha2{
