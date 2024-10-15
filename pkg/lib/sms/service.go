@@ -1,7 +1,7 @@
 package sms
 
 import (
-	"errors"
+	"context"
 	"log/slog"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
@@ -9,46 +9,31 @@ import (
 )
 
 type SMSService struct {
-	Logger       *slog.Logger
-	RootConfig   *config.RootConfig
-	SMSClientMap SMSClientMap
+	Logger         *slog.Logger
+	RootConfig     *config.RootConfig
+	SMSProviderMap SMSProviderMap
 }
 
 func (s *SMSService) Send(
+	ctx context.Context,
 	appID string,
 	sendOptions *smsclient.SendOptions,
-) (*smsclient.SendResult, error) {
-	clientName := GetClientNameByMatch(s.RootConfig, &MatchContext{AppID: appID, PhoneNumber: string(sendOptions.To)})
-	client := s.SMSClientMap.GetClientByName(clientName)
-	s.Logger.Info("selected client",
-		"to", sendOptions.To,
-		"client_name", clientName,
-	)
+) (*smsclient.SendResultSuccess, error) {
+	clientName := GetProviderNameByMatch(s.RootConfig, &MatchContext{AppID: appID, PhoneNumber: string(sendOptions.To)})
+	client := s.SMSProviderMap.GetProviderByName(clientName)
 
-	result, err := client.Send(sendOptions)
-	var errSendResult *smsclient.SendResult
-	if errors.As(err, &errSendResult) {
-		if errSendResult.Info == nil {
-			errSendResult.Info = &smsclient.SendResultInfo{}
+	ctx = smsclient.WithSendContext(ctx, func(sendCtx *smsclient.SendContext) {
+		if sendCtx.Root == nil {
+			sendCtx.Root = &smsclient.SendContextRoot{}
 		}
-		if errSendResult.Info.SendResultInfoRoot == nil {
-			errSendResult.Info.SendResultInfoRoot = &smsclient.SendResultInfoRoot{}
-		}
+		sendCtx.Root.ProviderName = clientName
+	})
 
-		errSendResult.Info.SendResultInfoRoot.ProviderName = clientName
-	}
+	s.Logger.InfoContext(ctx, "selected provider")
+
+	result, err := client.Send(ctx, sendOptions)
 	if err != nil {
 		return nil, err
-	}
-
-	if result.Info == nil {
-		result.Info = &smsclient.SendResultInfo{}
-	}
-	if result.Info.SendResultInfoRoot == nil {
-		result.Info.SendResultInfoRoot = &smsclient.SendResultInfoRoot{}
-	}
-	result.Info.SendResultInfoRoot = &smsclient.SendResultInfoRoot{
-		ProviderName: clientName,
 	}
 
 	return result, nil

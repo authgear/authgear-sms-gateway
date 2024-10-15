@@ -52,16 +52,22 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logger := h.Logger.With(
-		"app_id", body.AppID,
-		"to", body.To,
-		"template_name", body.TemplateName,
-		"language_tag", body.LanguageTag,
-	)
+	r = r.WithContext(smsclient.WithSendContext(
+		r.Context(),
+		func(sendCtx *smsclient.SendContext) {
+			sendCtx.Root = &smsclient.SendContextRoot{
+				AppID:        body.AppID,
+				To:           body.To,
+				TemplateName: body.TemplateName,
+				LanguageTag:  body.LanguageTag,
+			}
+		},
+	))
 
-	logger.Info("received send request")
+	h.Logger.InfoContext(r.Context(), "received send request")
 
 	sendResult, err := h.SMSService.Send(
+		r.Context(),
 		body.AppID,
 		&smsclient.SendOptions{
 			To:                body.To,
@@ -73,22 +79,23 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		var errorUnsuccessResponse *smsclient.SendResult
+		var errorUnsuccessResponse *smsclient.SendResultError
 		if errors.As(err, &errorUnsuccessResponse) {
-			logger.Error("unknown response",
+			h.Logger.ErrorContext(r.Context(), "unsuccessful response",
 				"dumped_response", string(errorUnsuccessResponse.DumpedResponse),
 				"error", err.Error(),
 			)
+			info := smsclient.GetSendContext(r.Context())
 			h.write(w, &ResponseBody{
 				Code:             CodeUnknownResponse,
 				DumpedResponse:   errorUnsuccessResponse.DumpedResponse,
 				ErrorDescription: err.Error(),
-				Info:             errorUnsuccessResponse.Info,
+				Info:             info,
 			})
 			return
 		}
 
-		logger.Error("unknown error",
+		h.Logger.ErrorContext(r.Context(), "unknown error",
 			"error", err.Error(),
 		)
 		h.write(w, &ResponseBody{
@@ -98,16 +105,13 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var attrs []slog.Attr
-	if sendResult.Info.SendResultInfoTwilio != nil && sendResult.Info.SendResultInfoTwilio.SegmentCount != nil {
-		attrs = append(attrs, slog.Int("segment_count", *sendResult.Info.SendResultInfoTwilio.SegmentCount))
-	}
-	logger.LogAttrs(r.Context(), slog.LevelInfo, "finished send request", attrs...)
+	h.Logger.InfoContext(r.Context(), "finished send request")
 
+	info := smsclient.GetSendContext(r.Context())
 	h.write(w, &ResponseBody{
 		Code:           CodeOK,
 		DumpedResponse: sendResult.DumpedResponse,
-		Info:           sendResult.Info,
+		Info:           info,
 	})
 }
 

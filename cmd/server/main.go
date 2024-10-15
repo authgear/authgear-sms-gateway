@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 	"os"
 	"time"
@@ -12,10 +13,16 @@ import (
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/logger"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
 func main() {
-	logger := logger.NewLogger()
+	stderrHandler := logger.NewTextHandler()
+	contextHandler := &logger.ContextHandler{
+		ContextKey: smsclient.SendContextKey,
+		Handler:    stderrHandler,
+	}
+	logger := slog.New(contextHandler)
 
 	err := godotenv.Load()
 	if errors.Is(err, os.ErrNotExist) {
@@ -42,11 +49,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	smsClientMap := sms.NewSMSClientMap(cfg, httpClient, logger)
+	smsProviderMap := sms.NewSMSProviderMap(cfg, httpClient, logger)
 	smsService := &sms.SMSService{
-		Logger:       logger,
-		RootConfig:   cfg,
-		SMSClientMap: smsClientMap,
+		Logger:         logger,
+		RootConfig:     cfg,
+		SMSProviderMap: smsProviderMap,
 	}
 
 	http.Handle("/healthz", &handler.HealthzHandler{})

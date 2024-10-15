@@ -9,9 +9,9 @@ import (
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
-type SMSClientMap map[string]smsclient.RawClient
+type SMSProviderMap map[string]smsclient.RawClient
 
-func NewSMSClientMap(c *config.RootConfig, httpClient *http.Client, logger *slog.Logger) SMSClientMap {
+func NewSMSProviderMap(c *config.RootConfig, httpClient *http.Client, logger *slog.Logger) SMSProviderMap {
 	var clientMap = make(map[string]smsclient.RawClient)
 
 	for _, provider := range c.Providers {
@@ -19,10 +19,10 @@ func NewSMSClientMap(c *config.RootConfig, httpClient *http.Client, logger *slog
 		clientMap[provider.Name] = client
 	}
 
-	return SMSClientMap(clientMap)
+	return SMSProviderMap(clientMap)
 }
 
-func (s SMSClientMap) GetClientByName(name string) smsclient.RawClient {
+func (s SMSProviderMap) GetProviderByName(name string) smsclient.RawClient {
 	client := s[name]
 	if client == nil {
 		panic(fmt.Errorf("Unknown client %v", name))
