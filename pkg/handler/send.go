@@ -10,6 +10,7 @@ import (
 	"github.com/authgear/authgear-server/pkg/util/validation"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/api"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
@@ -46,7 +47,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := httputil.BindJSONBody(r, w, RequestSchema.Validator(), &body)
 	if err != nil {
 		h.write(w, &ResponseBody{
-			Code:             CodeInvalidRequest,
+			Code:             api.CodeInvalidRequest,
 			ErrorDescription: err.Error(),
 		})
 		return
@@ -86,8 +87,13 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				"error", err.Error(),
 			)
 			info := smsclient.GetSendContext(r.Context())
+			code := api.CodeUnknownResponse
+			if errorUnsuccessResponse.Code != "" {
+				code = errorUnsuccessResponse.Code
+			}
 			h.write(w, &ResponseBody{
-				Code:             CodeUnknownResponse,
+				Code:             code,
+				ErrorDetail:      errorUnsuccessResponse.ErrorDetail,
 				DumpedResponse:   errorUnsuccessResponse.DumpedResponse,
 				ErrorDescription: err.Error(),
 				Info:             info,
@@ -99,7 +105,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			"error", err.Error(),
 		)
 		h.write(w, &ResponseBody{
-			Code:             CodeUnknownError,
+			Code:             api.CodeUnknownError,
 			ErrorDescription: err.Error(),
 		})
 		return
@@ -109,7 +115,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	info := smsclient.GetSendContext(r.Context())
 	h.write(w, &ResponseBody{
-		Code:           CodeOK,
+		Code:           api.CodeOK,
 		DumpedResponse: sendResult.DumpedResponse,
 		Info:           info,
 	})

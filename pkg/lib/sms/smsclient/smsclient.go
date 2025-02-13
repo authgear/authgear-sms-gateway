@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sensitive"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/api"
 )
 
 type TemplateVariables struct {
@@ -57,7 +58,9 @@ type SendResultSuccess struct {
 }
 
 type SendResultError struct {
-	DumpedResponse []byte `json:"dumped_response,omitempty"`
+	Code           api.Code `json:"code"`
+	ErrorDetail    string   `json:"error_detail,omitempty"`
+	DumpedResponse []byte   `json:"dumped_response,omitempty"`
 }
 
 func (r *SendResultError) Error() string {

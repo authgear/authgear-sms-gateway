@@ -2,7 +2,9 @@ package twilio
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
@@ -11,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/api"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
@@ -88,12 +91,20 @@ func (t *TwilioClient) send(ctx context.Context, options *smsclient.SendOptions)
 
 	sendResponse, err := ParseSendResponse(respData)
 	if err != nil {
+		var jsonUnmarshalErr *json.UnmarshalTypeError
+		if errors.As(err, &jsonUnmarshalErr) {
+			return nil, nil, t.parseAndHandleErrorResponse(respData, dumpedResponse)
+		}
 		return nil, nil, errors.Join(
 			err,
 			&smsclient.SendResultError{
 				DumpedResponse: dumpedResponse,
 			},
 		)
+	}
+
+	if sendResponse.ErrorCode != nil {
+		return nil, nil, t.makeError(*sendResponse.ErrorCode, dumpedResponse)
 	}
 
 	attrs := []slog.Attr{}
@@ -147,17 +158,68 @@ func (t *TwilioClient) Send(ctx context.Context, options *smsclient.SendOptions)
 		sendCtx.Twilio.SegmentCount = segmentCount
 	})
 
-	// Success case.
-	if sendSMSResponse.ErrorCode == nil {
-		return &smsclient.SendResultSuccess{
-			DumpedResponse: dumpedResponse,
-		}, nil
+	return &smsclient.SendResultSuccess{
+		DumpedResponse: dumpedResponse,
+	}, nil
+
+}
+
+func (t *TwilioClient) parseAndHandleErrorResponse(
+	responseBody []byte,
+	dumpedResponse []byte,
+) error {
+	errResponse, err := ParseErrorResponse(responseBody)
+
+	if err != nil {
+		var jsonUnmarshalErr *json.UnmarshalTypeError
+		if errors.As(err, &jsonUnmarshalErr) {
+			// Not something we can understand, return an error with the dumped response
+			return &smsclient.SendResultError{
+				DumpedResponse: dumpedResponse,
+			}
+		} else {
+			return errors.Join(err, &smsclient.SendResultError{
+				DumpedResponse: dumpedResponse,
+			})
+		}
 	}
 
-	// Failed case.
-	return nil, &smsclient.SendResultError{
+	return t.makeError(errResponse.Code, dumpedResponse)
+}
+
+func (t *TwilioClient) makeError(
+	errorCode int,
+	dumpedResponse []byte,
+) *smsclient.SendResultError {
+	err := &smsclient.SendResultError{
 		DumpedResponse: dumpedResponse,
 	}
+
+	// See https://www.twilio.com/docs/api/errors
+	switch errorCode {
+	case 21211:
+		err.Code = api.CodeInvalidPhoneNumber
+		err.ErrorDetail = fmt.Sprintf("%d", errorCode)
+	case 30022:
+		fallthrough
+	case 14107:
+		fallthrough
+	case 51002:
+		fallthrough
+	case 63017:
+		fallthrough
+	case 63018:
+		err.Code = api.CodeRateLimited
+		err.ErrorDetail = fmt.Sprintf("%d", errorCode)
+	case 20003:
+		err.Code = api.CodeAuthenticationFailed
+		err.ErrorDetail = fmt.Sprintf("%d", errorCode)
+	case 30002:
+		err.Code = api.CodeAuthorizationFailed
+		err.ErrorDetail = fmt.Sprintf("%d", errorCode)
+	}
+
+	return err
 }
 
 var _ smsclient.RawClient = &TwilioClient{}
