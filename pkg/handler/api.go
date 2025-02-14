@@ -18,9 +18,8 @@ type RequestBody struct {
 type ResponseBody struct {
 	Code             api.Code `json:"code"`
 	ErrorDescription string   `json:"error_description,omitempty"`
-	// error_detail is additional information you want to let the user know
-	// It may appear on the ui
-	ErrorDetail    string                 `json:"error_detail,omitempty"`
-	DumpedResponse []byte                 `json:"dumped_response,omitempty"`
-	Info           *smsclient.SendContext `json:"info,omitempty"`
+
+	ProviderErrorCode string                 `json:"provider_error_code,omitempty"`
+	DumpedResponse    []byte                 `json:"dumped_response,omitempty"`
+	Info              *smsclient.SendContext `json:"info,omitempty"`
 }

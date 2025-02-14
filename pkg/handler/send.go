@@ -92,11 +92,11 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				code = errorUnsuccessResponse.Code
 			}
 			h.write(w, &ResponseBody{
-				Code:             code,
-				ErrorDetail:      errorUnsuccessResponse.ErrorDetail,
-				DumpedResponse:   errorUnsuccessResponse.DumpedResponse,
-				ErrorDescription: err.Error(),
-				Info:             info,
+				Code:              code,
+				ProviderErrorCode: errorUnsuccessResponse.ErrorDetail,
+				DumpedResponse:    errorUnsuccessResponse.DumpedResponse,
+				ErrorDescription:  err.Error(),
+				Info:              info,
 			})
 			return
 		}
