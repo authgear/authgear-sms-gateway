@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/api"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
-	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/api"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
