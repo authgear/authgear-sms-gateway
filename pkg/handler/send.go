@@ -47,8 +47,8 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := httputil.BindJSONBody(r, w, RequestSchema.Validator(), &body)
 	if err != nil {
 		h.write(w, &ResponseBody{
-			Code:             api.CodeInvalidRequest,
-			ErrorDescription: err.Error(),
+			Code:    api.CodeInvalidRequest,
+			GoError: err.Error(),
 		})
 		return
 	}
@@ -96,7 +96,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				ProviderName:      errorUnsuccessResponse.ProviderName,
 				ProviderErrorCode: errorUnsuccessResponse.ProviderErrorCode,
 				DumpedResponse:    errorUnsuccessResponse.DumpedResponse,
-				ErrorDescription:  err.Error(),
+				GoError:           err.Error(),
 				Info:              info,
 			})
 			return
@@ -106,8 +106,8 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			"error", err.Error(),
 		)
 		h.write(w, &ResponseBody{
-			Code:             api.CodeUnknownError,
-			ErrorDescription: err.Error(),
+			Code:    api.CodeUnknownError,
+			GoError: err.Error(),
 		})
 		return
 	}
