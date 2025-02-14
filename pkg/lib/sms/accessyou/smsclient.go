@@ -101,8 +101,6 @@ func (n *AccessYouClient) makeError(
 	case "106":
 		fallthrough
 	case "107":
-		fallthrough
-	case "too_many_login_failure":
 		err.Code = api.CodeDeliveryRejected
 	}
 
