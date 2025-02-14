@@ -215,7 +215,7 @@ func (t *TwilioClient) makeError(
 		err.Code = api.CodeAuthenticationFailed
 		err.ErrorDetail = fmt.Sprintf("%d", errorCode)
 	case 30002:
-		err.Code = api.CodeAuthorizationFailed
+		err.Code = api.CodeDeliveryRejected
 		err.ErrorDetail = fmt.Sprintf("%d", errorCode)
 	}
 

@@ -14,8 +14,9 @@ const (
 	CodeRateLimited Code = "rate_limited"
 	// CodeAuthenticationFailed means authentication failed in the sms gateway
 	CodeAuthenticationFailed Code = "authentication_failed"
-	// CodeAuthorizationFailed means authorization failed in the sms gateway
-	CodeAuthorizationFailed Code = "authorization_failed"
+	// CodeDeliveryRejected means the sms gateway rejected the request for some reason
+	// e.g. The account was suspended
+	CodeDeliveryRejected Code = "delivery_rejected"
 
 	// CodeInvalidRequest means the request is invalid.
 	CodeInvalidRequest Code = "invalid_request"
@@ -37,7 +38,7 @@ func (c Code) HTTPStatusCode() int {
 		return http.StatusTooManyRequests
 	case CodeAuthenticationFailed:
 		return http.StatusInternalServerError
-	case CodeAuthorizationFailed:
+	case CodeDeliveryRejected:
 		return http.StatusInternalServerError
 	case CodeInvalidRequest:
 		return http.StatusBadRequest

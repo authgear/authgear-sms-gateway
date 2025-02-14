@@ -170,7 +170,7 @@ func (t *SendCloudClient) makeError(
 	case 499:
 		fallthrough
 	case 473:
-		err.Code = api.CodeAuthorizationFailed
+		err.Code = api.CodeDeliveryRejected
 		err.ErrorDetail = fmt.Sprintf("%d", statusCode)
 	}
 
