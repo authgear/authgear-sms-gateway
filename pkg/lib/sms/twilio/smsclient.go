@@ -192,14 +192,15 @@ func (t *TwilioClient) makeError(
 	dumpedResponse []byte,
 ) *smsclient.SendResultError {
 	err := &smsclient.SendResultError{
-		DumpedResponse: dumpedResponse,
+		DumpedResponse:    dumpedResponse,
+		ProviderName:      "twilio",
+		ProviderErrorCode: fmt.Sprintf("%d", errorCode),
 	}
 
 	// See https://www.twilio.com/docs/api/errors
 	switch errorCode {
 	case 21211:
 		err.Code = api.CodeInvalidPhoneNumber
-		err.ErrorDetail = fmt.Sprintf("%d", errorCode)
 	case 30022:
 		fallthrough
 	case 14107:
@@ -210,13 +211,10 @@ func (t *TwilioClient) makeError(
 		fallthrough
 	case 63018:
 		err.Code = api.CodeRateLimited
-		err.ErrorDetail = fmt.Sprintf("%d", errorCode)
 	case 20003:
 		err.Code = api.CodeAuthenticationFailed
-		err.ErrorDetail = fmt.Sprintf("%d", errorCode)
 	case 30002:
 		err.Code = api.CodeDeliveryRejected
-		err.ErrorDetail = fmt.Sprintf("%d", errorCode)
 	}
 
 	return err

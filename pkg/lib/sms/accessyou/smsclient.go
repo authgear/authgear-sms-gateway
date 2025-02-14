@@ -85,7 +85,9 @@ func (n *AccessYouClient) makeError(
 	dumpedResponse []byte,
 ) *smsclient.SendResultError {
 	err := &smsclient.SendResultError{
-		DumpedResponse: dumpedResponse,
+		DumpedResponse:    dumpedResponse,
+		ProviderName:      "accessyou",
+		ProviderErrorCode: msgStatus,
 	}
 
 	// See https://www.accessyou.com/smsapi.pdf
@@ -94,17 +96,14 @@ func (n *AccessYouClient) makeError(
 		fallthrough
 	case "110":
 		err.Code = api.CodeInvalidPhoneNumber
-		err.ErrorDetail = msgStatus
 	case "105":
 		err.Code = api.CodeAuthenticationFailed
-		err.ErrorDetail = msgStatus
 	case "106":
 		fallthrough
 	case "107":
 		fallthrough
 	case "too_many_login_failure":
 		err.Code = api.CodeDeliveryRejected
-		err.ErrorDetail = msgStatus
 	}
 
 	return err

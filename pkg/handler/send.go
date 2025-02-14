@@ -93,7 +93,8 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 			h.write(w, &ResponseBody{
 				Code:              code,
-				ProviderErrorCode: errorUnsuccessResponse.ErrorDetail,
+				ProviderName:      errorUnsuccessResponse.ProviderName,
+				ProviderErrorCode: errorUnsuccessResponse.ProviderErrorCode,
 				DumpedResponse:    errorUnsuccessResponse.DumpedResponse,
 				ErrorDescription:  err.Error(),
 				Info:              info,

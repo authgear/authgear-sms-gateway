@@ -149,29 +149,27 @@ func (t *SendCloudClient) makeError(
 	dumpedResponse []byte,
 ) *smsclient.SendResultError {
 	err := &smsclient.SendResultError{
-		DumpedResponse: dumpedResponse,
+		DumpedResponse:    dumpedResponse,
+		ProviderName:      "sendcloud",
+		ProviderErrorCode: fmt.Sprintf("%d", statusCode),
 	}
 
 	// See https://www.sendcloud.net/doc/sms/api/
 	switch statusCode {
 	case 412:
 		err.Code = api.CodeInvalidPhoneNumber
-		err.ErrorDetail = fmt.Sprintf("%d", statusCode)
 	case 50000:
 		err.Code = api.CodeRateLimited
-		err.ErrorDetail = fmt.Sprintf("%d", statusCode)
 	case 422:
 		fallthrough
 	case 471:
 		fallthrough
 	case 474:
 		err.Code = api.CodeAuthenticationFailed
-		err.ErrorDetail = fmt.Sprintf("%d", statusCode)
 	case 499:
 		fallthrough
 	case 473:
 		err.Code = api.CodeDeliveryRejected
-		err.ErrorDetail = fmt.Sprintf("%d", statusCode)
 	}
 
 	return err

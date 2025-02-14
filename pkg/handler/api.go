@@ -19,6 +19,7 @@ type ResponseBody struct {
 	Code             api.Code `json:"code"`
 	ErrorDescription string   `json:"error_description,omitempty"`
 
+	ProviderName      string                 `json:"provider_name,omitempty"`
 	ProviderErrorCode string                 `json:"provider_error_code,omitempty"`
 	DumpedResponse    []byte                 `json:"dumped_response,omitempty"`
 	Info              *smsclient.SendContext `json:"info,omitempty"`
