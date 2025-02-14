@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"regexp"
 
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/api"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
@@ -76,9 +77,34 @@ func (n *AccessYouClient) Send(ctx context.Context, options *smsclient.SendOptio
 	}
 
 	// Failed case.
-	return nil, &smsclient.SendResultError{
-		DumpedResponse: dumpedResponse,
+	return nil, n.makeError(sendSMSResponse.Status, dumpedResponse)
+}
+
+func (n *AccessYouClient) makeError(
+	msgStatus string,
+	dumpedResponse []byte,
+) *smsclient.SendResultError {
+	err := &smsclient.SendResultError{
+		DumpedResponse:    dumpedResponse,
+		ProviderName:      "accessyou",
+		ProviderErrorCode: msgStatus,
 	}
+
+	// See https://www.accessyou.com/smsapi.pdf
+	switch msgStatus {
+	case "108":
+		fallthrough
+	case "110":
+		err.Code = api.CodeInvalidPhoneNumber
+	case "105":
+		err.Code = api.CodeAuthenticationFailed
+	case "106":
+		fallthrough
+	case "107":
+		err.Code = api.CodeDeliveryRejected
+	}
+
+	return err
 }
 
 var _ smsclient.RawClient = &AccessYouClient{}

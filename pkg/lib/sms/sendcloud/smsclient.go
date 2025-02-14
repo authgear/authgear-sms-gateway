@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/api"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
@@ -138,12 +139,40 @@ func (n *SendCloudClient) Send(ctx context.Context, options *smsclient.SendOptio
 		return &smsclient.SendResultSuccess{
 			DumpedResponse: dumpedResponse,
 		}, nil
+	} else {
+		return nil, n.makeError(sendResponse.StatusCode, dumpedResponse)
+	}
+}
+
+func (t *SendCloudClient) makeError(
+	statusCode int,
+	dumpedResponse []byte,
+) *smsclient.SendResultError {
+	err := &smsclient.SendResultError{
+		DumpedResponse:    dumpedResponse,
+		ProviderName:      "sendcloud",
+		ProviderErrorCode: fmt.Sprintf("%d", statusCode),
 	}
 
-	// Failed case.
-	return nil, &smsclient.SendResultError{
-		DumpedResponse: dumpedResponse,
+	// See https://www.sendcloud.net/doc/sms/api/
+	switch statusCode {
+	case 412:
+		err.Code = api.CodeInvalidPhoneNumber
+	case 50000:
+		err.Code = api.CodeRateLimited
+	case 422:
+		fallthrough
+	case 471:
+		fallthrough
+	case 474:
+		err.Code = api.CodeAuthenticationFailed
+	case 499:
+		fallthrough
+	case 473:
+		err.Code = api.CodeDeliveryRejected
 	}
+
+	return err
 }
 
 var _ smsclient.RawClient = &SendCloudClient{}

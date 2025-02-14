@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/api"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sensitive"
 )
 
@@ -57,7 +58,10 @@ type SendResultSuccess struct {
 }
 
 type SendResultError struct {
-	DumpedResponse []byte `json:"dumped_response,omitempty"`
+	Code              api.Code `json:"code"`
+	ProviderName      string   `json:"provider_name,omitempty"`
+	ProviderErrorCode string   `json:"provider_error_code,omitempty"`
+	DumpedResponse    []byte   `json:"dumped_response,omitempty"`
 }
 
 func (r *SendResultError) Error() string {
