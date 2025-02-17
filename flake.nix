@@ -1,11 +1,8 @@
 {
-  description = "A basic flake with a shell";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    systems.url = "github:nix-systems/default";
     flake-utils = {
       url = "github:numtide/flake-utils";
-      inputs.systems.follows = "systems";
     };
   };
 
@@ -18,12 +15,27 @@
     flake-utils.lib.eachDefaultSystem (
       system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [
+            (final: prev: {
+              go = (
+                prev.go.overrideAttrs {
+                  version = "1.23.6";
+                  src = prev.fetchurl {
+                    url = "https://go.dev/dl/go1.23.6.src.tar.gz";
+                    hash = "sha256-A5xbBOZSedrO7opvcecL0Fz1uAF4K293xuGeLtBREiI=";
+                  };
+                }
+              );
+            })
+          ];
+        };
       in
       {
         devShells.default = pkgs.mkShell {
           packages = [
-            # This is go 1.23.4 unless you update flake.lock
+            # 1.23.6
             pkgs.go
 
             (pkgs.golangci-lint.overrideAttrs (

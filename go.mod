@@ -1,6 +1,6 @@
 module github.com/authgear/authgear-sms-gateway
 
-go 1.23.4
+go 1.23.6
 
 require (
 	github.com/authgear/authgear-server v0.0.0-20250117141119-17aa50525cfc

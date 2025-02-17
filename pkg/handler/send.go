@@ -9,6 +9,7 @@ import (
 	"github.com/authgear/authgear-server/pkg/util/httputil"
 	"github.com/authgear/authgear-server/pkg/util/validation"
 
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/api"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
@@ -46,8 +47,8 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := httputil.BindJSONBody(r, w, RequestSchema.Validator(), &body)
 	if err != nil {
 		h.write(w, &ResponseBody{
-			Code:             CodeInvalidRequest,
-			ErrorDescription: err.Error(),
+			Code:    api.CodeInvalidRequest,
+			GoError: err.Error(),
 		})
 		return
 	}
@@ -86,11 +87,17 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				"error", err.Error(),
 			)
 			info := smsclient.GetSendContext(r.Context())
+			code := api.CodeUnknownResponse
+			if errorUnsuccessResponse.Code != "" {
+				code = errorUnsuccessResponse.Code
+			}
 			h.write(w, &ResponseBody{
-				Code:             CodeUnknownResponse,
-				DumpedResponse:   errorUnsuccessResponse.DumpedResponse,
-				ErrorDescription: err.Error(),
-				Info:             info,
+				Code:              code,
+				ProviderName:      errorUnsuccessResponse.ProviderName,
+				ProviderErrorCode: errorUnsuccessResponse.ProviderErrorCode,
+				DumpedResponse:    errorUnsuccessResponse.DumpedResponse,
+				GoError:           err.Error(),
+				Info:              info,
 			})
 			return
 		}
@@ -99,8 +106,8 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			"error", err.Error(),
 		)
 		h.write(w, &ResponseBody{
-			Code:             CodeUnknownError,
-			ErrorDescription: err.Error(),
+			Code:    api.CodeUnknownError,
+			GoError: err.Error(),
 		})
 		return
 	}
@@ -109,7 +116,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	info := smsclient.GetSendContext(r.Context())
 	h.write(w, &ResponseBody{
-		Code:           CodeOK,
+		Code:           api.CodeOK,
 		DumpedResponse: sendResult.DumpedResponse,
 		Info:           info,
 	})
