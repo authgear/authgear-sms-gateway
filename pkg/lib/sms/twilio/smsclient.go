@@ -214,6 +214,8 @@ func (t *TwilioClient) makeError(
 	case 20003:
 		err.Code = api.CodeAuthenticationFailed
 	case 30002:
+		fallthrough
+	case 21266:
 		err.Code = api.CodeDeliveryRejected
 	}
 
