@@ -49,31 +49,6 @@
                 ];
               }
             ))
-
-            (pkgs.buildGoModule {
-              name = "govulncheck";
-              src = pkgs.fetchgit {
-                url = "https://go.googlesource.com/vuln";
-                rev = "refs/tags/v1.1.3";
-                hash = "sha256-ydJ8AeoCnLls6dXxjI05+THEqPPdJqtAsKTriTIK9Uc=";
-              };
-              vendorHash = "sha256-jESQV4Na4Hooxxd0RL96GHkA7Exddco5izjnhfH6xTg=";
-              subPackages = [ "cmd/govulncheck" ];
-              # checkPhase by default run tests. Running tests will result in build error.
-              # So we skip it.
-              doCheck = false;
-            })
-
-            (pkgs.buildGoModule {
-              name = "goimports";
-              src = pkgs.fetchgit {
-                url = "https://go.googlesource.com/tools";
-                rev = "refs/tags/v0.28.0";
-                hash = "sha256-BCxsVz4f2h75sj1LzDoKvQ9c8P8SYjcaQE9CdzFdt3w=";
-              };
-              vendorHash = "sha256-MSir25OEmQ7hg0OAOjZF9J5a5SjlJXdOc523uEBSOSs=";
-              subPackages = [ "cmd/goimports" ];
-            })
           ];
         };
       }

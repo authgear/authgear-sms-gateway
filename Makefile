@@ -6,8 +6,6 @@ GIT_HASH ?= git-$(shell git rev-parse --short=12 HEAD)
 vendor:
 	curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.64.8
 	go mod download
-	go install golang.org/x/vuln/cmd/govulncheck@latest
-	go install golang.org/x/tools/cmd/goimports@latest
 
 .PHONY: go-mod-outdated
 go-mod-outdated:
@@ -31,7 +29,7 @@ build:
 
 .PHONY: fmt
 fmt:
-	find ./pkg ./cmd -name '*.go' -not -name 'wire_gen.go' -not -name '*_mock_test.go' | sort | xargs goimports -w -format-only -local github.com/authgear/authgear-sms-gateway
+	find ./pkg ./cmd -name '*.go' -not -name 'wire_gen.go' -not -name '*_mock_test.go' | sort | xargs go tool goimports -w -format-only -local github.com/authgear/authgear-sms-gateway
 
 
 .PHONY: lint
@@ -45,7 +43,7 @@ check-dockerignore:
 
 .PHONY: govulncheck
 govulncheck:
-	govulncheck -show traces,version,verbose ./...
+	go tool govulncheck -show traces,version,verbose ./...
 
 .PHONY: test
 test:
