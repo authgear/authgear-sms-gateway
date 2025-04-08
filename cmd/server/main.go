@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -17,6 +18,8 @@ import (
 )
 
 func main() {
+	ctx := context.Background()
+
 	stderrHandler := logger.NewTextHandler()
 	contextHandler := &logger.ContextHandler{
 		ContextKey: smsclient.SendContextKey,
@@ -45,7 +48,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	cfg, err := config.ParseRootConfigFromYAML(configYAML)
+	cfg, err := config.ParseRootConfigFromYAML(ctx, configYAML)
 	if err != nil {
 		panic(err)
 	}

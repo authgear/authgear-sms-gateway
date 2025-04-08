@@ -1,6 +1,7 @@
 package sms
 
 import (
+	"context"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -62,9 +63,10 @@ provider_selector:
 `
 
 func TestSelector(t *testing.T) {
-	test := func(convey string, configYAML string, ctx *MatchContext, expectedName string) {
-		c, _ := config.ParseRootConfigFromYAML([]byte(configYAML))
-		res := GetProviderNameByMatch(c, ctx)
+	test := func(convey string, configYAML string, matchCtx *MatchContext, expectedName string) {
+		ctx := context.Background()
+		c, _ := config.ParseRootConfigFromYAML(ctx, []byte(configYAML))
+		res := GetProviderNameByMatch(c, matchCtx)
 		Convey(convey, t, func() {
 			So(res, ShouldEqual, expectedName)
 		})
