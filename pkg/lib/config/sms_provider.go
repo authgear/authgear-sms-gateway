@@ -2,6 +2,7 @@ package config
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"slices"
@@ -212,6 +213,8 @@ type RootConfig struct {
 	ProviderSelector *ProviderSelector `json:"provider_selector,omitempty"`
 }
 
+var _ validation.Validator = (*RootConfig)(nil)
+
 var _ = RootSchema.Add("RootConfig", `
 {
 	"type": "object",
@@ -228,10 +231,10 @@ var _ = RootSchema.Add("RootConfig", `
 }
 `)
 
-func (c *RootConfig) Validate(ctx *validation.Context) {
-	c.ValidateProviderSelectorUseProvider(ctx)
-	c.ValidateProviderSelectorDefault(ctx)
-	c.ValidateSendCloudConfigs(ctx)
+func (c *RootConfig) Validate(ctx context.Context, validationCtx *validation.Context) {
+	c.ValidateProviderSelectorUseProvider(validationCtx)
+	c.ValidateProviderSelectorDefault(validationCtx)
+	c.ValidateSendCloudConfigs(validationCtx)
 }
 
 func (c *RootConfig) ValidateProviderSelectorUseProvider(ctx *validation.Context) {
@@ -292,7 +295,7 @@ func (c *RootConfig) ValidateSendCloudConfig(ctx *validation.Context, sendCloudC
 
 }
 
-func ParseRootConfigFromYAML(inputYAML []byte) (*RootConfig, error) {
+func ParseRootConfigFromYAML(ctx context.Context, inputYAML []byte) (*RootConfig, error) {
 	const validationErrorMessage = "invalid configuration"
 
 	jsonData, err := yaml.YAMLToJSON(inputYAML)
@@ -300,7 +303,7 @@ func ParseRootConfigFromYAML(inputYAML []byte) (*RootConfig, error) {
 		return nil, err
 	}
 
-	err = RootSchema.Validator().ValidateWithMessage(bytes.NewReader(jsonData), validationErrorMessage)
+	err = RootSchema.Validator().ValidateWithMessage(ctx, bytes.NewReader(jsonData), validationErrorMessage)
 	if err != nil {
 		return nil, err
 	}
@@ -312,7 +315,7 @@ func ParseRootConfigFromYAML(inputYAML []byte) (*RootConfig, error) {
 		return nil, err
 	}
 
-	err = validation.ValidateValueWithMessage(&config, validationErrorMessage)
+	err = validation.ValidateValueWithMessage(ctx, &config, validationErrorMessage)
 	if err != nil {
 		return nil, err
 	}

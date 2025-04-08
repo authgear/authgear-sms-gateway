@@ -1,6 +1,7 @@
 package config_test
 
 import (
+	"context"
 	"errors"
 	"io"
 	"os"
@@ -43,7 +44,8 @@ func TestRootConfigValidation(t *testing.T) {
 					panic(err)
 				}
 
-				_, err = config.ParseRootConfigFromYAML([]byte(inputYAML))
+				ctx := context.Background()
+				_, err = config.ParseRootConfigFromYAML(ctx, []byte(inputYAML))
 				if testCase.Error != nil {
 					So(err, ShouldBeError, *testCase.Error)
 				} else {
