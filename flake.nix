@@ -17,31 +17,18 @@
       let
         pkgs = import nixpkgs {
           inherit system;
-          overlays = [
-            (final: prev: {
-              go = (
-                prev.go.overrideAttrs {
-                  version = "1.23.6";
-                  src = prev.fetchurl {
-                    url = "https://go.dev/dl/go1.23.6.src.tar.gz";
-                    hash = "sha256-A5xbBOZSedrO7opvcecL0Fz1uAF4K293xuGeLtBREiI=";
-                  };
-                }
-              );
-            })
-          ];
         };
       in
       {
         devShells.default = pkgs.mkShell {
           packages = [
-            # 1.23.6
+            # 1.24.1
             pkgs.go
 
             (pkgs.golangci-lint.overrideAttrs (
               prev:
               let
-                version = "1.63.4";
+                version = "1.64.8";
               in
               {
                 inherit version;
@@ -49,9 +36,9 @@
                   owner = "golangci";
                   repo = "golangci-lint";
                   rev = "v${version}";
-                  hash = "sha256-7nIo6Nuz8KLuQlT7btjnTRFpOl+KVd30v973HRKzh08=";
+                  hash = "sha256-H7IdXAleyzJeDFviISitAVDNJmiwrMysYcGm6vAoWso=";
                 };
-                vendorHash = "sha256-atr4HMxoPEfGeaNlHqwTEAcvgbSyzgCe262VUg3J86c=";
+                vendorHash = "sha256-i7ec4U4xXmRvHbsDiuBjbQ0xP7xRuilky3gi+dT1H10=";
                 # We do not actually override anything here,
                 # but if we do not repeat this, ldflags refers to the original version.
                 ldflags = [
