@@ -65,7 +65,7 @@ name: failed-provider-type
 error: |-
   invalid configuration:
   /providers/0/type: enum
-    map[actual:twillio expected:[twilio accessyou sendcloud]]
+    map[actual:twillio expected:[twilio accessyou sendcloud accessyou_otp]]
 config:
   providers:
     - name: twilio
