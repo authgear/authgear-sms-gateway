@@ -9,6 +9,10 @@ import (
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
+const (
+	STATUS_SUCCESS = "100"
+)
+
 type AccessYouClient struct {
 	BaseUrl   string
 	Client    *http.Client
@@ -44,13 +48,13 @@ func NewAccessYouClient(
 
 var plusHyphensRegexp = regexp.MustCompile(`[\+\-]+`)
 
-func fixPhoneNumber(phoneNumber string) string {
+func FixPhoneNumber(phoneNumber string) string {
 	// Access you phone number should have no + and -
 	return plusHyphensRegexp.ReplaceAllString(phoneNumber, "")
 }
 
 func (n *AccessYouClient) Send(ctx context.Context, options *smsclient.SendOptions) (*smsclient.SendResultSuccess, error) {
-	to := fixPhoneNumber(string(options.To))
+	to := FixPhoneNumber(string(options.To))
 
 	dumpedResponse, sendSMSResponse, err := SendSMS(
 		ctx,
@@ -69,7 +73,7 @@ func (n *AccessYouClient) Send(ctx context.Context, options *smsclient.SendOptio
 	}
 
 	// Success case.
-	if sendSMSResponse.Status == "100" {
+	if sendSMSResponse.Status == STATUS_SUCCESS {
 		return &smsclient.SendResultSuccess{
 			DumpedResponse: dumpedResponse,
 		}, nil

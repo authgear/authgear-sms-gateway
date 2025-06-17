@@ -4,8 +4,8 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
-	"regexp"
 
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/api"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/accessyou"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
@@ -43,15 +43,18 @@ func NewAccessYouOTPClient(
 	}
 }
 
-var plusHyphensRegexp = regexp.MustCompile(`[\+\-]+`)
-
-func fixPhoneNumber(phoneNumber string) string {
-	// Access you phone number should have no + and -
-	return plusHyphensRegexp.ReplaceAllString(phoneNumber, "")
-}
-
 func (n *AccessYouOTPClient) Send(ctx context.Context, options *smsclient.SendOptions) (*smsclient.SendResultSuccess, error) {
-	to := fixPhoneNumber(string(options.To))
+	to := accessyou.FixPhoneNumber(string(options.To))
+
+	code := options.TemplateVariables.Code
+	if code == "" {
+		return nil, &smsclient.SendResultError{
+			Code:              api.CodeAttemptedToSendOTPTemplateWithoutCode,
+			DumpedResponse:    nil,
+			ProviderName:      "accessyou_otp",
+			ProviderErrorCode: "",
+		}
+	}
 
 	dumpedResponse, sendSMSResponse, err := SendOTPSMS(
 		ctx,
@@ -64,7 +67,7 @@ func (n *AccessYouOTPClient) Send(ctx context.Context, options *smsclient.SendOp
 			Pwd:       n.Pwd,
 			A:         n.A,
 			To:        to,
-			Code:      options.Body,
+			Code:      code,
 		},
 	)
 	if err != nil {
@@ -72,14 +75,14 @@ func (n *AccessYouOTPClient) Send(ctx context.Context, options *smsclient.SendOp
 	}
 
 	// Success case.
-	if sendSMSResponse.Status == "100" {
+	if sendSMSResponse.Status == accessyou.STATUS_SUCCESS {
 		return &smsclient.SendResultSuccess{
 			DumpedResponse: dumpedResponse,
 		}, nil
 	}
 
 	// Failed case.
-	return nil, accessyou.MakeError(sendSMSResponse.Status, dumpedResponse, "accessyouotp")
+	return nil, accessyou.MakeError(sendSMSResponse.Status, dumpedResponse, "accessyou_otp")
 }
 
 var _ smsclient.RawClient = &AccessYouOTPClient{}

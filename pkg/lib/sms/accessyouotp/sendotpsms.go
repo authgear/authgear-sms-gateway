@@ -84,7 +84,7 @@ func SendOTPSMS(
 		)
 	}
 
-	logger.InfoContext(ctx, "accessyouotp response",
+	logger.InfoContext(ctx, "accessyou_otp response",
 		"msg_id", sendSMSResponse.MessageID,
 		"msg_status", sendSMSResponse.Status,
 		"msg_status_desc", sendSMSResponse.Description,
