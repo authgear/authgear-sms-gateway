@@ -60,6 +60,7 @@ type ProviderConfigAccessYou struct {
 }
 
 type ProviderConfigAccessYouOTP struct {
+	BaseUrl   string `json:"base_url,omitempty"`
 	AccountNo string `json:"accountno,omitempty"`
 	User      string `json:"user,omitempty"`
 	Pwd       string `json:"pwd,omitempty"`
@@ -157,6 +158,7 @@ var _ = RootSchema.Add("ProviderConfigAccessYouOTP", `
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
+		"base_url": { "type": "string" },
 		"accountno": { "type": "string" },
 		"user": { "type": "string" },
 		"pwd": {"type": "string"},
