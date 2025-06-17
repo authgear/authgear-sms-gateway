@@ -16,7 +16,7 @@ type AccessYouOTPClient struct {
 	AccountNo string
 	User      string
 	Pwd       string
-	A         string
+	TID       string
 	Logger    *slog.Logger
 }
 
@@ -26,7 +26,7 @@ func NewAccessYouOTPClient(
 	accountNo string,
 	user string,
 	pwd string,
-	a string,
+	tid string,
 	logger *slog.Logger,
 ) *AccessYouOTPClient {
 	if baseUrl == "" {
@@ -38,7 +38,7 @@ func NewAccessYouOTPClient(
 		AccountNo: accountNo,
 		User:      user,
 		Pwd:       pwd,
-		A:         a,
+		TID:       tid,
 		Logger:    logger,
 	}
 }
@@ -65,8 +65,9 @@ func (n *AccessYouOTPClient) Send(ctx context.Context, options *smsclient.SendOp
 			AccountNo: n.AccountNo,
 			User:      n.User,
 			Pwd:       n.Pwd,
-			A:         n.A,
+			TID:       n.TID,
 			To:        to,
+			AppName:   options.TemplateVariables.AppName,
 			Code:      code,
 		},
 	)

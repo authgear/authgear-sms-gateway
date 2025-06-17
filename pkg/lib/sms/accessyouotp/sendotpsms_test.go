@@ -23,7 +23,8 @@ func TestSendOTPSMS(t *testing.T) {
 		var accountNo = "accountno"
 		var pwd = "pwd"
 		var to = "to"
-		var a = "a"
+		var tid = "1"
+		var appName = "appName"
 		var code = "123456"
 		var user = "user"
 
@@ -35,10 +36,10 @@ func TestSendOTPSMS(t *testing.T) {
 			Get("/sendsms-otp.php").
 			MatchParam("accountno", accountNo).
 			MatchParam("pwd", pwd).
-			MatchParam("tid", "1").
+			MatchParam("tid", tid).
 			MatchParam("phone", to).
-			MatchParam("a", a).
-			MatchParam("otp", code).
+			MatchParam("a", appName).
+			MatchParam("b", code).
 			MatchParam("user", user).
 			Reply(200).
 			BodyString(successResponseWithBOM)
@@ -54,8 +55,9 @@ func TestSendOTPSMS(t *testing.T) {
 				AccountNo: accountNo,
 				User:      user,
 				Pwd:       pwd,
-				A:         a,
+				TID:       tid,
 				To:        to,
+				AppName:   appName,
 				Code:      code,
 			},
 		)

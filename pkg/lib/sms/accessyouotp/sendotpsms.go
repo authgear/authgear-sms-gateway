@@ -17,8 +17,9 @@ type SendOTPSMSOptions struct {
 	AccountNo string
 	User      string
 	Pwd       string
-	A         string
+	TID       string
 	To        string
+	AppName   string
 	Code      string
 }
 
@@ -38,9 +39,9 @@ func SendOTPSMS(
 	queryParams := url.Values{
 		"accountno": {opts.AccountNo},
 		"pwd":       {opts.Pwd},
-		"tid":       {"1"},
+		"tid":       {opts.TID},
 		"phone":     {opts.To},
-		"a":         {opts.A},
+		"a":         {opts.AppName},
 		"b":         {opts.Code},
 		"user":      {opts.User},
 	}

@@ -64,7 +64,7 @@ type ProviderConfigAccessYouOTP struct {
 	AccountNo string `json:"accountno,omitempty"`
 	User      string `json:"user,omitempty"`
 	Pwd       string `json:"pwd,omitempty"`
-	A         string `json:"a,omitempty"`
+	TID       string `json:"tid,omitempty"`
 }
 
 var _ = RootSchema.Add("Provider", `
@@ -162,9 +162,9 @@ var _ = RootSchema.Add("ProviderConfigAccessYouOTP", `
 		"accountno": { "type": "string" },
 		"user": { "type": "string" },
 		"pwd": {"type": "string"},
-		"a": {"type": "string"}
+		"tid": {"type": "string"}
 	},
-	"required": ["accountno", "user", "pwd", "a"]
+	"required": ["accountno", "user", "pwd", "tid"]
 }
 `)
 

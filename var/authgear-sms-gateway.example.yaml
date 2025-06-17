@@ -70,7 +70,7 @@ providers:
       accountno: "my-accountno"
       user: "my-user"
       pwd: "my-pwd"
-      a: "Authgear"
+      tid: "1"
 provider_selector:
   switch:
     - type: match_app_id_and_phone_number_alpha2

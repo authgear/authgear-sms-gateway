@@ -43,7 +43,7 @@ func NewClientFromConfigProvider(p *config.Provider, httpClient *http.Client, lo
 			p.AccessYouOTP.AccountNo,
 			p.AccessYouOTP.User,
 			p.AccessYouOTP.Pwd,
-			p.AccessYouOTP.A,
+			p.AccessYouOTP.TID,
 			logger,
 		)
 	case config.ProviderTypeSendCloud:
