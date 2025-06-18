@@ -9,8 +9,9 @@ import (
 
 	"gopkg.in/h2non/gock.v1"
 
-	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/accessyou"
 	. "github.com/smartystreets/goconvey/convey"
+
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/accessyou"
 )
 
 var successResponseWithoutBOM = `{"msg_status":"100","msg_status_desc":"Successfully submitted message. 执行成功","phoneno":"85264975244","msg_id":854998103}`
