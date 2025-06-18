@@ -18,10 +18,14 @@ func MakeError(
 
 	// See https://www.accessyou.com/smsapi.pdf
 	switch msgStatus {
+	case "103":
+		fallthrough
 	case "108":
 		fallthrough
 	case "110":
 		err.Code = api.CodeInvalidPhoneNumber
+	case "101":
+		fallthrough
 	case "105":
 		err.Code = api.CodeAuthenticationFailed
 	case "106":
