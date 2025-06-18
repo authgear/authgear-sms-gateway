@@ -32,7 +32,7 @@ func TestSendSMS(t *testing.T) {
 		defer gock.Off()
 
 		gock.New("https://www.example.com").
-			Post("/sendsms.php").
+			Get("/sendsms.php").
 			Reply(200).
 			Body(bytes.NewReader([]byte(successResponseWithBOM)))
 

@@ -51,7 +51,7 @@ func SendSMS(
 	u.RawQuery = queryParams.Encode()
 
 	req, _ := http.NewRequest(
-		"POST",
+		"GET",
 		u.String(),
 		nil)
 	req.Header.Set("Cookie", "dynamic=sms")
