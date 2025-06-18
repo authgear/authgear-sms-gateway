@@ -1,4 +1,4 @@
-package accessyou
+package accessyouotp
 
 import (
 	"context"
@@ -8,45 +8,42 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"regexp"
 
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/accessyou"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
-var leadingBOMRegexp = regexp.MustCompile(`^[\x{feff}]+`)
-
-func FixRespData(respData []byte) []byte {
-	// Remove BOM token from resp json,
-	// See _test.go for details.
-	return leadingBOMRegexp.ReplaceAll(respData, []byte(""))
+type SendOTPSMSOptions struct {
+	AccountNo string
+	User      string
+	Pwd       string
+	TID       string
+	To        string
+	AppName   string
+	Code      string
 }
 
-func SendSMS(
+func SendOTPSMS(
 	ctx context.Context,
 	client *http.Client,
 	baseUrl string,
-	accountNo string,
-	user string,
-	pwd string,
-	sender string,
-	to string,
-	body string,
 	logger *slog.Logger,
-) ([]byte, *SendSMSResponse, error) {
+	opts *SendOTPSMSOptions,
+) ([]byte, *accessyou.SendSMSResponse, error) {
 	u, err := url.Parse(baseUrl)
 	if err != nil {
 		return nil, nil, err
 	}
-	u.Path = "/sendsms.php"
+	u.Path = "/sendsms-otp.php"
 
 	queryParams := url.Values{
-		"accountno": {accountNo},
-		"pwd":       {pwd},
-		"tid":       {"1"},
-		"phone":     {to},
-		"a":         {body},
-		"user":      {user},
-		"from":      {sender},
+		"accountno": {opts.AccountNo},
+		"pwd":       {opts.Pwd},
+		"tid":       {opts.TID},
+		"phone":     {opts.To},
+		"a":         {opts.AppName},
+		"b":         {opts.Code},
+		"user":      {opts.User},
 	}
 	u.RawQuery = queryParams.Encode()
 
@@ -54,7 +51,7 @@ func SendSMS(
 		"GET",
 		u.String(),
 		nil)
-	req.Header.Set("Cookie", "dynamic=sms")
+	req.Header.Set("Cookie", "dynamic=otp")
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -77,8 +74,8 @@ func SendSMS(
 		)
 	}
 
-	respData = FixRespData(respData)
-	sendSMSResponse, err := ParseSendSMSResponse(respData)
+	respData = accessyou.FixRespData(respData)
+	sendSMSResponse, err := accessyou.ParseSendSMSResponse(respData)
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
@@ -88,7 +85,7 @@ func SendSMS(
 		)
 	}
 
-	logger.InfoContext(ctx, "accessyou response",
+	logger.InfoContext(ctx, "accessyou_otp response",
 		"msg_id", sendSMSResponse.MessageID,
 		"msg_status", sendSMSResponse.Status,
 		"msg_status_desc", sendSMSResponse.Description,

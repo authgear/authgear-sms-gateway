@@ -7,6 +7,7 @@ import (
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/accessyou"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/accessyouotp"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/sendcloud"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/twilio"
@@ -33,6 +34,16 @@ func NewClientFromConfigProvider(p *config.Provider, httpClient *http.Client, lo
 			p.AccessYou.User,
 			p.AccessYou.Pwd,
 			p.AccessYou.From,
+			logger,
+		)
+	case config.ProviderTypeAccessYouOTP:
+		return accessyouotp.NewAccessYouOTPClient(
+			httpClient,
+			p.AccessYouOTP.BaseUrl,
+			p.AccessYouOTP.AccountNo,
+			p.AccessYouOTP.User,
+			p.AccessYouOTP.Pwd,
+			p.AccessYouOTP.TID,
 			logger,
 		)
 	case config.ProviderTypeSendCloud:

@@ -6,8 +6,11 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/authgear/authgear-sms-gateway/pkg/lib/api"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
+)
+
+const (
+	STATUS_SUCCESS = "100"
 )
 
 type AccessYouClient struct {
@@ -30,7 +33,7 @@ func NewAccessYouClient(
 	logger *slog.Logger,
 ) *AccessYouClient {
 	if baseUrl == "" {
-		baseUrl = "http://sms.accessyou-anyip.com"
+		baseUrl = "https://sms.accessyou-anyip.com"
 	}
 	return &AccessYouClient{
 		Client:    httpClient,
@@ -45,13 +48,13 @@ func NewAccessYouClient(
 
 var plusHyphensRegexp = regexp.MustCompile(`[\+\-]+`)
 
-func fixPhoneNumber(phoneNumber string) string {
+func FixPhoneNumber(phoneNumber string) string {
 	// Access you phone number should have no + and -
 	return plusHyphensRegexp.ReplaceAllString(phoneNumber, "")
 }
 
 func (n *AccessYouClient) Send(ctx context.Context, options *smsclient.SendOptions) (*smsclient.SendResultSuccess, error) {
-	to := fixPhoneNumber(string(options.To))
+	to := FixPhoneNumber(string(options.To))
 
 	dumpedResponse, sendSMSResponse, err := SendSMS(
 		ctx,
@@ -70,41 +73,14 @@ func (n *AccessYouClient) Send(ctx context.Context, options *smsclient.SendOptio
 	}
 
 	// Success case.
-	if sendSMSResponse.Status == "100" {
+	if sendSMSResponse.Status == STATUS_SUCCESS {
 		return &smsclient.SendResultSuccess{
 			DumpedResponse: dumpedResponse,
 		}, nil
 	}
 
 	// Failed case.
-	return nil, n.makeError(sendSMSResponse.Status, dumpedResponse)
-}
-
-func (n *AccessYouClient) makeError(
-	msgStatus string,
-	dumpedResponse []byte,
-) *smsclient.SendResultError {
-	err := &smsclient.SendResultError{
-		DumpedResponse:    dumpedResponse,
-		ProviderName:      "accessyou",
-		ProviderErrorCode: msgStatus,
-	}
-
-	// See https://www.accessyou.com/smsapi.pdf
-	switch msgStatus {
-	case "108":
-		fallthrough
-	case "110":
-		err.Code = api.CodeInvalidPhoneNumber
-	case "105":
-		err.Code = api.CodeAuthenticationFailed
-	case "106":
-		fallthrough
-	case "107":
-		err.Code = api.CodeDeliveryRejected
-	}
-
-	return err
+	return nil, MakeError(sendSMSResponse.Status, dumpedResponse, "accessyou")
 }
 
 var _ smsclient.RawClient = &AccessYouClient{}

@@ -64,6 +64,13 @@ providers:
           by_languages:
             - authgear_language: en
               template_id: "919881"
+  - name: accessyou_otp
+    type: accessyou_otp
+    accessyou_otp:
+      accountno: "my-accountno"
+      user: "my-user"
+      pwd: "my-pwd"
+      tid: "1"
 provider_selector:
   switch:
     - type: match_app_id_and_phone_number_alpha2
@@ -74,7 +81,7 @@ provider_selector:
       use_provider: accessyou
       phone_number_alpha2: HK
     - type: match_phone_number_alpha2
-      use_provider: sendcloud
+      use_provider: accessyou_otp
       phone_number_alpha2: CN
     - type: default
       use_provider: twilio

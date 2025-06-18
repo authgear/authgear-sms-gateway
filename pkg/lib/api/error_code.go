@@ -14,6 +14,8 @@ const (
 	CodeRateLimited Code = "rate_limited"
 	// CodeAuthenticationFailed means authentication failed in the sms gateway
 	CodeAuthenticationFailed Code = "authentication_failed"
+	// CodeAttemptedToSendOTPTemplateWithoutCode means the message is not otp message, and the provider only support otp message
+	CodeAttemptedToSendOTPTemplateWithoutCode Code = "attempted_to_send_otp_template_without_code"
 	// CodeDeliveryRejected means the sms gateway rejected the request for some reason
 	// e.g. The account was suspended
 	CodeDeliveryRejected Code = "delivery_rejected"
@@ -38,6 +40,8 @@ func (c Code) HTTPStatusCode() int {
 		return http.StatusTooManyRequests
 	case CodeAuthenticationFailed:
 		return http.StatusInternalServerError
+	case CodeAttemptedToSendOTPTemplateWithoutCode:
+		return http.StatusBadRequest
 	case CodeDeliveryRejected:
 		return http.StatusInternalServerError
 	case CodeInvalidRequest:

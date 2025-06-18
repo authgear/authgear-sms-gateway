@@ -16,24 +16,26 @@ import (
 type ProviderType string
 
 const (
-	ProviderTypeTwilio    ProviderType = "twilio"
-	ProviderTypeAccessYou ProviderType = "accessyou"
-	ProviderTypeSendCloud ProviderType = "sendcloud"
+	ProviderTypeTwilio       ProviderType = "twilio"
+	ProviderTypeAccessYou    ProviderType = "accessyou"
+	ProviderTypeSendCloud    ProviderType = "sendcloud"
+	ProviderTypeAccessYouOTP ProviderType = "accessyou_otp"
 )
 
 var _ = RootSchema.Add("ProviderType", `
 {
 	"type": "string",
-	"enum": ["twilio", "accessyou", "sendcloud"]
+	"enum": ["twilio", "accessyou", "sendcloud", "accessyou_otp"]
 }
 `)
 
 type Provider struct {
-	Name      string                   `json:"name,omitempty"`
-	Type      ProviderType             `json:"type,omitempty"`
-	Twilio    *ProviderConfigTwilio    `json:"twilio,omitempty" nullable:"true"`
-	AccessYou *ProviderConfigAccessYou `json:"accessyou,omitempty" nullable:"true"`
-	SendCloud *ProviderConfigSendCloud `json:"sendcloud,omitempty" nullable:"true"`
+	Name         string                      `json:"name,omitempty"`
+	Type         ProviderType                `json:"type,omitempty"`
+	Twilio       *ProviderConfigTwilio       `json:"twilio,omitempty" nullable:"true"`
+	AccessYou    *ProviderConfigAccessYou    `json:"accessyou,omitempty" nullable:"true"`
+	SendCloud    *ProviderConfigSendCloud    `json:"sendcloud,omitempty" nullable:"true"`
+	AccessYouOTP *ProviderConfigAccessYouOTP `json:"accessyou_otp,omitempty" nullable:"true"`
 }
 
 type ProviderConfigTwilio struct {
@@ -57,6 +59,14 @@ type ProviderConfigAccessYou struct {
 	Pwd       string `json:"pwd,omitempty"`
 }
 
+type ProviderConfigAccessYouOTP struct {
+	BaseUrl   string `json:"base_url,omitempty"`
+	AccountNo string `json:"accountno,omitempty"`
+	User      string `json:"user,omitempty"`
+	Pwd       string `json:"pwd,omitempty"`
+	TID       string `json:"tid,omitempty"`
+}
+
 var _ = RootSchema.Add("Provider", `
 {
 	"type": "object",
@@ -66,7 +76,8 @@ var _ = RootSchema.Add("Provider", `
 		"type": { "$ref": "#/$defs/ProviderType" },
 		"twilio": { "$ref": "#/$defs/ProviderConfigTwilio" },
 		"accessyou": { "$ref": "#/$defs/ProviderConfigAccessYou" },
-		"sendcloud": { "$ref": "#/$defs/ProviderConfigSendCloud" }
+		"sendcloud": { "$ref": "#/$defs/ProviderConfigSendCloud" },
+		"accessyou_otp": { "$ref": "#/$defs/ProviderConfigAccessYouOTP" }
 	},
 	"allOf": [
 		{
@@ -80,6 +91,10 @@ var _ = RootSchema.Add("Provider", `
 		{
 			"if": { "properties": { "type": { "const": "sendcloud" } }},
 			"then": { "required": ["sendcloud"] }
+		},
+		{
+			"if": { "properties": { "type": { "const": "accessyou_otp" } }},
+			"then": { "required": ["accessyou_otp"] }
 		}
 	]
 }
@@ -135,6 +150,21 @@ var _ = RootSchema.Add("ProviderConfigAccessYou", `
 		"pwd": {"type": "string"}
 	},
 	"required": ["from", "accountno", "user", "pwd"]
+}
+`)
+
+var _ = RootSchema.Add("ProviderConfigAccessYouOTP", `
+{
+	"type": "object",
+	"additionalProperties": false,
+	"properties": {
+		"base_url": { "type": "string" },
+		"accountno": { "type": "string" },
+		"user": { "type": "string" },
+		"pwd": {"type": "string"},
+		"tid": {"type": "string"}
+	},
+	"required": ["accountno", "user", "pwd", "tid"]
 }
 `)
 
