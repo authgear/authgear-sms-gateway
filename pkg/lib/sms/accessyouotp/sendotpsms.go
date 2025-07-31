@@ -9,6 +9,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sensitive"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/accessyou"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
@@ -55,7 +56,7 @@ func SendOTPSMS(
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, sensitive.RedactHTTPClientError(err)
 	}
 	defer resp.Body.Close()
 
