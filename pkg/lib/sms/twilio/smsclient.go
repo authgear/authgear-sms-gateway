@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/api"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sensitive"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
@@ -70,7 +71,7 @@ func (t *TwilioClient) send(ctx context.Context, options *smsclient.SendOptions)
 
 	resp, err := t.Client.Do(req)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, sensitive.RedactHTTPClientError(err)
 	}
 	defer resp.Body.Close()
 

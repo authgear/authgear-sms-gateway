@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"regexp"
 
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sensitive"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
@@ -58,7 +59,7 @@ func SendSMS(
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, sensitive.RedactHTTPClientError(err)
 	}
 	defer resp.Body.Close()
 
