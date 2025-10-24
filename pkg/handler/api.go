@@ -19,6 +19,7 @@ type ResponseBody struct {
 	// These will be included in apierror
 	Code              api.Code `json:"code"`
 	ProviderName      string   `json:"provider_name,omitempty"`
+	ProviderType      string   `json:"provider_type,omitempty"`
 	ProviderErrorCode string   `json:"provider_error_code,omitempty"`
 
 	// These are only in debug logs

@@ -8,11 +8,9 @@ import (
 func MakeError(
 	msgStatus string,
 	dumpedResponse []byte,
-	providerName string,
 ) *smsclient.SendResultError {
 	err := &smsclient.SendResultError{
 		DumpedResponse:    dumpedResponse,
-		ProviderName:      providerName,
 		ProviderErrorCode: msgStatus,
 	}
 

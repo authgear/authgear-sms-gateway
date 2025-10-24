@@ -196,7 +196,6 @@ func (t *TwilioClient) makeError(
 ) *smsclient.SendResultError {
 	err := &smsclient.SendResultError{
 		DumpedResponse:    dumpedResponse,
-		ProviderName:      "twilio",
 		ProviderErrorCode: fmt.Sprintf("%d", errorCode),
 	}
 
@@ -243,6 +242,10 @@ func (t *TwilioClient) makeError(
 	}
 
 	return err
+}
+
+func (t *TwilioClient) ProviderType() string {
+	return "twilio"
 }
 
 var _ smsclient.RawClient = &TwilioClient{}

@@ -93,7 +93,8 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 			h.write(w, &ResponseBody{
 				Code:              code,
-				ProviderName:      errorUnsuccessResponse.ProviderName,
+				ProviderName:      info.Root.ProviderName,
+				ProviderType:      info.Root.ProviderType,
 				ProviderErrorCode: errorUnsuccessResponse.ProviderErrorCode,
 				DumpedResponse:    errorUnsuccessResponse.DumpedResponse,
 				GoError:           err.Error(),
@@ -117,6 +118,8 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	info := smsclient.GetSendContext(r.Context())
 	h.write(w, &ResponseBody{
 		Code:           api.CodeOK,
+		ProviderName:   info.Root.ProviderName,
+		ProviderType:   info.Root.ProviderType,
 		DumpedResponse: sendResult.DumpedResponse,
 		Info:           info,
 	})

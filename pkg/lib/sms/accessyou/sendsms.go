@@ -11,7 +11,6 @@ import (
 	"regexp"
 
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sensitive"
-	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
 var leadingBOMRegexp = regexp.MustCompile(`^[\x{feff}]+`)
@@ -74,9 +73,7 @@ func SendSMS(
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.SendResultError{
-				DumpedResponse: dumpedResponse,
-			},
+			MakeError("", dumpedResponse),
 		)
 	}
 
@@ -85,9 +82,7 @@ func SendSMS(
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.SendResultError{
-				DumpedResponse: dumpedResponse,
-			},
+			MakeError("", dumpedResponse),
 		)
 	}
 

@@ -59,7 +59,6 @@ type SendResultSuccess struct {
 
 type SendResultError struct {
 	Code              api.Code `json:"code"`
-	ProviderName      string   `json:"provider_name,omitempty"`
 	ProviderErrorCode string   `json:"provider_error_code,omitempty"`
 	DumpedResponse    []byte   `json:"dumped_response,omitempty"`
 }
@@ -70,5 +69,6 @@ func (r *SendResultError) Error() string {
 }
 
 type RawClient interface {
+	ProviderType() string
 	Send(ctx context.Context, options *SendOptions) (*SendResultSuccess, error)
 }
