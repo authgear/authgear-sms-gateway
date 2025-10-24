@@ -99,6 +99,7 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				DumpedResponse:    errorUnsuccessResponse.DumpedResponse,
 				GoError:           err.Error(),
 				Info:              info,
+				IsNonCritical:     errorUnsuccessResponse.IsNonCritical,
 			})
 			return
 		}

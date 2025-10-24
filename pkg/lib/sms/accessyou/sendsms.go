@@ -2,9 +2,11 @@ package accessyou
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"log/slog"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -58,7 +60,17 @@ func SendSMS(
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, nil, sensitive.RedactHTTPClientError(err)
+		err = sensitive.RedactHTTPClientError(err)
+		// It is observed that accessyou sometimes timeout:
+		// https://authgear.sentry.io/issues/6955764832/?project=4507492133109760&query=is%3Aunresolved&referrer=issue-stream
+		// We would like to skip logging such error in authgear server
+		var netErr net.Error
+		if errors.As(err, &netErr) && netErr.Timeout() {
+			sendErr := MakeError("", nil)
+			sendErr.IsNonCritical = true
+			err = errors.Join(err, sendErr)
+		}
+		return nil, nil, err
 	}
 	defer func() {
 		_ = resp.Body.Close()
@@ -80,9 +92,17 @@ func SendSMS(
 	respData = FixRespData(respData)
 	sendSMSResponse, err := ParseSendSMSResponse(respData)
 	if err != nil {
+		sendErr := MakeError("", dumpedResponse)
+		var jsonSyntaxErr *json.SyntaxError
+		if errors.As(err, &jsonSyntaxErr) {
+			// It is observed that accessyou sometimes return non-json response:
+			// https://authgear.sentry.io/issues/6774345455/?project=4507492133109760&query=is%3Aunresolved&referrer=issue-stream
+			// We would like to skip logging such error in authgear server
+			sendErr.IsNonCritical = true
+		}
 		return nil, nil, errors.Join(
 			err,
-			MakeError("", dumpedResponse),
+			sendErr,
 		)
 	}
 

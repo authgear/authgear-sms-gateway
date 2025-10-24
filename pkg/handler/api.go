@@ -26,4 +26,6 @@ type ResponseBody struct {
 	GoError        string                 `json:"go_error,omitempty"`
 	DumpedResponse []byte                 `json:"dumped_response,omitempty"`
 	Info           *smsclient.SendContext `json:"info,omitempty"`
+	// This flag is used to tell authgear server that this error is safe to ignore
+	IsNonCritical bool `json:"is_non_critical,omitempty"`
 }

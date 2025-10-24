@@ -61,6 +61,8 @@ type SendResultError struct {
 	Code              api.Code `json:"code"`
 	ProviderErrorCode string   `json:"provider_error_code,omitempty"`
 	DumpedResponse    []byte   `json:"dumped_response,omitempty"`
+	// This flag is used to tell authgear server that this error is safe to ignore
+	IsNonCritical bool `json:"is_non_critical,omitempty"`
 }
 
 func (r *SendResultError) Error() string {
