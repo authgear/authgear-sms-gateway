@@ -28,6 +28,12 @@ const (
 
 	// CodeUnknownError means any other error.
 	CodeUnknownError Code = "unknown_error"
+
+	// Error codes we use internally
+	// CodeUnknownResponseFormat means the response from the SMS provider is unknown format.
+	CodeUnknownResponseFormat Code = "_unknown_response_format"
+	// CodeProviderTimeout means the SMS provider timed out.
+	CodeProviderTimeout Code = "_provider_timeout"
 )
 
 func (c Code) HTTPStatusCode() int {
@@ -47,6 +53,11 @@ func (c Code) HTTPStatusCode() int {
 	case CodeInvalidRequest:
 		return http.StatusBadRequest
 	case CodeUnknownError:
+		return http.StatusInternalServerError
+	// Internal codes
+	case CodeUnknownResponseFormat:
+		return http.StatusInternalServerError
+	case CodeProviderTimeout:
 		return http.StatusInternalServerError
 	default:
 		return http.StatusInternalServerError

@@ -2,14 +2,17 @@ package sendcloud
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"log/slog"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"strings"
 
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/api"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sensitive"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
@@ -25,7 +28,15 @@ func Send(ctx context.Context, client *http.Client, baseUrl string, sendRequest 
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, nil, sensitive.RedactHTTPClientError(err)
+		err = sensitive.RedactHTTPClientError(err)
+		var netErr net.Error
+		if errors.As(err, &netErr) && netErr.Timeout() {
+			err = errors.Join(err, &smsclient.SendResultError{
+				DumpedResponse: nil,
+				Code:           api.CodeProviderTimeout,
+			})
+		}
+		return nil, nil, err
 	}
 	defer func() {
 		_ = resp.Body.Close()
@@ -48,11 +59,16 @@ func Send(ctx context.Context, client *http.Client, baseUrl string, sendRequest 
 
 	sendResponse, err := ParseSendResponse(respData)
 	if err != nil {
+		sendErr := &smsclient.SendResultError{
+			DumpedResponse: dumpedResponse,
+		}
+		var jsonSyntaxErr *json.SyntaxError
+		if errors.As(err, &jsonSyntaxErr) {
+			sendErr.Code = api.CodeUnknownResponseFormat
+		}
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.SendResultError{
-				DumpedResponse: dumpedResponse,
-			},
+			sendErr,
 		)
 	}
 

@@ -11,8 +11,10 @@ import (
 	"net/http/httputil"
 	"net/url"
 
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/api"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sensitive"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/accessyou"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
 
 type SendOTPSMSOptions struct {
@@ -63,9 +65,11 @@ func SendOTPSMS(
 		// We would like to skip logging such error in authgear server
 		var netErr net.Error
 		if errors.As(err, &netErr) && netErr.Timeout() {
-			sendErr := accessyou.MakeError("", nil)
-			sendErr.IsNonCritical = true
-			err = errors.Join(err, sendErr)
+			err = errors.Join(err, &smsclient.SendResultError{
+				DumpedResponse: nil,
+				Code:           api.CodeProviderTimeout,
+				IsNonCritical:  true,
+			})
 		}
 		return nil, nil, err
 	}
@@ -89,9 +93,12 @@ func SendOTPSMS(
 	respData = accessyou.FixRespData(respData)
 	sendSMSResponse, err := accessyou.ParseSendSMSResponse(respData)
 	if err != nil {
-		sendErr := accessyou.MakeError("", dumpedResponse)
+		sendErr := &smsclient.SendResultError{
+			DumpedResponse: dumpedResponse,
+		}
 		var jsonSyntaxErr *json.SyntaxError
 		if errors.As(err, &jsonSyntaxErr) {
+			sendErr.Code = api.CodeUnknownResponseFormat
 			// It is observed that accessyou sometimes return non-json response:
 			// https://authgear.sentry.io/issues/6774345455/?project=4507492133109760&query=is%3Aunresolved&referrer=issue-stream
 			// We would like to skip logging such error in authgear server
