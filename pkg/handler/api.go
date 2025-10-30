@@ -15,17 +15,18 @@ type RequestBody struct {
 	TemplateVariables *smsclient.TemplateVariables `json:"template_variables"`
 }
 
+// Read authgear-server/docs/specs/sms_gateway.md
 type ResponseBody struct {
-	// These will be included in apierror
-	Code              api.Code `json:"code"`
-	ProviderName      string   `json:"provider_name,omitempty"`
-	ProviderType      string   `json:"provider_type,omitempty"`
-	ProviderErrorCode string   `json:"provider_error_code,omitempty"`
+	Code        api.Code      `json:"code"`
+	Description string        `json:"description,omitempty"`
+	Info        *DetailedInfo `json:"info,omitempty"`
+}
 
-	// These are only in debug logs
-	GoError        string                 `json:"go_error,omitempty"`
-	DumpedResponse []byte                 `json:"dumped_response,omitempty"`
-	Info           *smsclient.SendContext `json:"info,omitempty"`
-	// This flag is used to tell authgear server that this error is safe to ignore
-	IsNonCritical bool `json:"is_non_critical,omitempty"`
+type DetailedInfo struct {
+	Context           *smsclient.SendContext `json:"context,omitempty"`
+	GoError           string                 `json:"go_error,omitempty"`
+	DumpedResponse    []byte                 `json:"dumped_response,omitempty"`
+	ProviderName      string                 `json:"provider_name,omitempty"`
+	ProviderType      string                 `json:"provider_type,omitempty"`
+	ProviderErrorCode string                 `json:"provider_error_code,omitempty"`
 }

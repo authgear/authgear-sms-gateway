@@ -60,15 +60,11 @@ func SendOTPSMS(
 	resp, err := client.Do(req)
 	if err != nil {
 		err = sensitive.RedactHTTPClientError(err)
-		// It is observed that accessyou sometimes timeout:
-		// https://authgear.sentry.io/issues/6955764832/?project=4507492133109760&query=is%3Aunresolved&referrer=issue-stream
-		// We would like to skip logging such error in authgear server
 		var netErr net.Error
 		if errors.As(err, &netErr) && netErr.Timeout() {
 			err = errors.Join(err, &smsclient.SendResultError{
 				DumpedResponse: nil,
 				Code:           api.CodeProviderTimeout,
-				IsNonCritical:  true,
 			})
 		}
 		return nil, nil, err
@@ -99,10 +95,6 @@ func SendOTPSMS(
 		var jsonSyntaxErr *json.SyntaxError
 		if errors.As(err, &jsonSyntaxErr) {
 			sendErr.Code = api.CodeUnknownResponseFormat
-			// It is observed that accessyou sometimes return non-json response:
-			// https://authgear.sentry.io/issues/6774345455/?project=4507492133109760&query=is%3Aunresolved&referrer=issue-stream
-			// We would like to skip logging such error in authgear server
-			sendErr.IsNonCritical = true
 		}
 		return nil, nil, errors.Join(
 			err,
