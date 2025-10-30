@@ -89,12 +89,13 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				"error", err.Error(),
 			)
 			info := smsclient.GetSendContext(r.Context())
-			code := api.CodeUnknownResponse
+			code := api.CodeUnknownError
 			if errorUnsuccessResponse.Code != "" {
 				code = errorUnsuccessResponse.Code
 			}
 			h.write(w, &ResponseBody{
-				Code: code,
+				Code:        code,
+				Description: errorUnsuccessResponse.Description,
 				Info: &DetailedInfo{
 					Context:           info,
 					GoError:           err.Error(),

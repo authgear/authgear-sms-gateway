@@ -77,7 +77,7 @@ func (t *TwilioClient) send(ctx context.Context, options *smsclient.SendOptions)
 		if errors.As(err, &netErr) && netErr.Timeout() {
 			err = errors.Join(err, &smsclient.SendResultError{
 				DumpedResponse: nil,
-				Code:           api.CodeProviderTimeout,
+				Code:           api.CodeTimeout,
 			})
 		}
 		return nil, nil, err
@@ -112,7 +112,7 @@ func (t *TwilioClient) send(ctx context.Context, options *smsclient.SendOptions)
 		}
 		var jsonSyntaxErr *json.SyntaxError
 		if errors.As(err, &jsonSyntaxErr) {
-			sendErr.Code = api.CodeUnknownResponseFormat
+			sendErr.Code = api.CodeUnknownError
 		}
 		return nil, nil, errors.Join(
 			err,

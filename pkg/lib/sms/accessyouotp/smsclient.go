@@ -49,7 +49,8 @@ func (n *AccessYouOTPClient) Send(ctx context.Context, options *smsclient.SendOp
 	code := options.TemplateVariables.Code
 	if code == "" {
 		return nil, &smsclient.SendResultError{
-			Code:              api.CodeAttemptedToSendOTPTemplateWithoutCode,
+			Code:              api.CodeUnsupportedRequest,
+			Description:       "Only 6-digit OTP message is supported.",
 			DumpedResponse:    nil,
 			ProviderErrorCode: "",
 		}
