@@ -59,7 +59,7 @@ type SendResultSuccess struct {
 
 type SendResultError struct {
 	Code              api.Code `json:"code"`
-	Description       string   `json:"description,"omitempty"`
+	Description       string   `json:"description,omitempty"`
 	ProviderErrorCode string   `json:"provider_error_code,omitempty"`
 	DumpedResponse    []byte   `json:"dumped_response,omitempty"`
 }
