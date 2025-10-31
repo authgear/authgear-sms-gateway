@@ -20,7 +20,9 @@ func TestRootConfigValidation(t *testing.T) {
 		if err != nil {
 			panic(err)
 		}
-		defer f.Close()
+		defer func() {
+			_ = f.Close()
+		}()
 
 		type TestCase struct {
 			Name   string      `json:"name"`

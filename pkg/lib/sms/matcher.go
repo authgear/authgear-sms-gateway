@@ -96,6 +96,6 @@ func ParseMatcher(rule *config.ProviderSelectorSwitchRule) Matcher {
 	case config.ProviderSelectorSwitchTypeDefault:
 		return &MatcherDefault{}
 	default:
-		panic(fmt.Errorf("Unknown rule type %s", rule.Type))
+		panic(fmt.Errorf("unknown rule type %s", rule.Type))
 	}
 }

@@ -82,7 +82,7 @@ func TestTemplateResolver(t *testing.T) {
 
 		Convey("Should be error due to template name not found", func() {
 			template, err := templateResolver.Resolve("gg.txt", "zh")
-			So(err.Error(), ShouldEqual, "Could not found template assignment from template name gg.txt")
+			So(err.Error(), ShouldEqual, "could not found template assignment from template name gg.txt")
 			So(template, ShouldBeNil)
 		})
 	})

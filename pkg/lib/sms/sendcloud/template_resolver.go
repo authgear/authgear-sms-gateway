@@ -57,7 +57,7 @@ func NewSendCloudTemplateAssignment(templateAssignment *config.SendCloudTemplate
 	for i, byLanguage := range templateAssignment.ByLanguages {
 		template := templateIDMap[TemplateID(byLanguage.TemplateID)]
 		if template == nil {
-			panic(fmt.Errorf("Cannot find template with id %v", byLanguage.TemplateID))
+			panic(fmt.Errorf("cannot find template with id %v", byLanguage.TemplateID))
 		}
 		b := NewByLanguage(AuthgearLanguage(byLanguage.AuthgearLanguage), template)
 		byLanguages[i] = b
@@ -66,7 +66,7 @@ func NewSendCloudTemplateAssignment(templateAssignment *config.SendCloudTemplate
 
 	defaultTemplate := templateIDMap[TemplateID(templateAssignment.DefaultTemplateID)]
 	if defaultTemplate == nil {
-		panic(fmt.Errorf("Cannot find template with id %v", templateAssignment.DefaultTemplateID))
+		panic(fmt.Errorf("cannot find template with id %v", templateAssignment.DefaultTemplateID))
 	}
 
 	return &SendCloudTemplateAssignment{
@@ -117,7 +117,7 @@ func NewSendCloudTemplateResolver(
 func (s *SendCloudTemplateResolver) Resolve(templateName string, languageTag string) (*SendCloudTemplate, error) {
 	templateAssignment := s.templateAssignmentMapByTemplateName[AuthgearTemplateName(templateName)]
 	if templateAssignment == nil {
-		return nil, fmt.Errorf("Could not found template assignment from template name %v", templateName)
+		return nil, fmt.Errorf("could not found template assignment from template name %v", templateName)
 	}
 	byLanguage := templateAssignment.ByLanguageMap[AuthgearLanguage(languageTag)]
 

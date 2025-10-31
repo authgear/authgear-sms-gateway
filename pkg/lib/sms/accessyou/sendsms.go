@@ -61,7 +61,9 @@ func SendSMS(
 	if err != nil {
 		return nil, nil, sensitive.RedactHTTPClientError(err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	dumpedResponse, err := httputil.DumpResponse(resp, true)
 	if err != nil {
