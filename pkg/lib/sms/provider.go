@@ -25,7 +25,7 @@ func NewSMSProviderMap(c *config.RootConfig, httpClient *http.Client, logger *sl
 func (s SMSProviderMap) GetProviderByName(name string) smsclient.RawClient {
 	client := s[name]
 	if client == nil {
-		panic(fmt.Errorf("Unknown client %v", name))
+		panic(fmt.Errorf("unknown client %v", name))
 	}
 	return client
 }

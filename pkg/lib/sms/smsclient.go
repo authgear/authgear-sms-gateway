@@ -60,6 +60,6 @@ func NewClientFromConfigProvider(p *config.Provider, httpClient *http.Client, lo
 			logger,
 		)
 	default:
-		panic(fmt.Errorf("Unknown type %s", p.Type))
+		panic(fmt.Errorf("unknown type %s", p.Type))
 	}
 }

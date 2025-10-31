@@ -20,7 +20,7 @@ func GetProviderNameByMatch(c *config.RootConfig, ctx *MatchContext) string {
 		}
 	}
 	if defaultClient == "" {
-		panic(fmt.Errorf("Cannot select provider given %v", ctx))
+		panic(fmt.Errorf("cannot select provider given %v", ctx))
 	}
 	return defaultClient
 }
