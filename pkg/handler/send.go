@@ -47,8 +47,10 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := httputil.BindJSONBody(r, w, RequestSchema.Validator(), &body)
 	if err != nil {
 		h.write(w, &ResponseBody{
-			Code:    api.CodeInvalidRequest,
-			GoError: err.Error(),
+			Code: api.CodeInvalidRequest,
+			Info: &DetailedInfo{
+				GoError: err.Error(),
+			},
 		})
 		return
 	}
@@ -87,17 +89,21 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				"error", err.Error(),
 			)
 			info := smsclient.GetSendContext(r.Context())
-			code := api.CodeUnknownResponse
+			code := api.CodeUnknownError
 			if errorUnsuccessResponse.Code != "" {
 				code = errorUnsuccessResponse.Code
 			}
 			h.write(w, &ResponseBody{
-				Code:              code,
-				ProviderName:      errorUnsuccessResponse.ProviderName,
-				ProviderErrorCode: errorUnsuccessResponse.ProviderErrorCode,
-				DumpedResponse:    errorUnsuccessResponse.DumpedResponse,
-				GoError:           err.Error(),
-				Info:              info,
+				Code:        code,
+				Description: errorUnsuccessResponse.Description,
+				Info: &DetailedInfo{
+					Context:           info,
+					GoError:           err.Error(),
+					DumpedResponse:    errorUnsuccessResponse.DumpedResponse,
+					ProviderName:      info.Root.ProviderName,
+					ProviderType:      info.Root.ProviderType,
+					ProviderErrorCode: errorUnsuccessResponse.ProviderErrorCode,
+				},
 			})
 			return
 		}
@@ -106,8 +112,10 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			"error", err.Error(),
 		)
 		h.write(w, &ResponseBody{
-			Code:    api.CodeUnknownError,
-			GoError: err.Error(),
+			Code: api.CodeUnknownError,
+			Info: &DetailedInfo{
+				GoError: err.Error(),
+			},
 		})
 		return
 	}
@@ -116,9 +124,13 @@ func (h *SendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	info := smsclient.GetSendContext(r.Context())
 	h.write(w, &ResponseBody{
-		Code:           api.CodeOK,
-		DumpedResponse: sendResult.DumpedResponse,
-		Info:           info,
+		Code: api.CodeOK,
+		Info: &DetailedInfo{
+			Context:        info,
+			DumpedResponse: sendResult.DumpedResponse,
+			ProviderName:   info.Root.ProviderName,
+			ProviderType:   info.Root.ProviderType,
+		},
 	})
 }
 

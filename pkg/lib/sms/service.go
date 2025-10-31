@@ -27,6 +27,7 @@ func (s *SMSService) Send(
 			sendCtx.Root = &smsclient.SendContextRoot{}
 		}
 		sendCtx.Root.ProviderName = clientName
+		sendCtx.Root.ProviderType = client.ProviderType()
 	})
 
 	s.Logger.InfoContext(ctx, "selected provider")

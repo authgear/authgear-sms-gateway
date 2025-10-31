@@ -57,6 +57,7 @@ type SendContextRoot struct {
 	LanguageTag  string                `json:"language_tag,omitempty"`
 
 	ProviderName string `json:"provider_name,omitempty"`
+	ProviderType string `json:"provider_type,omitempty"`
 }
 
 type SendContextAccessYou struct{}

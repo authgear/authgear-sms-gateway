@@ -2,13 +2,16 @@ package accessyouotp
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"log/slog"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/api"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sensitive"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/accessyou"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
@@ -56,7 +59,15 @@ func SendOTPSMS(
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, nil, sensitive.RedactHTTPClientError(err)
+		err = sensitive.RedactHTTPClientError(err)
+		var netErr net.Error
+		if errors.As(err, &netErr) && netErr.Timeout() {
+			err = errors.Join(err, &smsclient.SendResultError{
+				DumpedResponse: nil,
+				Code:           api.CodeTimeout,
+			})
+		}
+		return nil, nil, err
 	}
 	defer func() {
 		_ = resp.Body.Close()
@@ -71,20 +82,23 @@ func SendOTPSMS(
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.SendResultError{
-				DumpedResponse: dumpedResponse,
-			},
+			accessyou.MakeError("", dumpedResponse),
 		)
 	}
 
 	respData = accessyou.FixRespData(respData)
 	sendSMSResponse, err := accessyou.ParseSendSMSResponse(respData)
 	if err != nil {
+		sendErr := &smsclient.SendResultError{
+			DumpedResponse: dumpedResponse,
+		}
+		var jsonSyntaxErr *json.SyntaxError
+		if errors.As(err, &jsonSyntaxErr) {
+			sendErr.Code = api.CodeUnknownError
+		}
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.SendResultError{
-				DumpedResponse: dumpedResponse,
-			},
+			sendErr,
 		)
 	}
 

@@ -49,9 +49,9 @@ func (n *AccessYouOTPClient) Send(ctx context.Context, options *smsclient.SendOp
 	code := options.TemplateVariables.Code
 	if code == "" {
 		return nil, &smsclient.SendResultError{
-			Code:              api.CodeAttemptedToSendOTPTemplateWithoutCode,
+			Code:              api.CodeUnsupportedRequest,
+			Description:       "Only 6-digit OTP message is supported.",
 			DumpedResponse:    nil,
-			ProviderName:      "accessyou_otp",
 			ProviderErrorCode: "",
 		}
 	}
@@ -83,7 +83,11 @@ func (n *AccessYouOTPClient) Send(ctx context.Context, options *smsclient.SendOp
 	}
 
 	// Failed case.
-	return nil, accessyou.MakeError(sendSMSResponse.Status, dumpedResponse, "accessyou_otp")
+	return nil, accessyou.MakeError(sendSMSResponse.Status, dumpedResponse)
+}
+
+func (n *AccessYouOTPClient) ProviderType() string {
+	return "accessyou_otp"
 }
 
 var _ smsclient.RawClient = &AccessYouOTPClient{}

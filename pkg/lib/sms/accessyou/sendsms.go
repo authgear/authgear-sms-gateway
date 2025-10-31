@@ -2,14 +2,17 @@ package accessyou
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"log/slog"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"regexp"
 
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/api"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sensitive"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 )
@@ -59,7 +62,15 @@ func SendSMS(
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, nil, sensitive.RedactHTTPClientError(err)
+		err = sensitive.RedactHTTPClientError(err)
+		var netErr net.Error
+		if errors.As(err, &netErr) && netErr.Timeout() {
+			err = errors.Join(err, &smsclient.SendResultError{
+				DumpedResponse: nil,
+				Code:           api.CodeTimeout,
+			})
+		}
+		return nil, nil, err
 	}
 	defer func() {
 		_ = resp.Body.Close()
@@ -74,20 +85,23 @@ func SendSMS(
 	if err != nil {
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.SendResultError{
-				DumpedResponse: dumpedResponse,
-			},
+			MakeError("", dumpedResponse),
 		)
 	}
 
 	respData = FixRespData(respData)
 	sendSMSResponse, err := ParseSendSMSResponse(respData)
 	if err != nil {
+		var jsonSyntaxErr *json.SyntaxError
+		sendErr := &smsclient.SendResultError{
+			DumpedResponse: dumpedResponse,
+		}
+		if errors.As(err, &jsonSyntaxErr) {
+			sendErr.Code = api.CodeUnknownError
+		}
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.SendResultError{
-				DumpedResponse: dumpedResponse,
-			},
+			sendErr,
 		)
 	}
 

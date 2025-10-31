@@ -80,7 +80,11 @@ func (n *AccessYouClient) Send(ctx context.Context, options *smsclient.SendOptio
 	}
 
 	// Failed case.
-	return nil, MakeError(sendSMSResponse.Status, dumpedResponse, "accessyou")
+	return nil, MakeError(sendSMSResponse.Status, dumpedResponse)
+}
+
+func (n *AccessYouClient) ProviderType() string {
+	return "accessyou"
 }
 
 var _ smsclient.RawClient = &AccessYouClient{}

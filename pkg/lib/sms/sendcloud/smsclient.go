@@ -150,7 +150,6 @@ func (t *SendCloudClient) makeError(
 ) *smsclient.SendResultError {
 	err := &smsclient.SendResultError{
 		DumpedResponse:    dumpedResponse,
-		ProviderName:      "sendcloud",
 		ProviderErrorCode: fmt.Sprintf("%d", statusCode),
 	}
 
@@ -173,6 +172,10 @@ func (t *SendCloudClient) makeError(
 	}
 
 	return err
+}
+
+func (t *SendCloudClient) ProviderType() string {
+	return "sendcloud"
 }
 
 var _ smsclient.RawClient = &SendCloudClient{}

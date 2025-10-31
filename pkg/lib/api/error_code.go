@@ -4,29 +4,19 @@ import "net/http"
 
 type Code string
 
+// Read authgear-server/docs/specs/sms_gateway.md
 const (
-	// CodeOK means no error.
 	CodeOK Code = "ok"
 
-	// CodeInvalidPhoneNumber means the phone number is not a valid number
-	CodeInvalidPhoneNumber Code = "invalid_phone_number"
-	// CodeRateLimited means some rate limit is hit and the request should be retried later
-	CodeRateLimited Code = "rate_limited"
-	// CodeAuthenticationFailed means authentication failed in the sms gateway
+	CodeInvalidPhoneNumber   Code = "invalid_phone_number"
+	CodeRateLimited          Code = "rate_limited"
 	CodeAuthenticationFailed Code = "authentication_failed"
-	// CodeAttemptedToSendOTPTemplateWithoutCode means the message is not otp message, and the provider only support otp message
-	CodeAttemptedToSendOTPTemplateWithoutCode Code = "attempted_to_send_otp_template_without_code"
-	// CodeDeliveryRejected means the sms gateway rejected the request for some reason
-	// e.g. The account was suspended
-	CodeDeliveryRejected Code = "delivery_rejected"
+	CodeUnsupportedRequest   Code = "unsupported_request"
+	CodeDeliveryRejected     Code = "delivery_rejected"
+	CodeTimeout              Code = "timeout"
 
-	// CodeInvalidRequest means the request is invalid.
 	CodeInvalidRequest Code = "invalid_request"
 
-	// CodeUnknownResponse means the response from the SMS provider is unknown.
-	CodeUnknownResponse Code = "unknown_response"
-
-	// CodeUnknownError means any other error.
 	CodeUnknownError Code = "unknown_error"
 )
 
@@ -40,9 +30,11 @@ func (c Code) HTTPStatusCode() int {
 		return http.StatusTooManyRequests
 	case CodeAuthenticationFailed:
 		return http.StatusInternalServerError
-	case CodeAttemptedToSendOTPTemplateWithoutCode:
+	case CodeUnsupportedRequest:
 		return http.StatusBadRequest
 	case CodeDeliveryRejected:
+		return http.StatusInternalServerError
+	case CodeTimeout:
 		return http.StatusInternalServerError
 	case CodeInvalidRequest:
 		return http.StatusBadRequest

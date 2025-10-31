@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -71,7 +72,15 @@ func (t *TwilioClient) send(ctx context.Context, options *smsclient.SendOptions)
 
 	resp, err := t.Client.Do(req)
 	if err != nil {
-		return nil, nil, sensitive.RedactHTTPClientError(err)
+		err = sensitive.RedactHTTPClientError(err)
+		var netErr net.Error
+		if errors.As(err, &netErr) && netErr.Timeout() {
+			err = errors.Join(err, &smsclient.SendResultError{
+				DumpedResponse: nil,
+				Code:           api.CodeTimeout,
+			})
+		}
+		return nil, nil, err
 	}
 	defer func() {
 		_ = resp.Body.Close()
@@ -98,11 +107,16 @@ func (t *TwilioClient) send(ctx context.Context, options *smsclient.SendOptions)
 		if errors.As(err, &jsonUnmarshalErr) {
 			return nil, nil, t.parseAndHandleErrorResponse(respData, dumpedResponse)
 		}
+		sendErr := &smsclient.SendResultError{
+			DumpedResponse: dumpedResponse,
+		}
+		var jsonSyntaxErr *json.SyntaxError
+		if errors.As(err, &jsonSyntaxErr) {
+			sendErr.Code = api.CodeUnknownError
+		}
 		return nil, nil, errors.Join(
 			err,
-			&smsclient.SendResultError{
-				DumpedResponse: dumpedResponse,
-			},
+			sendErr,
 		)
 	}
 
@@ -196,7 +210,6 @@ func (t *TwilioClient) makeError(
 ) *smsclient.SendResultError {
 	err := &smsclient.SendResultError{
 		DumpedResponse:    dumpedResponse,
-		ProviderName:      "twilio",
 		ProviderErrorCode: fmt.Sprintf("%d", errorCode),
 	}
 
@@ -243,6 +256,10 @@ func (t *TwilioClient) makeError(
 	}
 
 	return err
+}
+
+func (t *TwilioClient) ProviderType() string {
+	return "twilio"
 }
 
 var _ smsclient.RawClient = &TwilioClient{}
