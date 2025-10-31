@@ -8,5 +8,5 @@ import (
 type HealthzHandler struct{}
 
 func (p *HealthzHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "OK")
+	_, _ = fmt.Fprintf(w, "OK")
 }
