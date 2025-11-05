@@ -65,7 +65,7 @@ name: failed-provider-type
 error: |-
   invalid configuration:
   /providers/0/type: enum
-    map[actual:twillio expected:[twilio accessyou sendcloud accessyou_otp]]
+    map[actual:twillio expected:[twilio accessyou sendcloud accessyou_otp cmcom]]
 config:
   providers:
     - name: twilio
@@ -406,3 +406,32 @@ config:
         use_provider: twilio
       - type: default
         use_provider: twilio
+---
+name: cmcom-setup
+error: null
+config:
+  providers:
+    - name: cmcom
+      type: cmcom
+      cmcom:
+        from: "my-sender"
+        product_token: "product-token"
+  provider_selector:
+    switch:
+      - type: default
+        use_provider: cmcom
+---
+name: cmcom-both-require-product-token-and-from
+error: |-
+  invalid configuration:
+  /providers/0/cmcom: required
+    map[actual:<nil> expected:[from product_token] missing:[from product_token]]
+config:
+  providers:
+    - name: cmcom
+      type: cmcom
+      cmcom: {}
+  provider_selector:
+    switch:
+      - type: default
+        use_provider: cmcom
