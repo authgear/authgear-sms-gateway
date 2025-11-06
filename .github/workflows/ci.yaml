@@ -38,13 +38,10 @@ jobs:
   image:
     runs-on: ubuntu-24.04
     needs: ["test"]
-    env:
-      TARGET: server
-      IMAGE_NAME: authgear-sms-gateway
     steps:
     - uses: actions/checkout@v4
-    - run: make build-image TARGET=$TARGET IMAGE_NAME=$IMAGE_NAME
-    - run: make tag-image IMAGE_NAME=$IMAGE_NAME
+    - run: make build-image
+    - run: make tag-image
     - name: docker login
       if: ${{ github.repository == 'authgear/authgear-sms-gateway' && github.event_name == 'push' }}
       env:
@@ -52,7 +49,7 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.QUAY_ROBOT_TOKEN }}
       run: |
         printf "$DOCKER_PASSWORD" | docker login --password-stdin --username "$DOCKER_USERNAME" quay.io
-    - run: make push-image IMAGE_NAME=$IMAGE_NAME
+    - run: make push-image
       if: ${{ github.repository == 'authgear/authgear-sms-gateway' && github.event_name == 'push' }}
     - name: docker logout
       if: ${{ always() }}

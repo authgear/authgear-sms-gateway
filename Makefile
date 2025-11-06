@@ -1,6 +1,7 @@
 # GIT_NAME could be empty.
 GIT_NAME ?= $(shell git describe --exact-match 2>/dev/null)
 GIT_HASH ?= git-$(shell git rev-parse --short=12 HEAD)
+IMAGE_NAME ?= authgear-sms-gateway
 
 .PHONY: vendor
 vendor:
@@ -57,7 +58,7 @@ check-tidy:
 
 .PHONY: build-image
 build-image:
-	docker build --pull --file ./cmd/$(TARGET)/Dockerfile --tag $(IMAGE_NAME) --build-arg GIT_HASH=$(GIT_HASH) .
+	docker build --pull --file ./cmd/server/Dockerfile --tag $(IMAGE_NAME) --build-arg GIT_HASH=$(GIT_HASH) .
 
 .PHONY: tag-image
 tag-image: DOCKER_IMAGE = quay.io/theauthgear/$(IMAGE_NAME)
