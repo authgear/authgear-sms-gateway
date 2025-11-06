@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     tzdata \
     && rm -rf /var/lib/apt/lists/*
-RUN update-ca-certificates
 COPY --from=stage1 /src/authgear-sms-gateway /usr/local/bin/
+COPY ./docker-entrypoint.sh /usr/local/bin/
+ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 8091
 CMD ["authgear-sms-gateway"]
