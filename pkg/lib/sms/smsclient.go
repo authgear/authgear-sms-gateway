@@ -8,6 +8,7 @@ import (
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/config"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/accessyou"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/accessyouotp"
+	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/cmcom"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/sendcloud"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/smsclient"
 	"github.com/authgear/authgear-sms-gateway/pkg/lib/sms/twilio"
@@ -59,6 +60,13 @@ func NewClientFromConfigProvider(p *config.Provider, httpClient *http.Client, lo
 			templateResolver,
 			logger,
 		)
+	case config.ProviderTypeCMCOM:
+		return &cmcom.CMCOMClient{
+			Client:       httpClient,
+			From:         p.CMCOM.From,
+			ProductToken: p.CMCOM.ProductToken,
+			Logger:       logger,
+		}
 	default:
 		panic(fmt.Errorf("unknown type %s", p.Type))
 	}
