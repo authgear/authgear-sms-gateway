@@ -39,6 +39,7 @@ type Messages struct {
 	Msg []Msg `json:"msg"`
 }
 
+// See https://developers.cm.com/messaging/docs/integration
 type SendRequest struct {
 	Messages Messages `json:"messages"`
 }
@@ -79,7 +80,7 @@ func SendMessage(
 					From: options.From,
 					To:   []To{{Number: options.To}},
 					Body: MessageBody{
-						Type:    "auto",
+						Type:    "auto", // See https://developers.cm.com/messaging/docs/sms
 						Content: options.Content,
 					},
 				},
