@@ -58,28 +58,30 @@ type SendResponse struct {
 	Messages  []MessageResponse `json:"messages"`
 }
 
+type SendMessageOptions struct {
+	ProductToken string
+	From         string
+	To           string
+	Content      string
+}
+
 // SendMessage sends a message via CM.com API and returns the response or an error
 func SendMessage(
 	ctx context.Context,
 	httpClient *http.Client,
 	logger *slog.Logger,
-	productToken string,
-	from string,
-	toNumber string,
-	content string,
-	reference string,
+	options *SendMessageOptions,
 ) (*smsclient.SendResultSuccess, error) {
 	reqBody := SendRequest{
 		Messages: Messages{
 			Msg: []Msg{
 				{
-					From: from,
-					To:   []To{{Number: toNumber}},
+					From: options.From,
+					To:   []To{{Number: options.To}},
 					Body: MessageBody{
 						Type:    "auto",
-						Content: content,
+						Content: options.Content,
 					},
-					Reference: reference,
 				},
 			},
 		},
@@ -96,7 +98,7 @@ func SendMessage(
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-CM-PRODUCTTOKEN", productToken)
+	req.Header.Set("X-CM-PRODUCTTOKEN", options.ProductToken)
 
 	resp, err := httpClient.Do(req)
 	if err != nil {

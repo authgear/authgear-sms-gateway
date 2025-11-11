@@ -18,7 +18,12 @@ type CMCOMClient struct {
 }
 
 func (c *CMCOMClient) Send(ctx context.Context, options *smsclient.SendOptions) (*smsclient.SendResultSuccess, error) {
-	return SendMessage(ctx, c.Client, c.Logger, c.ProductToken, c.From, string(options.To), options.Body, "")
+	return SendMessage(ctx, c.Client, c.Logger, &SendMessageOptions{
+		ProductToken: c.ProductToken,
+		From:         c.From,
+		To:           string(options.To),
+		Content:      options.Body,
+	})
 }
 
 func (c *CMCOMClient) ProviderType() string {
