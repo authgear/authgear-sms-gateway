@@ -195,19 +195,19 @@ func MakeError(providerErrorCode int, dumpedResponse []byte) *smsclient.SendResu
 	case 999: // Unknown error, please contact CM support
 		err.Code = api.CodeUnknownError
 	case 101: // Authentication of the request failed
-		fallthrough
+		err.Code = api.CodeAuthenticationFailed
 	case 102: // The account using this authentication has insufficient balance
-		fallthrough
+		err.Code = api.CodeDeliveryRejected
 	case 103: // The product token is incorrect
 		err.Code = api.CodeAuthenticationFailed
 	case 201: // This request has one or more errors in its messages. Some or all messages have not been sent. See MSGs for details
-		fallthrough
+		err.Code = api.CodeDeliveryRejected
 	case 202: // This request is malformed, please confirm the JSON and that the correct data types are used
 		fallthrough
 	case 203: // The request's MSG array is incorrect
 		fallthrough
 	case 301: // This MSG has an invalid From field (per msg)
-		err.Code = api.CodeDeliveryRejected
+		err.Code = api.CodeUnknownError
 	case 302: // This MSG has an invalid To field (per msg)
 		fallthrough
 	case 303: // This MSG has an invalid Phone Number in the To field (per msg,)
