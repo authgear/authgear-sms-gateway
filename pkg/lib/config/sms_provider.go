@@ -20,12 +20,13 @@ const (
 	ProviderTypeAccessYou    ProviderType = "accessyou"
 	ProviderTypeSendCloud    ProviderType = "sendcloud"
 	ProviderTypeAccessYouOTP ProviderType = "accessyou_otp"
+	ProviderTypeCMCOM        ProviderType = "cmcom"
 )
 
 var _ = RootSchema.Add("ProviderType", `
 {
 	"type": "string",
-	"enum": ["twilio", "accessyou", "sendcloud", "accessyou_otp"]
+	"enum": ["twilio", "accessyou", "sendcloud", "accessyou_otp", "cmcom"]
 }
 `)
 
@@ -36,6 +37,7 @@ type Provider struct {
 	AccessYou    *ProviderConfigAccessYou    `json:"accessyou,omitempty" nullable:"true"`
 	SendCloud    *ProviderConfigSendCloud    `json:"sendcloud,omitempty" nullable:"true"`
 	AccessYouOTP *ProviderConfigAccessYouOTP `json:"accessyou_otp,omitempty" nullable:"true"`
+	CMCOM        *ProviderConfigCMCOM        `json:"cmcom,omitempty"`
 }
 
 type ProviderConfigTwilio struct {
@@ -77,7 +79,8 @@ var _ = RootSchema.Add("Provider", `
 		"twilio": { "$ref": "#/$defs/ProviderConfigTwilio" },
 		"accessyou": { "$ref": "#/$defs/ProviderConfigAccessYou" },
 		"sendcloud": { "$ref": "#/$defs/ProviderConfigSendCloud" },
-		"accessyou_otp": { "$ref": "#/$defs/ProviderConfigAccessYouOTP" }
+		"accessyou_otp": { "$ref": "#/$defs/ProviderConfigAccessYouOTP" },
+		"cmcom": { "$ref": "#/$defs/ProviderConfigCMCOM" }
 	},
 	"allOf": [
 		{
@@ -95,6 +98,10 @@ var _ = RootSchema.Add("Provider", `
 		{
 			"if": { "properties": { "type": { "const": "accessyou_otp" } }},
 			"then": { "required": ["accessyou_otp"] }
+		},
+		{
+			"if": { "properties": { "type": { "const": "cmcom" } }},
+			"then": { "required": ["cmcom"] }
 		}
 	]
 }

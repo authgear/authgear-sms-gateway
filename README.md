@@ -36,7 +36,7 @@ $ curl --request POST \
   --data '{
     "app_id": "accounts",
     "to": "+85298765432",
-    "body": "Your OTP is 123456"
+    "body": "Your OTP is 123456",
     "language_tag": "zh-HK",
     "template_name": "verficiation_sms.txt",
     "template_variables": {}
