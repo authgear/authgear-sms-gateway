@@ -32,7 +32,6 @@ build:
 fmt:
 	find ./pkg ./cmd -name '*.go' -not -name 'wire_gen.go' -not -name '*_mock_test.go' | sort | xargs go tool goimports -w -format-only -local github.com/authgear/authgear-sms-gateway
 
-
 .PHONY: lint
 lint:
 	golangci-lint run ./cmd/... ./pkg/... --timeout 7m
@@ -55,6 +54,9 @@ check-tidy:
 	$(MAKE) fmt
 	go mod tidy
 	git status --porcelain | grep '.*'; test $$? -eq 1
+
+.PHONY: ci
+ci: vendor check-dockerignore govulncheck lint test fmt check-tidy
 
 .PHONY: build-image
 build-image:
