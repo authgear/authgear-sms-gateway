@@ -41,7 +41,7 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pquerna/otp v1.4.0 // indirect
-	github.com/sirupsen/logrus v1.9.3 // indirect
+	github.com/sirupsen/logrus v1.9.4 // indirect
 	github.com/smarty/assertions v1.15.0 // indirect
 	github.com/ua-parser/uap-go v0.0.0-20250213224047-9c035f085b90 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
