@@ -77,3 +77,13 @@ push-image:
 		docker push $(DOCKER_IMAGE):$(GIT_HASH) ;\
 		if [ ! -z $(GIT_NAME) ]; then docker push $(DOCKER_IMAGE):$(GIT_NAME); fi ;\
 	fi
+
+# Mirrors .github/workflows/ci.yaml: the steps that run for a pull request
+.PHONY: ci
+ci:
+	$(MAKE) check-dockerignore
+	$(MAKE) govulncheck
+	$(MAKE) lint
+	$(MAKE) test
+	$(MAKE) fmt
+	$(MAKE) check-tidy
