@@ -5,7 +5,7 @@ IMAGE_NAME ?= authgear-sms-gateway
 
 .PHONY: vendor
 vendor:
-	curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.64.8
+	curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b $$(go env GOPATH)/bin v2.12.2
 	go mod download
 
 .PHONY: go-mod-outdated
@@ -77,3 +77,13 @@ push-image:
 		docker push $(DOCKER_IMAGE):$(GIT_HASH) ;\
 		if [ ! -z $(GIT_NAME) ]; then docker push $(DOCKER_IMAGE):$(GIT_NAME); fi ;\
 	fi
+
+# Mirrors .github/workflows/ci.yaml: the steps that run for a pull request
+.PHONY: ci
+ci:
+	$(MAKE) check-dockerignore
+	$(MAKE) govulncheck
+	$(MAKE) lint
+	$(MAKE) test
+	$(MAKE) fmt
+	$(MAKE) check-tidy
