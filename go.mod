@@ -2,7 +2,7 @@ module github.com/authgear/authgear-sms-gateway
 
 go 1.26.0
 
-toolchain go1.26.5
+toolchain go1.26.11
 
 require (
 	github.com/authgear/authgear-server v0.0.0-20250407120113-dbe11c63a0aa
